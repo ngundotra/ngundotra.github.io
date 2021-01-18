@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Noah Gundotra</title>
+    <link>ngundotra.github.io/</link>
+    <description>Recent content on Noah Gundotra</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language><atom:link href="ngundotra.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Research</title>
+      <link>ngundotra.github.io/research/</link>
+      <pubDate>Sun, 17 Jan 2021 19:23:12 -0800</pubDate>
+      
+      <guid>ngundotra.github.io/research/</guid>
+      <description>Inverse Reinforcement Learning ICML &amp;lsquo;19, BAIR, @rohinmshah
+Rohin M Shah and I worked on this together, starting in 2017. Rohin was an excellent mentor and human being to do research with.
+Link to the paper. Link to the code.
+Policy Network, Exploration and Enhancement for Proving Large Theories CS 285 Final Project Fall &amp;lsquo;20, @yulunRaynWu @danielZeng
+Paper download. Link to code.
+Non-conventional research Text to Images Uizard Technologies, @uizard
+Tony Beltramelli was kind enough to allow mentor a bunch of young undergrads who wanted to toy with his Pix2Code paper.</description>
+    </item>
+    
+    <item>
+      <title>About Me</title>
+      <link>ngundotra.github.io/about/</link>
+      <pubDate>Sun, 17 Jan 2021 19:23:08 -0800</pubDate>
+      
+      <guid>ngundotra.github.io/about/</guid>
+      <description>I work full-time for Goldman Sachs as a quant, on the One Delta Equities team. In December 2020, I graduated from UC Berkeley with a double degree in Computer Science and Pure Mathematics.
+My Interests  Automated Theorem Proving Assistants Wim Hof Method Fasting   Evidence that helps shrink tumors because it starves fermentation-based cancer cells of free floating glucose (idk, see Metabolic Theory of Cancer)  Manifolds   To finish my calculus tutelage, duh!</description>
+    </item>
+    
+  </channel>
+</rss>
