@@ -1,7 +1,7 @@
 ---
 title: "About Me"
 date: 2021-01-17T19:23:08-08:00
-draft: true
+draft: false
 ---
 
 I work full-time for Goldman Sachs as a quant, on the One Delta Equities team. 

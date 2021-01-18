@@ -1,7 +1,7 @@
 ---
 title: "Research"
 date: 2021-01-17T19:23:12-08:00
-draft: true
+draft: false
 ---
 
 
