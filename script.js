@@ -18,7 +18,7 @@
           .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
         if (visible) setActive(visible.target.dataset.room);
       },
-      { rootMargin: "-30% 0px -50% 0px", threshold: [0.15, 0.35, 0.6] }
+      { rootMargin: "-35% 0px -45% 0px", threshold: [0.1, 0.25, 0.5] }
     );
     rooms.forEach((room) => observer.observe(room));
   }

@@ -20,6 +20,7 @@
 
 html {
   scroll-behavior: smooth;
+  scroll-padding-top: calc(var(--rail) + 0.55rem);
 }
 
 body {
@@ -189,6 +190,7 @@ a:hover {
   position: relative;
   padding: 2.1rem var(--gutter) 3.4rem;
   border-bottom: 1px solid var(--line);
+  scroll-margin-top: calc(var(--rail) + 0.55rem);
 }
 
 .room::before {
@@ -372,6 +374,7 @@ h2 {
   max-height: min(52vh, 28rem);
   object-fit: contain;
   object-position: center top;
+  background: #070605;
 }
 
 .frame figcaption,
@@ -517,7 +520,11 @@ h2 {
   }
 
   .frame--hero img {
-    max-height: none;
+    max-height: min(58vh, 26rem);
+  }
+
+  .links a {
+    overflow-wrap: anywhere;
   }
 }
 
