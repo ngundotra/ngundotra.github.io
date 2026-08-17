@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Noah Gundotra — Toy Museum</title>
+  <meta name="description" content="Things I built that I still think are cool.">
+  <meta name="theme-color" content="#100e0c">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Azeret+Mono:wght@400;500;600&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,600;1,9..144,300;1,9..144,480&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <a class="skip" href="#foyer">Skip to exhibits</a>
+
+  <canvas id="ink" class="ink" aria-hidden="true"></canvas>
+  <div class="grain" aria-hidden="true"></div>
+  <div class="vignette" aria-hidden="true"></div>
+
+  <header class="tickets" role="banner">
+    <p class="tickets__mark">Toy Museum</p>
+    <nav class="tickets__rail" aria-label="Rooms">
+      <a class="ticket is-active" href="#foyer" data-room="foyer"><span class="ticket__n">01</span><span class="ticket__l">Foyer</span></a>
+      <a class="ticket" href="#code2pix" data-room="code2pix"><span class="ticket__n">02</span><span class="ticket__l">Code2Pix</span></a>
+      <a class="ticket" href="#notelet" data-room="notelet"><span class="ticket__n">03</span><span class="ticket__l">Notelet</span></a>
+      <a class="ticket" href="#sculptml" data-room="sculptml"><span class="ticket__n">04</span><span class="ticket__l">SculptML</span></a>
+      <a class="ticket" href="#lastweek" data-room="lastweek"><span class="ticket__n">05</span><span class="ticket__l">Last Week</span></a>
+      <a class="ticket" href="#cabinet" data-room="cabinet"><span class="ticket__n">06</span><span class="ticket__l">Cabinet</span></a>
+    </nav>
+  </header>
+
+  <main>
+    <section id="foyer" class="room room--foyer" data-room="foyer" aria-labelledby="foyer-title">
+      <div class="room__inner foyer">
+        <p class="accession">Room 01 · Foyer</p>
+        <p class="kicker">Things I built that I still think are cool.</p>
+        <h1 id="foyer-title" class="name">
+          <span class="name__given">Noah</span>
+          <span class="name__family">Gundotra</span>
+        </h1>
+        <p class="place">Manhattan Beach, CA</p>
+        <ul class="links">
+          <li><a href="https://github.com/ngundotra">github.com/ngundotra</a></li>
+          <li><a href="https://www.linkedin.com/in/ngundotra">linkedin.com/in/ngundotra</a></li>
+        </ul>
+        <p class="ink-note">Please touch the exhibits. Cursor leaves ink.</p>
+      </div>
+    </section>
+
+    <section id="code2pix" class="room room--code2pix" data-room="code2pix" aria-labelledby="code2pix-title">
+      <div class="room__inner">
+        <p class="accession">Room 02 · 2018 · Jupyter · 141 stars</p>
+        <h2 id="code2pix-title">Code2Pix</h2>
+        <p class="lede">A differentiable compiler: textual GUI descriptions become pixels. Built with Uizard and Berkeley SUSA (Statistics Undergraduate Student Association).</p>
+        <ul class="links">
+          <li><a href="https://github.com/ngundotra/code2pix">github.com/ngundotra/code2pix</a></li>
+          <li><a href="https://medium.com/data-science/code2pix-deep-learning-compiler-for-graphical-user-interfaces-1256c346950b">Medium writeup</a></li>
+        </ul>
+
+        <figure class="frame frame--hero">
+          <img src="assets/code2pix-06-hydra-cross-platform.png" width="1200" height="800" alt="Hydra 3 by 3 grid of generated GUIs. Columns are Android, iOS, and Web GUIs. Rows are Android, iOS, and Web decoder heads.">
+          <figcaption>Hydra 3×3. Columns: Android / iOS / Web GUIs. Rows: Android / iOS / Web decoder heads.</figcaption>
+        </figure>
+
+        <h3 class="subhead">Predicted vs actual</h3>
+        <div class="strip">
+          <figure class="frame">
+            <img src="assets/code2pix-10-result-web.png" width="432" height="288" alt="Predicted versus actual web GUI.">
+            <figcaption>Web</figcaption>
+          </figure>
+          <figure class="frame">
+            <img src="assets/code2pix-11-result-android.png" width="432" height="288" alt="Predicted versus actual Android GUI.">
+            <figcaption>Android</figcaption>
+          </figure>
+          <figure class="frame">
+            <img src="assets/code2pix-12-result-ios.png" width="432" height="288" alt="Predicted versus actual iOS GUI.">
+            <figcaption>iOS</figcaption>
+          </figure>
+        </div>
+      </div>
+    </section>
+
+    <section id="notelet" class="room room--notelet" data-room="notelet" aria-labelledby="notelet-title">
+      <div class="room__inner">
+        <p class="accession">Room 03 · Devpost</p>
+        <h2 id="notelet-title">Notelet</h2>
+        <p class="lede">Handwritten notes compile to LaTeX. Select a stretch of math and Wolfram plots it. No public GitHub — the exhibit lives on Devpost.</p>
+        <ul class="links">
+          <li><a href="https://devpost.com/software/notelet-f5x0w6">devpost.com/software/notelet-f5x0w6</a></li>
+        </ul>
+
+        <div class="gallery" data-gallery="notelet">
+          <figure class="frame frame--hero">
+            <img id="notelet-hero" src="assets/notelet-04-wolfram-equation.png" width="1612" height="2100" alt="iPad Notelet canvas with a handwritten equation and a Wolfram plot overlay.">
+            <figcaption id="notelet-caption">iPad: select the handwritten equation, Wolfram plots it.</figcaption>
+          </figure>
+          <div class="thumbs" role="list">
+            <button type="button" class="thumb is-active" role="listitem" aria-pressed="true" data-src="assets/notelet-04-wolfram-equation.png" data-alt="iPad Notelet canvas with a handwritten equation and a Wolfram plot overlay." data-caption="iPad: select the handwritten equation, Wolfram plots it.">
+              <img src="assets/notelet-04-wolfram-equation.png" width="1612" height="2100" alt="" aria-hidden="true">
+              <span>Wolfram</span>
+            </button>
+            <button type="button" class="thumb" role="listitem" aria-pressed="false" data-src="assets/notelet-05-wolfram-function.png" data-alt="iPad Notelet canvas with a handwritten multivariable function and Wolfram 3D surface plots." data-caption="3D plots from a selected handwritten function.">
+              <img src="assets/notelet-05-wolfram-function.png" width="1584" height="2096" alt="" aria-hidden="true">
+              <span>3D plots</span>
+            </button>
+            <button type="button" class="thumb" role="listitem" aria-pressed="false" data-src="assets/notelet-02-latex.png" data-alt="Compiled LaTeX PDF snippet generated from handwritten notes." data-caption="Compiled LaTeX from the handwritten page.">
+              <img src="assets/notelet-02-latex.png" width="1406" height="488" alt="" aria-hidden="true">
+              <span>Compiled</span>
+            </button>
+            <button type="button" class="thumb" role="listitem" aria-pressed="false" data-src="assets/notelet-03-latex-document.png" data-alt="LaTeX source editor showing the generated .tex document." data-caption="The .tex editor view of the compiled notes.">
+              <img src="assets/notelet-03-latex-document.png" width="1356" height="992" alt="" aria-hidden="true">
+              <span>.tex</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="sculptml" class="room room--sculptml" data-room="sculptml" aria-labelledby="sculptml-title">
+      <div class="room__inner">
+        <p class="accession">Room 04 · iOS + Flask · CoreML</p>
+        <h2 id="sculptml-title">SculptML</h2>
+        <p class="lede">Visually build a net on your phone, train it on a Flask server, deploy as CoreML. Graph Builder on the left; a drawn 6 predicted as 6 on the right.</p>
+        <ul class="links">
+          <li><a href="https://github.com/ngundotra/sculptml">sculptml</a></li>
+          <li><a href="https://github.com/ngundotra/sculptml-ios-app">sculptml-ios-app</a></li>
+          <li><a href="https://github.com/ngundotra/sculptml-flask-app">sculptml-flask-app</a></li>
+        </ul>
+
+        <div class="phones">
+          <figure class="phone">
+            <img src="assets/sculptml-01-main-screen.png" width="862" height="1734" alt="SculptML Graph Builder on iPhone, assembling a CNN for MNIST.">
+            <figcaption>Graph Builder</figcaption>
+          </figure>
+          <figure class="phone">
+            <img src="assets/sculptml-04-normal-deploy.png" width="878" height="1730" alt="SculptML notepad: a drawn 6 classified as 6.">
+            <figcaption>Drawn 6 · predicted 6</figcaption>
+          </figure>
+        </div>
+      </div>
+    </section>
+
+    <section id="lastweek" class="room room--lastweek" data-room="lastweek" aria-labelledby="lastweek-title">
+      <div class="room__inner">
+        <p class="accession">Room 05 · Devpost</p>
+        <h2 id="lastweek-title">Last Week on X</h2>
+        <p class="lede">Grok turns the last 7 days of X into a spoken podcast. Devpost only.</p>
+        <p class="notice">The timeline in these shots is a Devpost product demo (Anitej Thamma), not Noah’s feed.</p>
+        <ul class="links">
+          <li><a href="https://devpost.com/software/last-week-on-x">devpost.com/software/last-week-on-x</a></li>
+        </ul>
+
+        <div class="gallery" data-gallery="lastweek">
+          <figure class="frame frame--hero">
+            <img id="lastweek-hero" src="assets/lastweekonx-03-dashboard.png" width="3024" height="1708" alt="Last Week on X dashboard with a podcast player and a Tweets This Week list. Demo account Anitej Thamma.">
+            <figcaption id="lastweek-caption">Dashboard — podcast player over the week’s posts. Demo feed: Anitej Thamma, not Noah.</figcaption>
+          </figure>
+          <div class="thumbs" role="list">
+            <button type="button" class="thumb is-active" role="listitem" aria-pressed="true" data-src="assets/lastweekonx-03-dashboard.png" data-alt="Last Week on X dashboard with a podcast player and a Tweets This Week list. Demo account Anitej Thamma." data-caption="Dashboard — podcast player over the week’s posts. Demo feed: Anitej Thamma, not Noah.">
+              <img src="assets/lastweekonx-03-dashboard.png" width="3024" height="1708" alt="" aria-hidden="true">
+              <span>Dashboard</span>
+            </button>
+            <button type="button" class="thumb" role="listitem" aria-pressed="false" data-src="assets/lastweekonx-02-wrapped.png" data-alt="Your Last Week Wrapped modal for @anitej_thamma, a Devpost product demo." data-caption="Wrapped for @anitej_thamma — Devpost product demo, not Noah’s feed.">
+              <img src="assets/lastweekonx-02-wrapped.png" width="1714" height="1662" alt="" aria-hidden="true">
+              <span>Wrapped</span>
+            </button>
+            <button type="button" class="thumb" role="listitem" aria-pressed="false" data-src="assets/lastweekonx-01-landing.png" data-alt="Last Week on X landing page with a Connect Your X Account button." data-caption="Landing. The connected-account shots use Anitej Thamma’s demo feed.">
+              <img src="assets/lastweekonx-01-landing.png" width="3012" height="1724" alt="" aria-hidden="true">
+              <span>Landing</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="cabinet" class="room room--cabinet" data-room="cabinet" aria-labelledby="cabinet-title">
+      <div class="room__inner">
+        <p class="accession">Room 06 · Cabinet</p>
+        <h2 id="cabinet-title">Cabinet</h2>
+        <p class="lede">Two smaller pieces, still on the shelf.</p>
+
+        <div class="drawers">
+          <article class="drawer">
+            <h3>Spyglass</h3>
+            <p>Search and reuse Solana code. Extracts and parses Rust functions from program source — a specific repository, or verified programs uploaded by a signer on chain.</p>
+            <ul class="links">
+              <li><a href="https://github.com/ngundotra/spyglass-solana">github.com/ngundotra/spyglass-solana</a></li>
+              <li><a href="https://spyglass-solana.vercel.app">spyglass-solana.vercel.app</a></li>
+            </ul>
+          </article>
+          <article class="drawer">
+            <h3>RubberLander</h3>
+            <p>Topological data analysis of state space for trained and untrained agents in LunarLander.</p>
+            <ul class="links">
+              <li><a href="https://github.com/ngundotra/RubberLander">github.com/ngundotra/RubberLander</a></li>
+            </ul>
+          </article>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="colophon">
+    <p>Security Engineer, Starship Security, SpaceX. Previously Solana Labs, Goldman Sachs. Berkeley Math &amp; CS.</p>
+    <p>
+      ICML 2019 with Shah, Abbeel, Dragan —
+      <a href="https://proceedings.mlr.press/v97/shah19a.html">On the Feasibility of Learning, Rather than Assuming, Human Biases for Reward Inference</a>
+    </p>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
