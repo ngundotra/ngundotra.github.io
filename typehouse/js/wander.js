@@ -9,8 +9,9 @@
   var frame = 0;
   var tmp = null;
   var LOT = 192;
-  var GW = 72;
-  var GH = 72;
+  var GW = 36;
+  var GH = 36;
+  var RING = 0.28;
 
   function rng() {
     seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0;
@@ -23,7 +24,7 @@
   }
 
   function walkPad(room) {
-    return T.isFenced(room) ? 42 : 16;
+    return T.isFenced(room) ? Math.round(LOT * 0.34) : 16;
   }
 
   function clamp(v, a, b) {
@@ -31,25 +32,38 @@
   }
 
   function clampWalk(a, room) {
+    if (T.isFenced(room)) {
+      var cx = LOT * 0.5 - GW * 0.5;
+      var cy = LOT * 0.48 - GH * 0.5;
+      var maxR = LOT * RING - GW * 0.35;
+      var dx = a.px - cx;
+      var dy = a.py - cy;
+      var d = Math.hypot(dx, dy);
+      if (d > maxR && d > 0.001) {
+        a.px = cx + (dx / d) * maxR;
+        a.py = cy + (dy / d) * maxR;
+      }
+      return;
+    }
     var pad = walkPad(room);
     a.px = clamp(a.px, pad, LOT - pad - GW);
     a.py = clamp(a.py, pad, LOT - pad - GH);
   }
 
   function standPoint(room) {
-    return { x: LOT * 0.5 - GW * 0.5, y: LOT * 0.5 };
+    return { x: LOT * 0.5 - GW * 0.5, y: LOT * 0.5 - GH * 0.2 };
   }
 
   function gatePoint() {
-    return { x: LOT * 0.5 - GW * 0.5, y: LOT - walkPad(null) - GH };
+    return { x: LOT * 0.5 - GW * 0.5, y: LOT * 0.62 };
   }
 
   function rugPoint() {
-    return { x: LOT * 0.42, y: LOT * 0.72 - GH };
+    return { x: LOT * 0.46 - GW * 0.5, y: LOT * 0.58 };
   }
 
   function propPoint() {
-    return { x: LOT * 0.38, y: LOT * 0.42 };
+    return { x: LOT * 0.42 - GW * 0.5, y: LOT * 0.4 };
   }
 
   function meetPoint(dir) {
@@ -147,10 +161,17 @@
   }
 
   function startWalk(a, room) {
-    var pad = walkPad(room);
     a.state = "walk";
-    a.tx = pad + rng() * (LOT - pad * 2 - GW);
-    a.ty = pad + rng() * (LOT - pad * 2 - GH);
+    if (T.isFenced(room)) {
+      var ang = rng() * Math.PI * 2;
+      var rad = rng() * LOT * (RING - 0.08);
+      a.tx = LOT * 0.5 - GW * 0.5 + Math.cos(ang) * rad;
+      a.ty = LOT * 0.48 - GH * 0.5 + Math.sin(ang) * rad;
+    } else {
+      var pad = walkPad(room);
+      a.tx = pad + rng() * (LOT - pad * 2 - GW);
+      a.ty = pad + rng() * (LOT - pad * 2 - GH);
+    }
     a.hold = 0;
   }
 
@@ -320,9 +341,11 @@
   function scratch() {
     if (!tmp) {
       tmp = document.createElement("canvas");
-      tmp.width = 72;
-      tmp.height = 72;
+      tmp.width = GW;
+      tmp.height = GH;
     }
+    tmp.width = GW;
+    tmp.height = GH;
     return tmp;
   }
 
@@ -333,29 +356,70 @@
     };
   }
 
+  function paintWaiters(ctx, bounds, s) {
+    if (!s) return;
+    var S = G.THSprites;
+    var buf = scratch();
+    var wait = T.waiting(s);
+    wait.forEach(function (d, i) {
+      var o = lotOrigin(1, 0, bounds);
+      var px = o.left + LOT * 0.28 + i * 22;
+      var py = o.top + LOT * 0.62;
+      S.paintGuest(buf, d.kind, frame, { sit: false });
+      ctx.drawImage(buf, Math.round(px), Math.round(py));
+    });
+  }
+
   function paint(ctx, bounds, cam, wrap) {
     if (!ctx) return;
     ctx.imageSmoothingEnabled = false;
     ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
     var S = G.THSprites;
     var buf = scratch();
+    var s = T.getState();
     Object.keys(actors).forEach(function (id) {
       var a = actors[id];
       if (!lotOnscreen(a.x, a.y, cam, wrap, bounds)) return;
       var o = lotOrigin(a.x, a.y, bounds);
+      var cell = s ? T.cell(s, a.x, a.y) : null;
       S.paintGuest(buf, a.kind, frame, { flip: a.face < 0, sit: a.state === "sit" });
+      ctx.save();
+      if (cell && T.isFenced(cell.room)) {
+        ctx.beginPath();
+        ctx.arc(o.left + LOT * 0.5, o.top + LOT * 0.49, LOT * 0.4, 0, Math.PI * 2);
+        ctx.clip();
+      }
       ctx.drawImage(buf, Math.round(o.left + a.px), Math.round(o.top + a.py));
+      ctx.restore();
     });
+    paintWaiters(ctx, bounds, s);
   }
 
   function hitTest(px, py, bounds) {
     var ids = Object.keys(actors);
-    for (var i = ids.length - 1; i >= 0; i--) {
-      var a = actors[ids[i]];
-      var o = lotOrigin(a.x, a.y, bounds);
-      var x = o.left + a.px;
-      var y = o.top + a.py;
+    var i;
+    var a;
+    var o;
+    var x;
+    var y;
+    for (i = ids.length - 1; i >= 0; i--) {
+      a = actors[ids[i]];
+      o = lotOrigin(a.x, a.y, bounds);
+      x = o.left + a.px;
+      y = o.top + a.py;
       if (px >= x - 4 && px <= x + GW + 4 && py >= y - 4 && py <= y + GH + 4) return a;
+    }
+    var s = T.getState();
+    if (s) {
+      var wait = T.waiting(s);
+      for (i = 0; i < wait.length; i++) {
+        o = lotOrigin(1, 0, bounds);
+        x = o.left + LOT * 0.28 + i * 22;
+        y = o.top + LOT * 0.62;
+        if (px >= x - 4 && px <= x + GW + 4 && py >= y - 4 && py <= y + GH + 4) {
+          return { id: wait[i].id, kind: wait[i].kind, x: 1, y: 0, waiting: true };
+        }
+      }
     }
     return null;
   }

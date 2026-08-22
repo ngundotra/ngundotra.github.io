@@ -231,6 +231,21 @@
     return out;
   }
 
+  function ownedBounds(s) {
+    var minX = Infinity;
+    var minY = Infinity;
+    var maxX = -Infinity;
+    var maxY = -Infinity;
+    eachCell(s, function (c) {
+      if (c.x < minX) minX = c.x;
+      if (c.y < minY) minY = c.y;
+      if (c.x > maxX) maxX = c.x;
+      if (c.y > maxY) maxY = c.y;
+    });
+    if (minX === Infinity) return { minX: 0, minY: 0, maxX: 2, maxY: 1, w: 3, h: 2 };
+    return { minX: minX, minY: minY, maxX: maxX, maxY: maxY, w: maxX - minX + 1, h: maxY - minY + 1 };
+  }
+
   function parkBounds(s) {
     var minX = Infinity;
     var minY = Infinity;
@@ -1039,6 +1054,121 @@
     }
   }
 
+  function ensureLot(s, x, y) {
+    if (cell(s, x, y)) return true;
+    if (ownedCount(s) >= 16) return false;
+    s.cells[key(x, y)] = emptyCell(x, y);
+    s.lotsBought = (s.lotsBought || 0) + 1;
+    syncGrid(s);
+    return true;
+  }
+
+  function seedRoom(s, x, y, kind) {
+    ensureLot(s, x, y);
+    var c = cell(s, x, y);
+    if (!c) return;
+    if (!c.room) c.room = kind;
+  }
+
+  function seedGuest(s, kind, x, y, stage) {
+    if (!denizen(s, kind)) {
+      s.denizens.push({
+        id: kind,
+        kind: kind,
+        stage: stage || 1,
+        progress: 20,
+        x: null,
+        y: null,
+        exhaustedUntil: 0,
+      });
+    }
+    var d = denizen(s, kind);
+    if (stage != null && d.stage < stage) d.stage = stage;
+    if (x != null && d.x == null) place(s, kind, x, y, true);
+  }
+
+  function seedMid(s) {
+    s.flags.sootDone = true;
+    s.sootDue = false;
+    s.onboard = 2;
+    s.openSec = Math.max(s.openSec, 480);
+    s.lifetimeTally = Math.max(s.lifetimeTally, 90);
+    s.tally = Math.max(s.tally, 64);
+    s.scrap = Math.max(s.scrap, 22);
+    s.dust = Math.max(s.dust, 3);
+    s.unlocks = s.unlocks || {};
+    s.unlocks.cistern = true;
+    s.unlocks.conservatory = true;
+    s.unlocks.dynamo = true;
+    ensureLot(s, 0, 2);
+    ensureLot(s, 1, 2);
+    seedRoom(s, 1, 1, "hearth");
+    seedRoom(s, 2, 1, "cistern");
+    seedRoom(s, 0, 1, "conservatory");
+    seedRoom(s, 1, 2, "dynamo");
+    seedRoom(s, 0, 2, "dormer");
+    seedGuest(s, "Wicknoll", 1, 1, 1);
+    seedGuest(s, "Puddlewick", 2, 1, 1);
+    seedGuest(s, "Ledgerfrond", 0, 1, 2);
+    seedGuest(s, "Zitterplug", 1, 2, 1);
+    blot(s, "A mid-morning zoo. Four pens on the dirt.");
+  }
+
+  function seedLate(s) {
+    s.flags.sootDone = true;
+    s.sootDue = false;
+    s.onboard = 2;
+    s.openSec = Math.max(s.openSec, 2100);
+    s.lifetimeTally = Math.max(s.lifetimeTally, 280);
+    s.tally = Math.max(s.tally, 186);
+    s.scrap = Math.max(s.scrap, 44);
+    s.dust = Math.max(s.dust, 8);
+    s.unlocks = {
+      hearth: true,
+      cistern: true,
+      conservatory: true,
+      dynamo: true,
+      dormer: true,
+      scullery: true,
+      vitrine: true,
+      transom: true,
+      larder: true,
+    };
+    [
+      [3, 0],
+      [3, 1],
+      [0, 2],
+      [1, 2],
+      [2, 2],
+      [3, 2],
+      [0, 3],
+      [1, 3],
+      [2, 3],
+      [3, 3],
+    ].forEach(function (xy) {
+      ensureLot(s, xy[0], xy[1]);
+    });
+    seedRoom(s, 1, 1, "hearth");
+    seedRoom(s, 0, 1, "conservatory");
+    seedRoom(s, 2, 1, "cistern");
+    seedRoom(s, 3, 1, "dynamo");
+    seedRoom(s, 1, 2, "dormer");
+    seedRoom(s, 2, 2, "scullery");
+    seedRoom(s, 3, 2, "vitrine");
+    seedRoom(s, 0, 2, "transom");
+    seedRoom(s, 2, 0, "larder");
+    seedRoom(s, 3, 0, "transom");
+    seedGuest(s, "Wicknoll", 1, 1, 2);
+    seedGuest(s, "Puddlewick", 2, 1, 2);
+    seedGuest(s, "Ledgerfrond", 0, 1, 2);
+    seedGuest(s, "Zitterplug", 3, 1, 1);
+    seedGuest(s, "Napwisp", 1, 2, 1);
+    seedGuest(s, "Flakesmith", 2, 2, 1);
+    seedGuest(s, "Specktin", 3, 2, 1);
+    seedGuest(s, "Fluekin", 0, 2, 1);
+    blot(s, "The grounds filled in. Lamps on the dirt.");
+  }
+
   function applyDebug(s) {
     var q = parseQS();
     if (q.debug || q.rich) {
@@ -1079,6 +1209,8 @@
       if (denizen(s, "Puddlewick").x == null) place(s, "Puddlewick", 2, 1, true);
       if (denizen(s, "Ledgerfrond").x == null) place(s, "Ledgerfrond", 0, 1, true);
     }
+    if (q.demo === "mid") seedMid(s);
+    if (q.demo === "late") seedLate(s);
     if (q.lots) {
       var lotsN = parseInt(q.lots, 10);
       if (lotsN > 0) {
@@ -1265,6 +1397,24 @@
     else pass("migrated fog halo");
     if (D.ROOMS.hearth.name !== "Ember Grounds" || D.ROOMS.lobby.name !== "Gatehouse") fail("display names");
     else pass("habitat display names");
+    var mid = fresh();
+    seedMid(mid);
+    if (ownedCount(mid) < 6 || ownedCount(mid) > 8) fail("mid lots " + ownedCount(mid));
+    else pass("mid lots " + ownedCount(mid));
+    if (roomCount(mid) < 4 || roomCount(mid) > 5) fail("mid habitats " + roomCount(mid));
+    else pass("mid habitats " + roomCount(mid));
+    var seatedMid = mid.denizens.filter(function (d) { return d.x != null; }).length;
+    if (seatedMid < 3) fail("mid seated " + seatedMid);
+    else pass("mid seated " + seatedMid);
+    var late = fresh();
+    seedLate(late);
+    if (ownedCount(late) < 12 || ownedCount(late) > 16) fail("late lots " + ownedCount(late));
+    else pass("late lots " + ownedCount(late));
+    if (roomCount(late) < 8 || roomCount(late) > 10) fail("late habitats " + roomCount(late));
+    else pass("late habitats " + roomCount(late));
+    var seatedLate = late.denizens.filter(function (d) { return d.x != null; }).length;
+    if (seatedLate < 6) fail("late seated " + seatedLate);
+    else pass("late seated " + seatedLate);
     state = s;
     return report;
   }
@@ -1285,7 +1435,10 @@
     buyGeometry: buyGeometry,
     fogOf: fogOf,
     parkBounds: parkBounds,
+    ownedBounds: ownedBounds,
     ownedCount: ownedCount,
+    seedMid: seedMid,
+    seedLate: seedLate,
     isFenced: isFenced,
     migrateV1: migrateV1,
     place: place,

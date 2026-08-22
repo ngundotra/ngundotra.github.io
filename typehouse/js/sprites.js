@@ -316,6 +316,7 @@
   var readyCount = 0;
   var waiters = [];
   var cache = {};
+  var punched = false;
 
   function isReady() {
     return readyCount >= NAMES.length;
@@ -323,6 +324,12 @@
 
   function notify() {
     if (!isReady()) return;
+    if (!punched) {
+      punched = true;
+      ["kiln", "well", "greenhouse"].forEach(function (n) {
+        if (IMG[n] && srcW(IMG[n])) IMG[n] = punchRail(IMG[n]);
+      });
+    }
     waiters.splice(0).forEach(function (fn) {
       fn();
     });
@@ -349,11 +356,78 @@
     });
   }
 
+  function srcW(im) {
+    return im.naturalWidth || im.width || 0;
+  }
+
+  function srcH(im) {
+    return im.naturalHeight || im.height || 0;
+  }
+
+  function isPlateLime(r, g, b, a) {
+    return a > 8 && b < 18 && g > 150 && g > r + 12;
+  }
+
+  /* Kill leftover lime grass plate. Keep the circular rail + south wood bridge. */
+  function punchRail(im) {
+    var w = srcW(im);
+    var h = srcH(im);
+    if (!w || !h) return im;
+    var c = document.createElement("canvas");
+    c.width = w;
+    c.height = h;
+    var ctx = c.getContext("2d");
+    ctx.drawImage(im, 0, 0);
+    var data = ctx.getImageData(0, 0, w, h);
+    var px = data.data;
+    var cx = w * 0.5;
+    var cy = h * 0.49;
+    var inner = Math.min(w, h) * 0.395;
+    var outer = Math.min(w, h) * 0.432;
+    var i;
+    var x;
+    var y;
+    var r;
+    var g;
+    var b;
+    var a;
+    var dx;
+    var dy;
+    var d2;
+    var lime;
+    var bridge;
+    for (y = 0; y < h; y++) {
+      for (x = 0; x < w; x++) {
+        i = (y * w + x) * 4;
+        a = px[i + 3];
+        if (a < 8) continue;
+        r = px[i];
+        g = px[i + 1];
+        b = px[i + 2];
+        dx = x - cx;
+        dy = y - cy;
+        d2 = dx * dx + dy * dy;
+        lime = isPlateLime(r, g, b, a);
+        if (d2 <= inner * inner) continue;
+        if (lime) {
+          px[i + 3] = 0;
+          continue;
+        }
+        if (d2 <= outer * outer) continue;
+        bridge = Math.abs(dx) <= 18 && y > h * 0.52 && y < h * 0.9 && r > 155 && b > 18 && g < 215;
+        if (bridge) continue;
+        px[i + 3] = 0;
+      }
+    }
+    ctx.putImageData(data, 0, 0);
+    return c;
+  }
+
   function blit(ctx, name, x, y, w, h) {
     var im = IMG[name];
-    if (!im || !im.naturalWidth) return false;
-    var sx = w / im.naturalWidth;
-    var sy = h / im.naturalHeight;
+    if (!im || !srcW(im)) return false;
+    var sx = w / srcW(im);
+    var sy = h / srcH(im);
     var integer =
       Math.abs(sx - Math.round(sx)) < 0.02 && Math.abs(sy - Math.round(sy)) < 0.02;
     ctx.imageSmoothingEnabled = !integer;
@@ -363,7 +437,7 @@
 
   function blitCrisp(ctx, name, x, y, w, h) {
     var im = IMG[name];
-    if (!im || !im.naturalWidth) return false;
+    if (!im || !srcW(im)) return false;
     ctx.imageSmoothingEnabled = false;
     ctx.drawImage(im, Math.round(x), Math.round(y), Math.round(w), Math.round(h));
     return true;
@@ -373,17 +447,20 @@
     ctx.save();
     ctx.lineCap = "round";
     ctx.lineJoin = "round";
-    ctx.strokeStyle = "#6a4824";
-    ctx.lineWidth = 20;
+    ctx.strokeStyle = "#4a2e12";
+    ctx.lineWidth = 30;
     ctx.beginPath();
     ctx.moveTo(x1, y1);
     ctx.lineTo(x2, y2);
     ctx.stroke();
-    ctx.strokeStyle = "#c4a05a";
-    ctx.lineWidth = 14;
+    ctx.strokeStyle = "#8a5a28";
+    ctx.lineWidth = 24;
     ctx.stroke();
-    ctx.strokeStyle = "#d8b46a";
-    ctx.lineWidth = 8;
+    ctx.strokeStyle = "#c49048";
+    ctx.lineWidth = 18;
+    ctx.stroke();
+    ctx.strokeStyle = "#d8b06a";
+    ctx.lineWidth = 10;
     ctx.stroke();
     ctx.restore();
   }
@@ -419,7 +496,7 @@
       ctx.scale(-1, 1);
     }
     var png = GUEST_PNG[id];
-    if (png && IMG[png] && IMG[png].naturalWidth) {
+    if (png && IMG[png] && srcW(IMG[png])) {
       ctx.imageSmoothingEnabled = false;
       var pad = 1;
       ctx.drawImage(IMG[png], pad, pad + bob, canvas.width - pad * 2, canvas.height - pad * 2 - bob);
@@ -469,9 +546,11 @@
     var x;
     var y;
     ctx.imageSmoothingEnabled = false;
-    if (IMG.grass && IMG.grass.naturalWidth) {
-      for (y = 0; y < h; y += IMG.grass.naturalHeight) {
-        for (x = 0; x < w; x += IMG.grass.naturalWidth) {
+    if (IMG.grass && srcW(IMG.grass)) {
+      var gw = srcW(IMG.grass);
+      var gh = srcH(IMG.grass);
+      for (y = 0; y < h; y += gh) {
+        for (x = 0; x < w; x += gw) {
           ctx.drawImage(IMG.grass, x, y);
         }
       }
@@ -480,34 +559,146 @@
       ctx.fillRect(0, 0, w, h);
     }
     /* Sky + trees only on the north zoo edge, never under the pens. */
+    var skyH = Math.floor(lot * 0.18);
+    if (bounds.maxY >= 2) skyH = Math.floor(lot * 0.12);
     ctx.fillStyle = "#7ec8f0";
-    ctx.fillRect(0, 0, w, Math.floor(lot * 0.22));
+    ctx.fillRect(0, 0, w, skyH);
     ctx.fillStyle = "#4aa8e8";
-    ctx.fillRect(0, 0, w, Math.floor(lot * 0.1));
-    if (IMG.trees && IMG.trees.naturalWidth) {
-      ctx.drawImage(IMG.trees, 0, 0, w, Math.floor(lot * 0.38));
+    ctx.fillRect(0, 0, w, Math.floor(skyH * 0.45));
+    if (IMG.trees && srcW(IMG.trees)) {
+      ctx.drawImage(IMG.trees, 0, 0, w, Math.floor(lot * 0.28));
+    }
+    paintDirtSpine(ctx, lot, bounds, owned);
+  }
+
+  function lotPt(x, y, bounds, lot, fx, fy) {
+    return {
+      x: (x - bounds.minX) * lot + lot * fx,
+      y: (bounds.maxY - y) * lot + lot * fy,
+    };
+  }
+
+  function hasLot(owned, x, y) {
+    return !!(owned[x + "," + y]);
+  }
+
+  /* One packed-earth figure: gate mouth → north bridges. Lamps sit on the dirt. */
+  function paintDirtSpine(ctx, lot, bounds, owned) {
+    var mouth = lotPt(1, 0, bounds, lot, 0.5, 0.92);
+    var fork = lotPt(1, 1, bounds, lot, 0.5, 0.8);
+    var west = lotPt(0, 1, bounds, lot, 0.5, 0.8);
+    var east = lotPt(2, 1, bounds, lot, 0.5, 0.8);
+    var gateMid = lotPt(1, 0, bounds, lot, 0.5, 0.42);
+    paintVisitorPath(ctx, mouth.x, mouth.y, gateMid.x, gateMid.y);
+    paintVisitorPath(ctx, gateMid.x, gateMid.y, fork.x, fork.y);
+    if (hasLot(owned, 0, 1) || hasLot(owned, 2, 1)) {
+      paintVisitorPath(ctx, west.x, west.y, east.x, east.y);
     }
     Object.keys(owned).forEach(function (k) {
       var c = owned[k];
-      if (!c) return;
-      var o = lotOrigin(c, bounds, lot);
-      var east = owned[c.x + 1 + "," + c.y];
+      if (!c || !c.room || c.room === "lobby") return;
+      var bridge = lotPt(c.x, c.y, bounds, lot, 0.5, 0.8);
       var south = owned[c.x + "," + (c.y - 1)];
-      var southY = o.y + lot * 0.82;
-      if (east) {
-        var eo = lotOrigin(east, bounds, lot);
-        paintVisitorPath(ctx, o.x + lot * 0.5, southY, eo.x + lot * 0.5, eo.y + lot * 0.82);
-        blitCrisp(ctx, "lantern", o.x + lot - 16, southY - 44, 14, 40);
-      }
+      var eastC = owned[c.x + 1 + "," + c.y];
       if (south) {
-        var so = lotOrigin(south, bounds, lot);
-        paintVisitorPath(ctx, o.x + lot * 0.5, o.y + lot * 0.78, so.x + lot * 0.5, so.y + lot * 0.22);
-        blitCrisp(ctx, "lantern", o.x + lot * 0.5 + 10, o.y + lot - 22, 14, 40);
+        var so = lotPt(south.x, south.y, bounds, lot, 0.5, south.room === "lobby" ? 0.28 : 0.8);
+        paintVisitorPath(ctx, bridge.x, bridge.y, so.x, so.y);
       }
-      if (c.room === "lobby") {
-        paintVisitorPath(ctx, o.x + lot * 0.5, o.y + lot * 0.96, o.x + lot * 0.5, o.y + lot * 0.28);
+      if (eastC && eastC.room) {
+        var eo = lotPt(eastC.x, eastC.y, bounds, lot, 0.5, 0.8);
+        paintVisitorPath(ctx, bridge.x, bridge.y, eo.x, eo.y);
       }
     });
+    blitCrisp(ctx, "lantern", fork.x + 10, fork.y - 46, 16, 44);
+    blitCrisp(ctx, "lantern", west.x - 8, west.y - 46, 16, 44);
+    blitCrisp(ctx, "lantern", east.x + 8, east.y - 46, 16, 44);
+  }
+
+  function fillDisk(ctx, cx, cy, r, col) {
+    ctx.fillStyle = col;
+    ctx.beginPath();
+    ctx.arc(cx, cy, r, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  function paintFenceRing(ctx, cx, cy, r, col) {
+    ctx.save();
+    ctx.strokeStyle = "#2a1c10";
+    ctx.lineWidth = 6;
+    ctx.beginPath();
+    ctx.arc(cx, cy, r, 0.15 * Math.PI, 0.85 * Math.PI, true);
+    ctx.stroke();
+    ctx.strokeStyle = col || "#8a6030";
+    ctx.lineWidth = 3;
+    ctx.stroke();
+    var i;
+    var a;
+    var px;
+    var py;
+    for (i = 0; i < 10; i++) {
+      a = (i / 10) * Math.PI * 1.7 + 0.55 * Math.PI;
+      px = Math.round(cx + Math.cos(a) * r);
+      py = Math.round(cy + Math.sin(a) * r);
+      ctx.fillStyle = "#3a2410";
+      ctx.fillRect(px - 2, py - 3, 5, 8);
+      ctx.fillStyle = "#a87838";
+      ctx.fillRect(px - 1, py - 2, 3, 6);
+    }
+    ctx.restore();
+  }
+
+  function paintTypeBadge(ctx, cx, cy, type) {
+    var x = cx + 18;
+    var y = cy + 28;
+    ctx.fillStyle = "#2a1c10";
+    ctx.fillRect(x - 1, y - 1, 14, 14);
+    ctx.fillStyle = G.THData.TYPE_COLOR[type] || P.copper;
+    ctx.fillRect(x, y, 12, 12);
+    ctx.fillStyle = "#fff6dc";
+    if (type === "ember") {
+      ctx.fillRect(x + 5, y + 3, 2, 7);
+      ctx.fillRect(x + 3, y + 6, 6, 2);
+    } else if (type === "tide") {
+      ctx.fillRect(x + 5, y + 2, 2, 3);
+      ctx.fillRect(x + 3, y + 6, 6, 4);
+    } else if (type === "moss") {
+      ctx.fillRect(x + 5, y + 2, 2, 8);
+      ctx.fillRect(x + 2, y + 5, 8, 2);
+    } else if (type === "spark") {
+      ctx.fillRect(x + 5, y + 2, 2, 8);
+      ctx.fillRect(x + 2, y + 5, 8, 2);
+      ctx.fillRect(x + 3, y + 3, 2, 2);
+    } else {
+      ctx.fillRect(x + 3, y + 4, 6, 4);
+    }
+  }
+
+  function paintProcPen(ctx, w, h, kind) {
+    var def = G.THData.ROOMS[kind];
+    var type = def && def.type ? def.type : "none";
+    var col = type !== "none" ? G.THData.TYPE_COLOR[type] : P.copper;
+    var cx = Math.floor(w / 2);
+    var cy = Math.floor(h / 2) - 4;
+    var r = Math.floor(w * 0.36);
+    if (kind === "transom") {
+      paintVisitorPath(ctx, cx, 8, cx, h - 8);
+      paintVisitorPath(ctx, 16, h * 0.62, w - 16, h * 0.62);
+      paintTypeBadge(ctx, cx + 10, cy + 10, "draft");
+      return;
+    }
+    if (kind === "larder") {
+      ctx.fillStyle = "#6a4220";
+      ctx.fillRect(cx - 22, cy - 8, 44, 28);
+      ctx.fillStyle = "#3a7ec8";
+      ctx.fillRect(cx - 24, cy - 16, 48, 12);
+      return;
+    }
+    fillDisk(ctx, cx, cy, r - 2, col);
+    fillDisk(ctx, cx, cy, r - 8, kind === "dynamo" ? "#f0d020" : kind === "dormer" ? "#c4a0e0" : kind === "scullery" ? "#d86a2c" : kind === "vitrine" ? "#e8c428" : col);
+    paintFenceRing(ctx, cx, cy, r, "#8a6030");
+    ctx.fillStyle = "#6a4220";
+    ctx.fillRect(cx - 10, cy + r - 6, 20, 10);
+    paintTypeBadge(ctx, cx, cy + r - 40, type);
   }
 
   function paintHabitat(canvas, kind, opt) {
@@ -518,21 +709,35 @@
     ctx.imageSmoothingEnabled = false;
     ctx.clearRect(0, 0, w, h);
     var yard = YARD[kind];
-    if (yard && blitCrisp(ctx, yard, 0, 0, w, h)) {
-      /* transparent exhibit on shared park grass */
+    var drew = false;
+    if (kind === "lobby") {
+      drew = blitCrisp(ctx, "cottage", 0, 0, w, h);
+    } else if (yard && srcW(IMG[yard])) {
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(w * 0.5, h * 0.49, Math.min(w, h) * 0.44, 0, Math.PI * 2);
+      ctx.rect(w * 0.5 - 16, h * 0.72, 32, 28);
+      ctx.clip();
+      drew = blitCrisp(ctx, yard, 0, 0, w, h);
+      ctx.restore();
     }
+    if (!drew) paintProcPen(ctx, w, h, kind);
     if (opt.leaking) {
       ctx.fillStyle = "rgba(232,80,20,0.35)";
       ctx.fillRect(Math.floor(w * 0.3), Math.floor(h * 0.4), 6, Math.floor(h * 0.3));
     }
     if (opt.haunted) {
       ctx.fillStyle = "rgba(90,50,120,0.18)";
-      ctx.fillRect(0, 0, w, h);
+      ctx.beginPath();
+      ctx.arc(w / 2, h / 2, Math.min(w, h) * 0.4, 0, Math.PI * 2);
+      ctx.fill();
     }
     if (opt.selected) {
       ctx.strokeStyle = "#e8c428";
       ctx.lineWidth = 3;
-      ctx.strokeRect(2, 2, w - 4, h - 4);
+      ctx.beginPath();
+      ctx.arc(w / 2, h / 2 - 2, Math.min(w, h) * 0.46, 0, Math.PI * 2);
+      ctx.stroke();
     }
   }
 
@@ -572,7 +777,7 @@
     c.height = size;
     var ctx = c.getContext("2d");
     ctx.imageSmoothingEnabled = false;
-    if (IMG.cottage && IMG.cottage.naturalWidth) ctx.drawImage(IMG.cottage, 0, 0, size, size);
+    if (IMG.cottage && srcW(IMG.cottage)) ctx.drawImage(IMG.cottage, 0, 0, size, size);
     else {
       ctx.fillStyle = P.ember;
       ctx.fillRect(0, 0, size, size);
