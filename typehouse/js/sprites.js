@@ -364,18 +364,18 @@
   }
 
   function paintLantern(ctx, x, y) {
-    ctx.fillStyle = shade(P.lamp, 0.22);
-    ctx.fillRect(x - 4, y - 5, 10, 8);
+    ctx.fillStyle = shade(P.lamp, 0.28);
+    ctx.fillRect(x - 5, y - 6, 12, 10);
     ctx.fillStyle = P.ink;
-    ctx.fillRect(x, y, 2, 9);
+    ctx.fillRect(x, y - 1, 3, 11);
     ctx.fillStyle = P.timber;
-    ctx.fillRect(x, y, 2, 8);
+    ctx.fillRect(x, y, 2, 9);
     ctx.fillStyle = P.lamp;
-    ctx.fillRect(x - 2, y - 4, 6, 5);
+    ctx.fillRect(x - 3, y - 5, 8, 6);
     ctx.fillStyle = P.ember;
-    ctx.fillRect(x, y - 2, 2, 2);
+    ctx.fillRect(x, y - 3, 3, 3);
     ctx.fillStyle = P.parchment;
-    ctx.fillRect(x - 1, y - 3, 1, 1);
+    ctx.fillRect(x - 1, y - 4, 2, 2);
   }
 
   function paintPathStrip(ctx, x0, y0, x1, y1, wide) {
@@ -787,15 +787,12 @@
   function paintCottageExtras(ctx, w, h) {
     var cx = Math.floor(w / 2);
     var cy = Math.floor(h * 0.42);
+    fillDisk(ctx, cx, cy + 10, 6, P.ink);
+    fillDisk(ctx, cx, cy + 10, 5, P.copper);
+    fillDisk(ctx, cx, cy + 10, 4, P.parchment);
     ctx.fillStyle = P.ink;
-    ctx.fillRect(cx - 6, cy + 2, 12, 12);
-    ctx.fillStyle = P.copper;
-    ctx.fillRect(cx - 5, cy + 3, 10, 10);
-    ctx.fillStyle = P.parchment;
-    ctx.fillRect(cx - 3, cy + 5, 6, 6);
-    ctx.fillStyle = P.ink;
-    ctx.fillRect(cx - 1, cy + 6, 2, 4);
-    ctx.fillRect(cx - 2, cy + 8, 4, 1);
+    ctx.fillRect(cx - 1, cy + 8, 2, 5);
+    ctx.fillRect(cx - 2, cy + 10, 4, 1);
     paintLantern(ctx, 14, Math.floor(h * 0.38));
     paintLantern(ctx, w - 16, Math.floor(h * 0.38));
     ctx.fillStyle = P.timber;
@@ -834,6 +831,7 @@
     var fenceR = 39;
 
     if (kind === "lobby") {
+      fillDisk(ctx, cx, cy + 2, 26, "#2a1c14");
       paintPathStrip(ctx, cx, cy + 8, cx, h - 2, 12);
       paintProp(ctx, "lobby", cx, cy - 2);
       paintCottageExtras(ctx, w, h);
