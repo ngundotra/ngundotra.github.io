@@ -275,15 +275,22 @@
     }
   }
 
-  function paintGuest(canvas, id, frame) {
+  function paintGuest(canvas, id, frame, opt) {
     var a = GUESTS[id];
     if (!a) return;
+    opt = opt || {};
     var ctx = canvas.getContext("2d");
     ctx.imageSmoothingEnabled = false;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     var scale = Math.max(1, Math.floor(canvas.width / 16));
-    var bob = frame % 2 ? Math.max(1, Math.floor(scale * 0.4)) : 0;
+    var bob = opt.sit ? 0 : frame % 2 ? Math.max(1, Math.floor(scale * 0.4)) : 0;
+    ctx.save();
+    if (opt.flip) {
+      ctx.translate(canvas.width, 0);
+      ctx.scale(-1, 1);
+    }
     drawMap(ctx, a, scale, 0, bob);
+    ctx.restore();
   }
 
   function guestUrl(id, scale) {
@@ -309,6 +316,94 @@
     return "rgba(" + r + "," + g + "," + b + "," + a + ")";
   }
 
+  function dirtFill(ctx, w, h, tint) {
+    ctx.fillStyle = "#2a1c14";
+    ctx.fillRect(0, 0, w, h);
+    ctx.fillStyle = "#231610";
+    var i;
+    var j;
+    for (i = 1; i < w; i += 4) {
+      for (j = 1; j < h; j += 5) {
+        if ((i * 13 + j * 7) % 11 < 4) ctx.fillRect(i, j, 2, 1);
+      }
+    }
+    ctx.fillStyle = "#332218";
+    for (i = 2; i < w; i += 6) {
+      for (j = 3; j < h; j += 7) {
+        if ((i + j) % 5 === 0) ctx.fillRect(i, j, 1, 2);
+      }
+    }
+    if (tint) {
+      ctx.fillStyle = shade(tint, 0.34);
+      ctx.fillRect(0, 0, w, h);
+    }
+  }
+
+  function paintPath(ctx, w, h, vertical) {
+    ctx.fillStyle = "#3a2a1c";
+    if (vertical) ctx.fillRect(Math.floor(w * 0.38), 0, Math.floor(w * 0.24), h);
+    else ctx.fillRect(0, Math.floor(h * 0.42), w, Math.floor(h * 0.2));
+    ctx.fillStyle = "#2e2118";
+    if (vertical) {
+      ctx.fillRect(Math.floor(w * 0.38), 0, 1, h);
+      ctx.fillRect(Math.floor(w * 0.62), 0, 1, h);
+    }
+  }
+
+  function paintLantern(ctx, x, y) {
+    ctx.fillStyle = P.timber;
+    ctx.fillRect(x, y, 2, 8);
+    ctx.fillStyle = P.lamp;
+    ctx.fillRect(x - 2, y - 4, 6, 5);
+    ctx.fillStyle = P.ember;
+    ctx.fillRect(x, y - 2, 2, 2);
+  }
+
+  function paintDeed(ctx, w, h, col) {
+    var x = w - 16;
+    var y = h - 24;
+    ctx.fillStyle = P.ink;
+    ctx.fillRect(x + 4, y + 2, 3, 16);
+    ctx.fillStyle = P.timber;
+    ctx.fillRect(x + 5, y + 3, 1, 14);
+    ctx.fillStyle = P.ink;
+    ctx.fillRect(x, y, 12, 9);
+    ctx.fillStyle = col || P.parchment;
+    ctx.fillRect(x + 2, y + 2, 8, 5);
+  }
+
+  function paintFence(ctx, w, h, col, edges) {
+    var m = 5;
+    ctx.strokeStyle = P.ink;
+    ctx.lineWidth = 2;
+    ctx.strokeRect(m, m, w - m * 2, h - m * 2);
+    ctx.strokeStyle = shade(P.timber, 0.9);
+    ctx.lineWidth = 1;
+    ctx.strokeRect(m + 2, m + 2, w - m * 2 - 4, h - m * 2 - 4);
+    var posts = [
+      [m - 1, m - 1, "nw"],
+      [w - m - 3, m - 1, "ne"],
+      [m - 1, h - m - 3, "sw"],
+      [w - m - 3, h - m - 3, "se"],
+      [Math.floor(w / 2) - 1, m - 1, "n"],
+      [Math.floor(w / 2) - 1, h - m - 3, "s"],
+      [m - 1, Math.floor(h / 2) - 1, "w"],
+      [w - m - 3, Math.floor(h / 2) - 1, "e"],
+    ];
+    edges = edges || {};
+    posts.forEach(function (p) {
+      var edge = edges[p[2]] || {};
+      ctx.fillStyle = edge.friction ? P.ember : edge.nourish ? P.moss : col || P.timber;
+      ctx.fillRect(p[0], p[1], 4, 4);
+      ctx.fillStyle = P.ink;
+      ctx.fillRect(p[0] + 1, p[1] + 1, 2, 2);
+      if (edge.friction || edge.nourish) {
+        ctx.fillStyle = edge.friction ? P.ember : P.moss;
+        ctx.fillRect(p[0] - 1, p[1] - 1, 6, 2);
+      }
+    });
+  }
+
   function paintRoom(canvas, kind, opt) {
     opt = opt || {};
     var ctx = canvas.getContext("2d");
@@ -318,119 +413,174 @@
     var def = G.THData.ROOMS[kind];
     var col = def && def.type !== "none" ? G.THData.TYPE_COLOR[def.type] : P.copper;
 
-    ctx.fillStyle = "#241814";
-    ctx.fillRect(0, 0, w, h);
-    ctx.fillStyle = "#1e1612";
-    for (var fy = Math.floor(h * 0.58); fy < h; fy += 3) ctx.fillRect(0, fy, w, 1);
+    dirtFill(ctx, w, h, kind === "lobby" || kind === "larder" || kind === "transom" ? null : col);
 
     if (kind === "lobby") {
+      paintPath(ctx, w, h, true);
       ctx.fillStyle = P.timber;
-      ctx.fillRect(3, Math.floor(h * 0.5), Math.floor(w * 0.62), 7);
-      ctx.fillStyle = P.parchment;
-      ctx.fillRect(5, Math.floor(h * 0.5) - 5, 9, 5);
-      ctx.fillStyle = P.lamp;
-      ctx.fillRect(w - 14, 6, 6, 8);
+      ctx.fillRect(Math.floor(w * 0.22), h - 18, Math.floor(w * 0.56), 12);
       ctx.fillStyle = P.ink;
-      ctx.fillRect(18, Math.floor(h * 0.5) - 3, 7, 2);
+      ctx.fillRect(Math.floor(w * 0.22), h - 18, Math.floor(w * 0.56), 2);
+      ctx.fillStyle = P.copper;
+      ctx.fillRect(Math.floor(w / 2) - 6, h - 28, 12, 12);
+      ctx.fillStyle = P.parchment;
+      ctx.fillRect(Math.floor(w / 2) - 3, h - 25, 6, 6);
+      ctx.fillStyle = P.ink;
+      ctx.fillRect(Math.floor(w / 2) - 1, h - 23, 2, 3);
+      ctx.fillStyle = P.timber;
+      ctx.fillRect(8, Math.floor(h * 0.42), Math.floor(w * 0.28), 8);
+      ctx.fillStyle = P.parchment;
+      ctx.fillRect(10, Math.floor(h * 0.42) - 4, 10, 4);
+      paintLantern(ctx, 10, Math.floor(h * 0.28));
+      paintLantern(ctx, w - 12, Math.floor(h * 0.28));
     } else if (kind === "larder") {
       ctx.fillStyle = P.copper;
-      ctx.fillRect(6, 8, w - 14, h - 18);
+      ctx.fillRect(14, 16, w - 28, h - 36);
       ctx.fillStyle = P.timber;
-      ctx.fillRect(8, 12, w - 18, 4);
-      ctx.fillRect(8, 20, w - 18, 4);
-      ctx.fillStyle = P.parchment;
-      ctx.fillRect(10, 13, 4, 2);
+      ctx.fillRect(16, 20, w - 32, 5);
+      ctx.fillRect(16, 30, w - 32, 5);
+      ctx.fillStyle = P.ink;
+      ctx.strokeStyle = P.ink;
+      ctx.strokeRect(14, 16, w - 28, h - 36);
+      paintDeed(ctx, w, h, P.copper);
+    } else if (kind === "transom") {
+      paintPath(ctx, w, h, true);
+      paintPath(ctx, w, h, false);
+      ctx.fillStyle = P.dusk;
+      ctx.fillRect(Math.floor(w * 0.44), 8, 4, h - 16);
+      paintLantern(ctx, Math.floor(w * 0.3), 14);
     } else {
-      ctx.fillStyle = shade(col, 0.32);
-      ctx.fillRect(2, 2, w - 4, Math.floor(h * 0.54));
-      ctx.fillStyle = opt.haunted ? P.timber : col;
-      var wx = Math.floor(w * 0.6);
-      var wy = Math.floor(h * 0.12);
-      var ww = Math.max(6, Math.floor(w * 0.24));
-      var wh = Math.max(6, Math.floor(h * 0.22));
-      ctx.fillRect(wx, wy, ww, wh);
-      ctx.fillStyle = "rgba(26,18,16,0.4)";
-      ctx.fillRect(wx + Math.floor(ww / 2), wy, 1, wh);
-      ctx.fillRect(wx, wy + Math.floor(wh / 2), ww, 1);
+      if (kind === "cistern") {
+        ctx.fillStyle = "#1a2836";
+        ctx.fillRect(Math.floor(w * 0.2), Math.floor(h * 0.38), Math.floor(w * 0.6), Math.floor(h * 0.32));
+        ctx.fillRect(Math.floor(w * 0.26), Math.floor(h * 0.32), Math.floor(w * 0.48), Math.floor(h * 0.44));
+        ctx.fillStyle = shade(P.dusk, 0.7);
+        ctx.fillRect(Math.floor(w * 0.28), Math.floor(h * 0.42), Math.floor(w * 0.44), Math.floor(h * 0.2));
+      } else if (kind === "conservatory") {
+        ctx.fillStyle = shade(P.moss, 0.55);
+        ctx.fillRect(10, 10, w - 20, h - 20);
+      } else if (kind === "hearth") {
+        ctx.fillStyle = shade(P.ember, 0.22);
+        ctx.fillRect(Math.floor(w * 0.2), Math.floor(h * 0.4), Math.floor(w * 0.6), Math.floor(h * 0.3));
+        ctx.fillRect(Math.floor(w * 0.26), Math.floor(h * 0.34), Math.floor(w * 0.48), Math.floor(h * 0.4));
+      }
       furniture(ctx, kind, w, h, col, opt);
+      paintFence(ctx, w, h, col, opt.edges);
+      paintDeed(ctx, w, h, col);
     }
 
     if (opt.leaking) {
       ctx.fillStyle = P.ember;
-      ctx.fillRect(2, Math.floor(h * 0.3), 3, h - Math.floor(h * 0.4));
+      ctx.fillRect(8, Math.floor(h * 0.35), 3, h - Math.floor(h * 0.5));
     }
     if (opt.haunted) {
-      ctx.fillStyle = "rgba(61,42,36,0.4)";
+      ctx.fillStyle = "rgba(61,42,36,0.35)";
       ctx.fillRect(0, 0, w, h);
     }
     if (opt.unpowered) {
       ctx.fillStyle = P.ink;
-      ctx.fillRect(Math.floor(w * 0.4), 4, 8, 4);
+      ctx.fillRect(Math.floor(w * 0.4), 8, 10, 4);
     }
     if (opt.home) {
       ctx.fillStyle = col;
-      ctx.fillRect(6, h - 6, w - 12, 4);
+      ctx.fillRect(Math.floor(w * 0.28), h - 18, Math.floor(w * 0.36), 5);
+      ctx.fillStyle = shade(P.parchment, 0.5);
+      ctx.fillRect(Math.floor(w * 0.3), h - 17, Math.floor(w * 0.32), 3);
     }
-    ctx.strokeStyle = P.ink;
-    ctx.lineWidth = 2;
-    ctx.strokeRect(1, 1, w - 2, h - 2);
   }
 
   function furniture(ctx, kind, w, h, col, opt) {
-    var y = Math.floor(h * 0.5);
+    var y = Math.floor(h * 0.38);
     ctx.fillStyle = col;
     if (kind === "hearth") {
-      ctx.fillRect(6, y - 4, 16, 14);
+      ctx.fillRect(Math.floor(w / 2) - 10, y - 2, 20, 16);
+      ctx.fillStyle = P.ink;
+      ctx.fillRect(Math.floor(w / 2) - 6, y - 10, 12, 10);
       ctx.fillStyle = P.ember;
-      ctx.fillRect(10, y, 8, 6);
+      ctx.fillRect(Math.floor(w / 2) - 6, y + 4, 12, 7);
       ctx.fillStyle = P.lamp;
-      if (!opt.unpowered) ctx.fillRect(12, y + 2, 4, 3);
+      if (!opt.unpowered) ctx.fillRect(Math.floor(w / 2) - 3, y + 6, 6, 3);
     } else if (kind === "cistern") {
+      ctx.fillStyle = P.copper;
+      ctx.fillRect(Math.floor(w / 2) - 6, y - 8, 12, 8);
       ctx.fillStyle = P.dusk;
-      ctx.fillRect(8, y - 2, w - 18, 14);
-      ctx.fillStyle = P.lamp;
-      ctx.fillRect(10, y + 2, w - 22, 6);
+      ctx.fillRect(Math.floor(w / 2) - 8, y, 16, 6);
+      ctx.fillStyle = P.timber;
+      ctx.fillRect(w - 22, y + 8, 14, 3);
     } else if (kind === "conservatory") {
+      ctx.fillStyle = P.ink;
+      ctx.fillRect(Math.floor(w / 2) - 12, y - 6, 24, 18);
+      ctx.fillStyle = shade(P.moss, 0.8);
+      ctx.fillRect(Math.floor(w / 2) - 10, y - 4, 20, 14);
       ctx.fillStyle = P.moss;
-      ctx.fillRect(5, y + 6, w - 10, 5);
-      ctx.fillRect(8, y - 4, 3, 12);
-      ctx.fillRect(16, y - 8, 3, 16);
+      ctx.fillRect(12, y + 12, 4, 10);
+      ctx.fillRect(w - 18, y + 8, 4, 14);
     } else if (kind === "dynamo") {
       ctx.fillStyle = P.lamp;
-      ctx.fillRect(10, y - 6, 14, 14);
+      ctx.fillRect(Math.floor(w / 2) - 8, y, 16, 16);
       ctx.fillStyle = P.copper;
-      ctx.fillRect(14, y - 2, 6, 6);
+      ctx.fillRect(Math.floor(w / 2) - 4, y + 4, 8, 8);
     } else if (kind === "dormer") {
       ctx.fillStyle = P.timber;
-      ctx.fillRect(6, y, 18, 8);
+      ctx.fillRect(14, y + 4, w - 28, 14);
       ctx.fillStyle = P.parchment;
-      ctx.fillRect(8, y - 6, 10, 6);
+      ctx.fillRect(18, y - 4, 16, 8);
     } else if (kind === "scullery") {
       ctx.fillStyle = P.copper;
-      ctx.fillRect(5, y, 14, 8);
-      ctx.fillRect(w - 16, y - 6, 10, 12);
+      ctx.fillRect(12, y + 6, 18, 10);
+      ctx.fillRect(w - 28, y, 14, 14);
     } else if (kind === "vitrine") {
       ctx.fillStyle = P.parchment;
-      ctx.fillRect(8, 8, w - 16, h - 20);
+      ctx.fillRect(16, 16, w - 32, h - 40);
       ctx.fillStyle = P.lamp;
-      ctx.fillRect(12, 14, 6, 6);
-    } else if (kind === "transom") {
-      ctx.fillStyle = P.dusk;
-      ctx.fillRect(Math.floor(w * 0.35), 4, Math.floor(w * 0.3), h - 10);
-      ctx.fillStyle = P.lamp;
-      ctx.fillRect(Math.floor(w * 0.4), 8, Math.floor(w * 0.2), 3);
+      ctx.fillRect(Math.floor(w / 2) - 4, 24, 8, 8);
+      ctx.strokeStyle = P.ink;
+      ctx.strokeRect(16, 16, w - 32, h - 40);
     }
   }
 
-  function paintEmpty(canvas) {
+  function paintEmpty(canvas, opt) {
+    opt = opt || {};
     var ctx = canvas.getContext("2d");
     ctx.imageSmoothingEnabled = false;
-    ctx.fillStyle = "#201612";
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    ctx.fillStyle = "#2a1c18";
-    for (var i = 5; i < canvas.width; i += 7) {
-      for (var j = 5; j < canvas.height; j += 7) ctx.fillRect(i, j, 2, 2);
+    var w = canvas.width;
+    var h = canvas.height;
+    dirtFill(ctx, w, h, null);
+    if (opt.path) paintPath(ctx, w, h, true);
+    ctx.fillStyle = P.timber;
+    ctx.fillRect(Math.floor(w / 2) - 1, h - 16, 2, 10);
+    ctx.fillStyle = P.ink;
+    ctx.fillRect(Math.floor(w / 2) - 4, h - 20, 8, 5);
+  }
+
+  function paintFog(canvas, opt) {
+    opt = opt || {};
+    var ctx = canvas.getContext("2d");
+    ctx.imageSmoothingEnabled = false;
+    var w = canvas.width;
+    var h = canvas.height;
+    ctx.fillStyle = "#12161c";
+    ctx.fillRect(0, 0, w, h);
+    var i;
+    var j;
+    for (i = 0; i < w; i += 2) {
+      for (j = 0; j < h; j += 2) {
+        var n = (i * 17 + j * 31 + (i ^ j)) % 7;
+        if (n < 2) ctx.fillStyle = "#0c1016";
+        else if (n < 4) ctx.fillStyle = "#1a2430";
+        else ctx.fillStyle = "#151c26";
+        ctx.fillRect(i, j, 2, 2);
+      }
     }
+    ctx.fillStyle = "rgba(20,28,40,0.45)";
+    ctx.fillRect(0, 0, w, h);
+    var lx = Math.floor(w / 2) - 6;
+    var ly = Math.floor(h / 2) - 14;
+    ctx.fillStyle = P.ink;
+    ctx.fillRect(lx + 2, ly, 8, 6);
+    ctx.fillRect(lx, ly + 5, 12, 10);
+    ctx.fillStyle = P.parchment;
+    ctx.fillRect(lx + 5, ly + 8, 2, 4);
   }
 
   function paintIcon(size) {
@@ -459,6 +609,7 @@
     paintGuest: paintGuest,
     paintRoom: paintRoom,
     paintEmpty: paintEmpty,
+    paintFog: paintFog,
     paintIcon: paintIcon,
     guestUrl: guestUrl,
     GUESTS: GUESTS,

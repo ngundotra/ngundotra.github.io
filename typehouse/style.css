@@ -56,7 +56,15 @@ body {
   padding: 8px 6px;
   min-height: 44px;
   display: flex;
-  align-items: center;
+  flex-direction: column;
+  justify-content: center;
+}
+#title small {
+  display: block;
+  font-size: 8px;
+  letter-spacing: 0.2em;
+  color: var(--parchment);
+  font-weight: 700;
 }
 
 #wallet {
@@ -93,62 +101,67 @@ body {
 #house-wrap {
   flex: 1;
   position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 8px 8px 0;
+  overflow: hidden;
+  touch-action: none;
+  padding: 0;
   min-height: 0;
+  background: #14100c;
+  user-select: none;
+  -webkit-user-select: none;
 }
 
-.roof {
-  width: min(92%, 380px);
-  height: 18px;
-  background:
-    linear-gradient(180deg, var(--ember), var(--copper));
-  clip-path: polygon(50% 0, 100% 100%, 0 100%);
-  border-bottom: 3px solid #0e0a08;
-  image-rendering: pixelated;
+.roof { display: none; }
+
+#park {
+  position: absolute;
+  left: 0;
+  top: 0;
+  transform-origin: 0 0;
+  will-change: transform;
 }
 
 #house {
-  display: grid;
-  gap: 0;
-  background: #0e0a08;
-  border: 4px solid #0e0a08;
-  box-shadow: 6px 6px 0 #0a0706;
+  position: relative;
+  background: #1a1410;
 }
 
-.cell {
-  position: relative;
+#critters {
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 2;
+  pointer-events: none;
+  image-rendering: pixelated;
+}
+
+.lot {
+  position: absolute;
   padding: 0;
   border: 0;
   background: none;
   display: block;
-  min-width: 44px;
-  min-height: 44px;
+  width: 96px;
+  height: 96px;
 }
-.cell canvas { image-rendering: pixelated; display: block; }
-.cell .tile { width: 100%; height: 100%; }
-.cell .who {
+.lot canvas { image-rendering: pixelated; display: block; }
+.lot .tile { width: 100%; height: 100%; }
+.lot.on { outline: 3px solid var(--lamp); outline-offset: -3px; }
+.lot.gate { box-shadow: inset 0 0 0 2px var(--parchment); }
+.lot.fog .fog-tag {
   position: absolute;
-  left: 50%;
-  bottom: 10%;
-  transform: translateX(-50%);
+  left: 8px;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-20%);
   pointer-events: none;
+  text-align: center;
+  color: var(--parchment);
+  font-size: 8px;
+  letter-spacing: 0.08em;
+  line-height: 1.3;
 }
-.cell .plus {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--copper);
-  font-size: 22px;
-  font-weight: 700;
-}
-.cell.on { outline: 3px solid var(--lamp); outline-offset: -3px; }
-.cell.lobby { box-shadow: inset 0 0 0 2px var(--parchment); }
+.lot.fog .fog-tag b { display: block; color: var(--lamp); }
+.lot.fog .fog-tag em { display: block; font-style: normal; color: var(--copper); }
 .ticks {
   position: absolute;
   top: 3px;
@@ -167,7 +180,7 @@ body {
 .tick.friction { background: var(--ember); }
 .tick.haunt { background: var(--timber); }
 
-#pips { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+#pips { position: absolute; inset: 0; z-index: 3; pointer-events: none; overflow: hidden; }
 .pip {
   position: absolute;
   font-size: 10px;

@@ -1,15 +1,28 @@
-/* Typehouse UI — portrait phone, sheets, dock, blotter. */
+/* Typehouse UI — Habitat Grounds park, sheets, dock, blotter. */
 (function (G) {
   const T = G.Typehouse;
   const D = G.THData;
   const S = G.THSprites;
+  const W = G.THWander;
   var selected = null;
   var mode = "none";
   var assignId = null;
   var frame = 0;
   var lastSave = 0;
+  var lastHouse = 0;
+  var lastWander = 0;
+  var dirty = true;
   var pressTimer = 0;
   var lastWallet = { tally: 12, scrap: 6, dust: 0 };
+  var LOT = 96;
+  var view = { minX: 0, minY: 0, maxX: 2, maxY: 1, w: 3, h: 2 };
+  var cam = { x: 0, y: 0 };
+  var camReady = false;
+  var pid = null;
+  var pan = { sx: 0, sy: 0, cx: 0, cy: 0, moved: false };
+  var lastBlotter = "";
+  var lastWaitKey = "";
+  var lastStripFrame = -1;
 
   function $(id) {
     return document.getElementById(id);
@@ -29,6 +42,57 @@
     return selected ? T.key(selected.x, selected.y) : "";
   }
 
+  function sheetOpen() {
+    return $("sheet").classList.contains("open");
+  }
+
+  function markDirty() {
+    dirty = true;
+  }
+
+  function roomName(id) {
+    return D.ROOMS[id] ? D.ROOMS[id].name : id;
+  }
+
+  function wantsLine(def) {
+    return def.wants
+      .map(function (id) {
+        return roomName(id);
+      })
+      .join(" / ");
+  }
+
+  function scoreEdge(types, roomId) {
+    var rt = D.ROOMS[roomId] ? D.ROOMS[roomId].type : "none";
+    var bestN = 0;
+    var worstF = 0;
+    types.forEach(function (t) {
+      if (D.presses(t, rt)) bestN = 1;
+      if (D.presses(rt, t)) worstF = 1;
+    });
+    return { nourish: bestN, friction: worstF };
+  }
+
+  function edgeFlags(s, c) {
+    var edges = {};
+    if (!c || !c.denizen) return edges;
+    var d = T.denizen(s, c.denizen);
+    if (!d) return edges;
+    var types = D.DENIZENS[d.kind].types;
+    var map = { "1,0": "e", "-1,0": "w", "0,1": "n", "0,-1": "s" };
+    [
+      [1, 0],
+      [-1, 0],
+      [0, 1],
+      [0, -1],
+    ].forEach(function (dir) {
+      var n = T.cell(s, c.x + dir[0], c.y + dir[1]);
+      if (!n || !n.room) return;
+      edges[map[dir[0] + "," + dir[1]]] = scoreEdge(types, n.room);
+    });
+    return edges;
+  }
+
   function showSheet(html, cls) {
     var sh = $("sheet");
     sh.className = "sheet open" + (cls ? " " + cls : "");
@@ -44,6 +108,65 @@
     mode = "none";
     assignId = null;
     renderDock();
+  }
+
+  function applyCam() {
+    $("park").style.transform = "translate(" + Math.round(cam.x) + "px," + Math.round(cam.y) + "px)";
+  }
+
+  function clampCam() {
+    var wrap = $("house-wrap");
+    var park = $("park");
+    if (!wrap || !park) return;
+    var ww = wrap.clientWidth;
+    var wh = wrap.clientHeight;
+    var pw = view.w * LOT;
+    var ph = view.h * LOT;
+    if (pw <= ww) cam.x = Math.round((ww - pw) / 2);
+    else cam.x = Math.min(0, Math.max(ww - pw, cam.x));
+    if (ph <= wh) cam.y = Math.round((wh - ph) / 2);
+    else cam.y = Math.min(0, Math.max(wh - ph, cam.y));
+    applyCam();
+  }
+
+  function centerOn(x, y) {
+    var wrap = $("house-wrap");
+    if (!wrap) return;
+    var left = (x - view.minX) * LOT + LOT / 2;
+    var top = (view.maxY - y) * LOT + LOT / 2;
+    cam.x = wrap.clientWidth / 2 - left;
+    cam.y = wrap.clientHeight / 2 - top;
+    clampCam();
+  }
+
+  function includeLot(x, y) {
+    var wrap = $("house-wrap");
+    if (!wrap) return;
+    var left = (x - view.minX) * LOT;
+    var top = (view.maxY - y) * LOT;
+    var sl = left + cam.x;
+    var st = top + cam.y;
+    var pad = 10;
+    if (sl < pad) cam.x += pad - sl;
+    if (st < pad) cam.y += pad - st;
+    if (sl + LOT > wrap.clientWidth - pad) cam.x -= sl + LOT - (wrap.clientWidth - pad);
+    if (st + LOT > wrap.clientHeight - pad) cam.y -= st + LOT - (wrap.clientHeight - pad);
+    clampCam();
+  }
+
+  function ensureCam(s) {
+    view = T.parkBounds(s);
+    if (!camReady) {
+      centerOn(1, 0);
+      camReady = true;
+    } else {
+      clampCam();
+    }
+  }
+
+  function wrapBox() {
+    var wrap = $("house-wrap");
+    return wrap ? { w: wrap.clientWidth, h: wrap.clientHeight } : { w: 320, h: 320 };
   }
 
   function renderWallet(s) {
@@ -75,77 +198,83 @@
     }
   }
 
-  function cellSize(s) {
-    var wrap = $("house-wrap");
-    var maxW = Math.min(wrap.clientWidth - 16, 400);
-    var maxH = wrap.clientHeight - 28;
-    var cell = Math.floor(Math.min(maxW / s.gridW, maxH / s.gridH));
-    return Math.max(56, Math.min(86, cell));
+  function lotNode(house, k, x, y, fog) {
+    var node = house.querySelector('[data-k="' + k + '"]');
+    if (node) return node;
+    node = document.createElement("div");
+    node.className = "lot" + (fog ? " fog" : "");
+    node.dataset.k = k;
+    node.dataset.x = String(x);
+    node.dataset.y = String(y);
+    node.innerHTML = fog
+      ? '<canvas class="tile"></canvas><span class="fog-tag"><b>+ BUY LAND</b><em></em></span>'
+      : '<canvas class="tile"></canvas>';
+    house.appendChild(node);
+    return node;
   }
 
   function renderHouse(s) {
+    var bounds = T.parkBounds(s);
+    view = bounds;
     var house = $("house");
-    var size = cellSize(s);
-    house.style.width = s.gridW * size + "px";
-    house.style.height = s.gridH * size + "px";
-    house.style.gridTemplateColumns = "repeat(" + s.gridW + ", " + size + "px)";
-    house.style.gridTemplateRows = "repeat(" + s.gridH + ", " + size + "px)";
+    var park = $("park");
+    var critters = $("critters");
+    var pw = bounds.w * LOT;
+    var ph = bounds.h * LOT;
+    park.style.width = pw + "px";
+    park.style.height = ph + "px";
+    house.style.width = pw + "px";
+    house.style.height = ph + "px";
+    critters.width = pw;
+    critters.height = ph;
+    ensureCam(s);
 
-    var existing = {};
-    Array.prototype.forEach.call(house.children, function (n) {
-      existing[n.dataset.k] = n;
-    });
     var keep = {};
+    var fog = T.fogOf(s);
+    var cost = D.lotCost(s.lotsBought || 0);
 
-    for (var y = s.gridH - 1; y >= 0; y--) {
-      for (var x = 0; x < s.gridW; x++) {
-        var k = T.key(x, y);
-        keep[k] = true;
-        var node = existing[k];
-        if (!node) {
-          node = document.createElement("button");
-          node.type = "button";
-          node.className = "cell";
-          node.dataset.k = k;
-          node.dataset.x = x;
-          node.dataset.y = y;
-          node.innerHTML =
-            '<canvas class="tile"></canvas><canvas class="who"></canvas><span class="plus">+</span><span class="ticks"></span>';
-          node.addEventListener("click", onCell);
-          house.appendChild(node);
-        }
-        node.style.order = s.gridH - 1 - y;
-        node.style.width = size + "px";
-        node.style.height = size + "px";
-        paintCell(s, node, x, y, size);
-      }
-    }
-    Object.keys(existing).forEach(function (k) {
-      if (!keep[k]) existing[k].remove();
+    Object.keys(s.cells).forEach(function (k) {
+      var c = s.cells[k];
+      keep[k] = true;
+      var node = lotNode(house, k, c.x, c.y, false);
+      node.className = "lot" + (selKey() === k ? " on" : "") + (c.room === "lobby" ? " gate" : "");
+      node.style.left = (c.x - bounds.minX) * LOT + "px";
+      node.style.top = (bounds.maxY - c.y) * LOT + "px";
+      node.style.width = LOT + "px";
+      node.style.height = LOT + "px";
+      paintLot(s, node, c);
     });
 
-    renderPips(s, size);
+    fog.forEach(function (f) {
+      var k = "fog:" + T.key(f.x, f.y);
+      keep[k] = true;
+      var node = lotNode(house, k, f.x, f.y, true);
+      node.className = "lot fog" + (selKey() === T.key(f.x, f.y) ? " on" : "");
+      node.style.left = (f.x - bounds.minX) * LOT + "px";
+      node.style.top = (bounds.maxY - f.y) * LOT + "px";
+      node.style.width = LOT + "px";
+      node.style.height = LOT + "px";
+      var tile = node.querySelector(".tile");
+      tile.width = LOT;
+      tile.height = LOT;
+      S.paintFog(tile, { cost: cost });
+      var em = node.querySelector(".fog-tag em");
+      if (em) em.textContent = cost.scrap + " SCRAP" + (cost.tally ? " · " + cost.tally + " TALLY" : "") + (cost.dust ? " · " + cost.dust + " DUST" : "");
+    });
+
+    Array.prototype.forEach.call(house.children, function (n) {
+      if (!keep[n.dataset.k]) n.remove();
+    });
+
+    renderPips(s);
   }
 
-  function paintCell(s, node, x, y, size) {
-    var c = T.cell(s, x, y);
+  function paintLot(s, node, c) {
     var tile = node.querySelector(".tile");
-    var who = node.querySelector(".who");
-    var plus = node.querySelector(".plus");
-    var ticks = node.querySelector(".ticks");
-    tile.width = size;
-    tile.height = size;
-    var gsz = Math.max(24, Math.floor(size * 0.42));
-    who.width = gsz;
-    who.height = gsz;
-    node.classList.toggle("on", selKey() === T.key(x, y));
-    node.classList.toggle("lobby", c.room === "lobby");
-    plus.hidden = !!c.room;
-
+    tile.width = LOT;
+    tile.height = LOT;
     if (!c.room) {
-      S.paintEmpty(tile);
-      who.hidden = true;
-      ticks.innerHTML = "";
+      S.paintEmpty(tile, { path: c.x === 1 });
       return;
     }
     var d = c.denizen ? T.denizen(s, c.denizen) : null;
@@ -156,91 +285,102 @@
       leaking: c.leaking,
       unpowered: c.unpowered,
       home: !!(d && info.home),
+      edges: edgeFlags(s, c),
     });
-    if (d) {
-      who.hidden = false;
-      S.paintGuest(who, d.kind, frame);
-    } else {
-      who.hidden = true;
-    }
-    var bits = "";
-    if (d && info.home) bits += '<i class="tick home" title="HOME"></i>';
-    if (d && info.nourish > 0) bits += '<i class="tick nourish" title="NOURISH"></i>';
-    if (d && info.friction > 0) bits += '<i class="tick friction" title="FRICTION"></i>';
-    if (c.haunted) bits += '<i class="tick haunt" title="HAUNTED"></i>';
-    ticks.innerHTML = bits;
   }
 
-  function renderPips(s, size) {
+  function renderPips(s) {
     var layer = $("pips");
     layer.innerHTML = "";
-    var house = $("house");
-    var rect = house.getBoundingClientRect();
-    var wrap = $("house-wrap").getBoundingClientRect();
-    s.pips.slice(-8).forEach(function (p, i) {
+    s.pips.slice(-8).forEach(function (p) {
       var age = s.openSec - p.t;
       if (age > 2) return;
       var el = document.createElement("div");
       el.className = "pip " + p.res;
       el.textContent = (p.res === "tally" ? "+" : p.res === "scrap" ? "s+" : "h+") + fmtRate(p.amt);
-      el.style.left = rect.left - wrap.left + p.x * size + size * 0.35 + "px";
-      el.style.top = rect.top - wrap.top + (s.gridH - 1 - p.y) * size + size * 0.15 - age * 10 + "px";
+      el.style.left = (p.x - view.minX) * LOT + LOT * 0.35 + "px";
+      el.style.top = (view.maxY - p.y) * LOT + LOT * 0.15 - age * 10 + "px";
       layer.appendChild(el);
     });
   }
 
+  function paintGuests(s) {
+    var ctx = $("critters").getContext("2d");
+    W.paint(ctx, view, cam, wrapBox());
+  }
+
   function renderBlotter(s) {
-    $("blotter").textContent = s.blotter || "";
+    if ((s.blotter || "") !== lastBlotter) {
+      $("blotter").textContent = s.blotter || "";
+      lastBlotter = s.blotter || "";
+    }
     var wait = T.waiting(s);
     var strip = $("lobby-strip");
-    strip.innerHTML = "";
+    var key = wait
+      .map(function (d) {
+        return d.id;
+      })
+      .join(",") + "|" + (assignId || "");
     if (!wait.length) {
       strip.hidden = true;
+      strip.innerHTML = "";
+      lastWaitKey = key;
       return;
     }
     strip.hidden = false;
-    wait.forEach(function (d) {
-      var b = document.createElement("button");
-      b.type = "button";
-      b.className = "wait" + (assignId === d.id ? " on" : "");
-      var cv = document.createElement("canvas");
-      cv.width = 32;
-      cv.height = 32;
-      S.paintGuest(cv, d.kind, frame);
-      b.appendChild(cv);
-      var lab = document.createElement("span");
-      lab.textContent = d.kind;
-      b.appendChild(lab);
-      b.addEventListener("click", function () {
-        assignId = d.id;
-        mode = "assign";
-        openAssignHint(s, d);
-        renderDock();
-        renderAll();
+    if (key !== lastWaitKey) {
+      lastWaitKey = key;
+      strip.innerHTML = "";
+      wait.forEach(function (d) {
+        var b = document.createElement("button");
+        b.type = "button";
+        b.className = "wait" + (assignId === d.id ? " on" : "");
+        var cv = document.createElement("canvas");
+        cv.width = 32;
+        cv.height = 32;
+        S.paintGuest(cv, d.kind, frame);
+        b.appendChild(cv);
+        var lab = document.createElement("span");
+        lab.textContent = d.kind;
+        b.appendChild(lab);
+        b.addEventListener("click", function () {
+          assignId = d.id;
+          mode = "assign";
+          openAssignHint(s, d);
+          renderDock();
+          renderChrome(s);
+        });
+        strip.appendChild(b);
       });
-      strip.appendChild(b);
-    });
+      lastStripFrame = frame;
+      return;
+    }
+    if (frame !== lastStripFrame) {
+      lastStripFrame = frame;
+      Array.prototype.forEach.call(strip.querySelectorAll("canvas"), function (cv, i) {
+        if (wait[i]) S.paintGuest(cv, wait[i].kind, frame);
+      });
+    }
   }
 
   function openAssignHint(s, d) {
     var def = D.DENIZENS[d.kind];
-    $("context").innerHTML =
-      "<b>ASSIGN " +
-      d.kind +
-      "</b> · wants " +
-      def.wants.join(" / ") +
-      " · tap a room";
+    $("context").innerHTML = "<b>ASSIGN " + d.kind + "</b> · wants " + wantsLine(def) + " · tap a habitat";
   }
 
   function renderContext(s) {
     if (mode === "assign" && assignId) return;
     if (!selected) {
-      $("context").innerHTML = "<b>TYPEHOUSE</b> · tap a cell · we ask which room";
+      $("context").innerHTML = "<b>HABITAT GROUNDS</b> · drag to pan · we ask which grounds";
       return;
     }
     var c = T.cell(s, selected.x, selected.y);
+    if (!c) {
+      $("context").innerHTML = "<b>FOG</b> " + selected.x + "," + selected.y + " · BUY LAND";
+      return;
+    }
     if (!c.room) {
-      $("context").innerHTML = "<b>EMPTY</b> " + selected.x + "," + selected.y + " · BUILD";
+      $("context").innerHTML = "<b>GROUNDS</b> " + selected.x + "," + selected.y + " · BUILD";
       return;
     }
     var def = D.ROOMS[c.room];
@@ -262,31 +402,59 @@
     $("btn-help").classList.toggle("on", mode === "help");
   }
 
-  function onCell(ev) {
-    var x = parseInt(ev.currentTarget.dataset.x, 10);
-    var y = parseInt(ev.currentTarget.dataset.y, 10);
+  function parkToLot(px, py) {
+    return {
+      x: Math.floor(px / LOT) + view.minX,
+      y: view.maxY - Math.floor(py / LOT),
+    };
+  }
+
+  function onParkTap(ev) {
+    var wrap = $("house-wrap").getBoundingClientRect();
+    var px = ev.clientX - wrap.left - cam.x;
+    var py = ev.clientY - wrap.top - cam.y;
+    if (px < 0 || py < 0 || px >= view.w * LOT || py >= view.h * LOT) return;
     var s = T.getState();
-    selected = { x: x, y: y };
-    var c = T.cell(s, x, y);
+    var hit = W.hitTest(px, py, view);
+    if (hit) {
+      selected = { x: hit.x, y: hit.y };
+      var hc = T.cell(s, hit.x, hit.y);
+      if (hc && hc.room) openInspect(s, hc);
+      markDirty();
+      renderChrome(s);
+      return;
+    }
+    var lot = parkToLot(px, py);
+    var c = T.cell(s, lot.x, lot.y);
+    selected = { x: lot.x, y: lot.y };
+    if (!c) {
+      var isFog = T.fogOf(s).some(function (f) {
+        return f.x === lot.x && f.y === lot.y;
+      });
+      if (isFog) openBuy(s, lot.x, lot.y);
+      markDirty();
+      renderChrome(s);
+      return;
+    }
     if (mode === "assign" && assignId) {
-      var msg = T.place(s, assignId, x, y);
+      var msg = T.place(s, assignId, lot.x, lot.y);
       if (msg === "ok") {
+        W.enter(assignId);
         assignId = null;
         mode = "none";
-        openInspect(s, c);
+        openInspect(s, T.cell(s, lot.x, lot.y));
       } else {
         s.blotter = msg;
       }
-      renderAll();
-      return;
-    }
-    if (mode === "build" && !c.room) {
-      openBuild(s, c);
+      markDirty();
+      renderChrome(s);
+      renderHouse(s);
       return;
     }
     if (!c.room) openBuild(s, c);
     else openInspect(s, c);
-    renderAll();
+    markDirty();
+    renderChrome(s);
   }
 
   function costLine(cost) {
@@ -297,6 +465,46 @@
     return bits.join(" · ") || "free";
   }
 
+  function openBuy(s, x, y) {
+    var cost = D.lotCost(s.lotsBought || 0);
+    var unlocked = T.buyUnlocked(s);
+    var geo = T.buyGeometry(s, x, y);
+    var ownedMax = T.ownedCount(s) >= 16;
+    var ok = unlocked && geo === "ok" && !ownedMax && T.canPay(s, cost);
+    var why = !unlocked
+      ? "Seat Wicknoll in Ember Grounds first."
+      : ownedMax
+        ? "Sixteen lots is the fence."
+        : geo !== "ok"
+          ? geo
+          : !T.canPay(s, cost)
+            ? "Need " + costLine(cost) + "."
+            : "";
+    var html =
+      '<div class="sheet-h">BUY LAND</div><p class="sheet-p">Fogged lot ' +
+      x +
+      "," +
+      y +
+      ". Adjacent grounds only.</p>";
+    html += '<p class="sheet-p">' + costLine(cost) + "</p>";
+    if (why) html += '<p class="sheet-p muted">' + why + "</p>";
+    html += '<button class="fat" id="do-buy"' + (ok ? "" : " disabled") + ">BUY LOT · " + costLine(cost) + "</button>";
+    showSheet(html);
+    if ($("do-buy"))
+      $("do-buy").onclick = function () {
+        var msg = T.buyLot(s, x, y);
+        if (msg === "ok") {
+          hideSheet();
+          selected = { x: x, y: y };
+          view = T.parkBounds(s);
+          includeLot(x, y);
+          markDirty();
+        } else s.blotter = msg;
+        renderChrome(s);
+        renderHouse(s);
+      };
+  }
+
   function openBuild(s, c) {
     var onboardHearth = s.onboard === 0;
     var rooms = Object.keys(D.ROOMS).filter(function (id) {
@@ -304,18 +512,24 @@
       if (onboardHearth) return id === "hearth";
       return T.canUnlock(s, id);
     });
-    var html = '<div class="sheet-h">BUILD</div><p class="sheet-p">Empty cell ' + c.x + "," + c.y + ". One room. No demolish.</p>";
+    var html =
+      '<div class="sheet-h">BUILD</div><p class="sheet-p">Empty grounds ' +
+      c.x +
+      "," +
+      c.y +
+      ". One habitat. No demolish.</p>";
     html += '<div class="build-list">';
     rooms.forEach(function (id) {
       var def = D.ROOMS[id];
       var ok = T.canPay(s, def.cost);
       var adjOk = true;
       if (onboardHearth && id === "hearth") adjOk = Math.abs(c.x - 1) + Math.abs(c.y - 0) === 1;
+      var cap = T.roomCount(s) >= 12;
       html +=
         '<button class="build-card" data-kind="' +
         id +
         '" ' +
-        (!ok || !adjOk ? "disabled" : "") +
+        (!ok || !adjOk || cap ? "disabled" : "") +
         '><span class="dot" style="background:' +
         (D.TYPE_COLOR[def.type] || D.PAL.copper) +
         '"></span><b>' +
@@ -324,16 +538,11 @@
         def.blurb +
         "</small><em>" +
         costLine(def.cost) +
-        (!adjOk ? " · beside lobby" : "") +
+        (!adjOk ? " · beside Gatehouse" : "") +
+        (cap ? " · twelve habitats" : "") +
         "</em></button>";
     });
     html += "</div>";
-    if (s.onboard > 0) {
-      html += '<div class="row">';
-      if (!s.expandRow) html += '<button class="fat ghost" id="exp-row">+ ROW · 40 scrap</button>';
-      if (!s.expandCol) html += '<button class="fat ghost" id="exp-col">+ COL · 40 scrap</button>';
-      html += "</div>";
-    }
     showSheet(html);
     Array.prototype.forEach.call(document.querySelectorAll(".build-card"), function (btn) {
       btn.addEventListener("click", function () {
@@ -343,34 +552,24 @@
           selected = { x: c.x, y: c.y };
           openInspect(s, T.cell(s, c.x, c.y));
         } else s.blotter = msg;
-        renderAll();
+        markDirty();
+        renderChrome(s);
+        renderHouse(s);
       });
     });
-    if ($("exp-row"))
-      $("exp-row").onclick = function () {
-        s.blotter = T.expand(s, "row");
-        hideSheet();
-        renderAll();
-      };
-    if ($("exp-col"))
-      $("exp-col").onclick = function () {
-        s.blotter = T.expand(s, "col");
-        hideSheet();
-        renderAll();
-      };
   }
 
   function openInspect(s, c) {
     var def = D.ROOMS[c.room];
     if (c.room === "lobby" && s.onboard === 0) {
       showSheet(
-        '<div class="sheet-h">LOBBY</div><p class="sheet-p">The night desk is open. First job: a Hearth beside this cell. Prefer 1,1.</p><button class="fat" id="do-hearth">BUILD A HEARTH</button><button class="fat ghost" disabled>SEAT</button>'
+        '<div class="sheet-h">GATEHOUSE</div><p class="sheet-p">The night desk is open. First job: Ember Grounds beside this lot. Prefer 1,1.</p><button class="fat" id="do-hearth">BUILD EMBER GROUNDS</button><button class="fat ghost" disabled>SEAT</button>'
       );
       $("do-hearth").onclick = function () {
         mode = "build";
         selected = null;
         hideSheet();
-        $("context").innerHTML = "<b>BUILD HEARTH</b> · tap a cell beside the Lobby";
+        $("context").innerHTML = "<b>BUILD EMBER GROUNDS</b> · tap a lot beside the Gatehouse";
         renderDock();
       };
       return;
@@ -387,7 +586,7 @@
       html += '<div class="who-card">';
       html += '<canvas id="who-big" width="64" height="64"></canvas>';
       html += "<div><b>" + d.kind + "</b><small>" + gdef.types.join("/") + " · " + D.STAGES[d.stage] + "</small>";
-      html += "<small>wants " + gdef.wants.join(" / ") + "</small></div></div>";
+      html += "<small>wants " + wantsLine(gdef) + "</small></div></div>";
       var badges = [];
       if (r.info.home) badges.push('<span class="badge home">HOME</span>');
       if (r.info.nourish > 0) badges.push('<span class="badge nourish">NOURISH</span>');
@@ -404,7 +603,7 @@
         fmtRate(r.dust) +
         " dust/s</div>";
     } else if (c.room === "lobby") {
-      html += "<p class='sheet-p'>" + T.waiting(s).length + " waiting. Tap a face below, then a room.</p>";
+      html += "<p class='sheet-p'>" + T.waiting(s).length + " waiting. Tap a face below, then a habitat.</p>";
     } else if (c.room === "larder") {
       html += "<p class='sheet-p'>No seat. Neighbors ×1.10.</p>";
     } else {
@@ -434,16 +633,22 @@
         var w = T.waiting(s)[0];
         if (!w) return;
         var msg = T.place(s, w.id, c.x, c.y);
-        if (msg === "ok") openInspect(s, T.cell(s, c.x, c.y));
-        else s.blotter = msg;
-        renderAll();
+        if (msg === "ok") {
+          W.enter(w.id);
+          openInspect(s, T.cell(s, c.x, c.y));
+        } else s.blotter = msg;
+        markDirty();
+        renderChrome(s);
+        renderHouse(s);
       };
     if ($("do-up"))
       $("do-up").onclick = function () {
         var msg = T.upgrade(s, c.x, c.y);
         if (msg !== "ok") s.blotter = msg;
         openInspect(s, T.cell(s, c.x, c.y));
-        renderAll();
+        markDirty();
+        renderChrome(s);
+        renderHouse(s);
       };
   }
 
@@ -465,7 +670,9 @@
       btn.addEventListener("click", function () {
         T.resolveEvent(s, parseInt(btn.dataset.i, 10));
         hideSheet();
-        renderAll();
+        markDirty();
+        renderChrome(s);
+        renderHouse(s);
       });
     });
   }
@@ -486,42 +693,43 @@
       " dust.</p>";
     if (r.stages && r.stages.length) html += '<p class="sheet-p">' + r.stages.join(" ") + "</p>";
     if (r.roomWeird) html += '<p class="sheet-p">' + r.roomWeird + "</p>";
-    if (r.event) html += '<p class="sheet-p">The house kept an opinion.</p>';
+    if (r.event) html += '<p class="sheet-p">The grounds kept an opinion.</p>';
     html += '<button class="fat" id="recap-ok">I SEE</button>';
     showSheet(html, "event");
     $("recap-ok").onclick = function () {
       T.dismissRecap();
       $("sheet").className = "sheet";
       $("dim").classList.remove("on");
-      renderAll();
+      markDirty();
+      renderChrome(s);
     };
   }
 
   function openHelp(s) {
     var bag = T.sumYield(s);
     var html =
-      '<div class="sheet-h">BLOTTER</div><p class="sheet-p">We do not ask what they are. We ask which room.</p>' +
-      '<p class="sheet-p">Tally / Scrap / Hush-dust. Types press types. HOME is a rug. FRICTION is an ember tick. NOURISH is moss.</p>' +
-      '<p class="sheet-p">Live house: ' +
+      '<div class="sheet-h">BLOTTER</div><p class="sheet-p">We do not ask what they are. We ask which grounds.</p>' +
+      '<p class="sheet-p">Tally / Scrap / Hush-dust. Types press types. HOME is a rug. FRICTION is an ember post. NOURISH is moss on the rail.</p>' +
+      '<p class="sheet-p">Live grounds: ' +
       fmtRate(bag.tally) +
       " tally/s. Open " +
       Math.floor(s.openSec) +
-      "s. Rooms " +
+      "s. Habitats " +
       T.roomCount(s) +
+      ". Lots " +
+      T.ownedCount(s) +
       ".</p>";
     if (s.flags.hint) html += '<p class="sheet-p">Hint: ' + s.flags.hint + "</p>";
-    html += '<p class="sheet-p muted">Long-press TYPEHOUSE to reset. Offline. No accounts.</p>';
+    html += '<p class="sheet-p muted">Long-press TYPEHOUSE to reset. Offline. No accounts. Fogged lots are BUY LAND, not BUILD.</p>';
     html += '<button class="fat" id="help-ok">BACK TO THE DESK</button>';
     showSheet(html);
     $("help-ok").onclick = hideSheet;
   }
 
-  function renderAll() {
-    var s = T.getState();
+  function renderChrome(s) {
     if (!s) return;
     renderWallet(s);
     renderWeather(s);
-    renderHouse(s);
     renderBlotter(s);
     renderContext(s);
     renderDock();
@@ -530,8 +738,8 @@
       toast.hidden = false;
       toast.textContent = s.toast.text;
     } else toast.hidden = true;
-    if (s.recap) openRecap(s);
-    else if (s.pendingEvent) openEvent(s);
+    if (s.recap && !sheetOpen()) openRecap(s);
+    else if (s.pendingEvent && !sheetOpen()) openEvent(s);
   }
 
   function loop(prev) {
@@ -543,7 +751,20 @@
         T.save(T.getState());
         lastSave = t;
       }
-      renderAll();
+      if (s) {
+        renderChrome(s);
+        if (dirty || t - lastHouse > 1000) {
+          renderHouse(s);
+          lastHouse = t;
+          dirty = false;
+        }
+        if (t - lastWander > 125) {
+          W.sync(s, LOT);
+          W.step(s, LOT, t, cam, wrapBox(), view);
+          paintGuests(s);
+          lastWander = t;
+        }
+      }
       requestAnimationFrame(loop(t));
     };
   }
@@ -552,22 +773,22 @@
     $("btn-build").onclick = function () {
       mode = mode === "build" ? "none" : "build";
       assignId = null;
-      $("context").innerHTML = mode === "build" ? "<b>BUILD</b> · tap an empty cell" : "";
+      $("context").innerHTML = mode === "build" ? "<b>BUILD</b> · tap empty grounds" : "";
       renderDock();
     };
     $("btn-assign").onclick = function () {
       var s = T.getState();
       var w = T.waiting(s);
       if (!w.length) {
-        s.blotter = "No one waiting in the lobby void.";
-        renderAll();
+        s.blotter = "No one waiting at the Gatehouse.";
+        renderChrome(s);
         return;
       }
       mode = "assign";
       assignId = w[0].id;
       openAssignHint(s, w[0]);
       renderDock();
-      renderAll();
+      renderChrome(s);
     };
     $("btn-help").onclick = function () {
       mode = "help";
@@ -581,11 +802,17 @@
     var title = $("title");
     title.addEventListener("pointerdown", function () {
       pressTimer = setTimeout(function () {
-        if (confirm("New house? The current inn is forgotten.")) {
+        if (confirm("New grounds? The current park is forgotten.")) {
           T.reset();
+          W.reset();
           selected = null;
+          camReady = false;
+          lastBlotter = "";
+          lastWaitKey = "";
           hideSheet();
-          renderAll();
+          markDirty();
+          renderChrome(T.getState());
+          renderHouse(T.getState());
         }
       }, 1400);
     });
@@ -594,19 +821,60 @@
         clearTimeout(pressTimer);
       });
     });
+    var wrap = $("house-wrap");
+    wrap.addEventListener("pointerdown", function (ev) {
+      if (sheetOpen()) return;
+      if (pid != null) return;
+      pid = ev.pointerId;
+      wrap.setPointerCapture(pid);
+      pan.sx = ev.clientX;
+      pan.sy = ev.clientY;
+      pan.cx = cam.x;
+      pan.cy = cam.y;
+      pan.moved = false;
+    });
+    wrap.addEventListener("pointermove", function (ev) {
+      if (ev.pointerId !== pid) return;
+      if (sheetOpen()) return;
+      var dx = ev.clientX - pan.sx;
+      var dy = ev.clientY - pan.sy;
+      if (!pan.moved && Math.hypot(dx, dy) > 8) pan.moved = true;
+      if (pan.moved) {
+        cam.x = pan.cx + dx;
+        cam.y = pan.cy + dy;
+        clampCam();
+      }
+    });
+    function endPan(ev) {
+      if (ev.pointerId !== pid) return;
+      var was = pan.moved;
+      pid = null;
+      if (sheetOpen()) return;
+      if (!was) onParkTap(ev);
+    }
+    wrap.addEventListener("pointerup", endPan);
+    wrap.addEventListener("pointercancel", endPan);
     document.addEventListener("visibilitychange", function () {
       T.save(T.getState());
     });
     window.addEventListener("pagehide", function () {
       T.save(T.getState());
     });
-    window.addEventListener("resize", renderAll);
+    window.addEventListener("resize", function () {
+      clampCam();
+      markDirty();
+    });
   }
 
   function bootUI() {
     T.boot();
+    W.reset();
     bind();
-    renderAll();
+    var s = T.getState();
+    renderChrome(s);
+    renderHouse(s);
+    W.sync(s, LOT);
+    paintGuests(s);
     lastSave = performance.now();
     requestAnimationFrame(loop(performance.now()));
     if ("serviceWorker" in navigator) {
@@ -614,7 +882,7 @@
     }
   }
 
-  G.THUI = { boot: bootUI, render: renderAll };
+  G.THUI = { boot: bootUI, render: function () { markDirty(); } };
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", bootUI);
   else bootUI();
 })(window);

@@ -1,7 +1,7 @@
 {
   "name": "Typehouse",
   "short_name": "Typehouse",
-  "description": "Night clerk of a pixel boarding house.",
+  "description": "Night clerk of Habitat Grounds.",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",

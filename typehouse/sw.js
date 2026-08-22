@@ -1,4 +1,4 @@
-const CACHE = "typehouse-v1";
+const CACHE = "typehouse-v2";
 const ASSETS = [
   "./",
   "./index.html",
@@ -7,6 +7,7 @@ const ASSETS = [
   "./js/data.js",
   "./js/sprites.js",
   "./js/game.js",
+  "./js/wander.js",
   "./js/ui.js",
   "./icons/icon-192.png",
   "./icons/icon-512.png",
