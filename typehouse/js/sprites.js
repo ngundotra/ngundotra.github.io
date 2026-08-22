@@ -660,8 +660,11 @@
     paintVisitorPath(ctx, mouthS.x, mouthS.y, mouthJoin.x, mouthJoin.y);
     var ember = owned["1,1"];
     if (ember && ember.room && ember.room !== "lobby") {
-      var emberLip = lotPt(1, 1, bounds, lot, 0.5, 0.92);
-      paintVisitorPath(ctx, gateN.x, gateN.y, emberLip.x, emberLip.y);
+      var emberLip = lotPt(1, 1, bounds, lot, 0.5, 0.96);
+      var seam = lotPt(1, 1, bounds, lot, 0.5, 1.0);
+      paintVisitorPath(ctx, emberLip.x, emberLip.y, seam.x, seam.y);
+      paintVisitorPath(ctx, seam.x, seam.y, gateN.x, gateN.y);
+      fillDisk(ctx, seam.x, seam.y, 16, "#f0b44a");
     }
 
     var rows = {};
@@ -712,8 +715,10 @@
     paintVisitorPath(ctx, mouthS.x, mouthS.y, mouthJoin.x, mouthJoin.y);
     var ember = owned["1,1"];
     if (ember && ember.room && ember.room !== "lobby") {
-      var fork = lotPt(1, 1, bounds, lot, 0.5, 0.92);
-      paintVisitorPath(ctx, gateN.x, gateN.y, fork.x, fork.y);
+      var fork = lotPt(1, 1, bounds, lot, 0.5, 0.96);
+      var seam = lotPt(1, 1, bounds, lot, 0.5, 1.0);
+      paintVisitorPath(ctx, fork.x, fork.y, seam.x, seam.y);
+      paintVisitorPath(ctx, seam.x, seam.y, gateN.x, gateN.y);
     }
     var westR = owned["0,1"];
     var eastR = owned["2,1"];
