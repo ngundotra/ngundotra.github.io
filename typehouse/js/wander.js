@@ -8,9 +8,9 @@
   var last = 0;
   var frame = 0;
   var tmp = null;
-  var LOT = 96;
-  var GW = 40;
-  var GH = 40;
+  var LOT = 192;
+  var GW = 72;
+  var GH = 72;
 
   function rng() {
     seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0;
@@ -23,7 +23,7 @@
   }
 
   function walkPad(room) {
-    return T.isFenced(room) ? 18 : 10;
+    return T.isFenced(room) ? 42 : 16;
   }
 
   function clamp(v, a, b) {
@@ -37,7 +37,7 @@
   }
 
   function standPoint(room) {
-    return { x: LOT * 0.5 - GW * 0.5, y: LOT * 0.52 };
+    return { x: LOT * 0.5 - GW * 0.5, y: LOT * 0.5 };
   }
 
   function gatePoint() {
@@ -45,16 +45,16 @@
   }
 
   function rugPoint() {
-    return { x: LOT * 0.42, y: LOT - 22 - GH };
+    return { x: LOT * 0.42, y: LOT * 0.72 - GH };
   }
 
   function propPoint() {
-    return { x: LOT * 0.36, y: LOT * 0.34 };
+    return { x: LOT * 0.38, y: LOT * 0.42 };
   }
 
   function meetPoint(dir) {
-    var pad = 18;
-    var p = { x: LOT * 0.5 - GW * 0.5, y: LOT * 0.46 };
+    var pad = 24;
+    var p = { x: LOT * 0.5 - GW * 0.5, y: LOT * 0.62 };
     if (dir[0] === 1) p.x = LOT - pad - GW;
     if (dir[0] === -1) p.x = pad;
     if (dir[1] === 1) p.y = pad;
@@ -320,8 +320,8 @@
   function scratch() {
     if (!tmp) {
       tmp = document.createElement("canvas");
-      tmp.width = 40;
-      tmp.height = 40;
+      tmp.width = 72;
+      tmp.height = 72;
     }
     return tmp;
   }

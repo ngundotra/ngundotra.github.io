@@ -1,4 +1,4 @@
-const CACHE = "typehouse-v4";
+const CACHE = "typehouse-v8";
 const ASSETS = [
   "./",
   "./index.html",
@@ -12,6 +12,19 @@ const ASSETS = [
   "./icons/icon-192.png",
   "./icons/icon-512.png",
   "./icons/apple-touch-icon.png",
+  "./img/kiln.png",
+  "./img/well.png",
+  "./img/greenhouse.png",
+  "./img/cottage.png",
+  "./img/grass.png",
+  "./img/path.png",
+  "./img/trees.png",
+  "./img/canopy.png",
+  "./img/wicknoll.png",
+  "./img/puddlewick.png",
+  "./img/ledgerfrond.png",
+  "./img/lantern.png",
+  "./img/buyland.png",
 ];
 
 self.addEventListener("install", function (e) {

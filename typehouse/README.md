@@ -6,6 +6,8 @@ We do not ask what they are. We ask which grounds.
 
 This is original IP. Not a farm, not a battler, not Nintendo, not Pokémon, not 3D.
 
+Yards are authored PNGs in `typehouse/img/` (kiln, well, greenhouse, cottage, grass, trees, Wicknoll). The camera starts pulled back so kiln, cottage, and a neighbor habitat can share one phone frame.
+
 ## Run locally
 
 Zero build. Relative paths only.
@@ -20,8 +22,8 @@ Add to Home Screen: the folder ships a PWA manifest (`The Grounds`, theme `#6aaa
 ## How to play
 
 1. The **Gatehouse** is already open at the front gate. **Wicknoll** waits. Wallet starts **12 Tally / 6 Scrap / 0 Hush-dust**. The park is a **3×2** deed with fogged lots around it.
-2. Tap the Gatehouse. **BUILD EMBER GROUNDS** on an adjacent empty lot (prefer the lot above, `1,1`) for 8 Tally.
-3. **ASSIGN** Wicknoll. It walks in. Tally ticks.
+2. The Gatehouse sheet opens. Tap **BUILD EMBER GROUNDS** — Ember Grounds is built on the lawn above the cottage (`1,1`) for 8 Tally. One tap. No second lot-hunt.
+3. **ASSIGN WICKNOLL**. It walks in the ring. Tally ticks.
 4. After about a minute the grounds offer a **soot handshake**. Keep the soot.
 5. Then **Tide Basin** and **Moss Plot** unlatch. Types press each other through the fence. HOME is a rug. FRICTION is an ember post. NOURISH is moss on the rail.
 6. After Wicknoll is seated, tap fog to **BUY LAND**. First lot is 12 scrap, next is 20. Pan with one thumb. Pinch, double-tap, or the fat **+ / −** buttons to zoom (0.7×–2.2×). The park starts zoomed in on the Gatehouse.
