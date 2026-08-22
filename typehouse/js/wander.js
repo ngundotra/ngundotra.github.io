@@ -125,9 +125,11 @@
 
   function lotOnscreen(x, y, cam, wrap, bounds) {
     if (!cam || !wrap || !bounds) return true;
-    var left = cam.x + (x - bounds.minX) * LOT;
-    var top = cam.y + (bounds.maxY - y) * LOT;
-    return left < wrap.w && left + LOT > 0 && top < wrap.h && top + LOT > 0;
+    var z = cam.z || 1;
+    var left = cam.x + (x - bounds.minX) * LOT * z;
+    var top = cam.y + (bounds.maxY - y) * LOT * z;
+    var size = LOT * z;
+    return left < wrap.w && left + size > 0 && top < wrap.h && top + size > 0;
   }
 
   function nourishPairs(s, d) {

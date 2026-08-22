@@ -1,13 +1,13 @@
 {
-  "name": "Typehouse",
-  "short_name": "Typehouse",
-  "description": "Night clerk of Habitat Grounds.",
+  "name": "The Grounds",
+  "short_name": "The Grounds",
+  "description": "Clerk of The Grounds.",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait",
-  "background_color": "#1a1210",
-  "theme_color": "#1a1210",
+  "background_color": "#6aaa48",
+  "theme_color": "#6aaa48",
   "icons": [
     {
       "src": "icons/icon-192.png",

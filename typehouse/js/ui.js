@@ -15,10 +15,19 @@
   var pressTimer = 0;
   var lastWallet = { tally: 12, scrap: 6, dust: 0 };
   var LOT = 96;
+  var Z_MIN = 0.7;
+  var Z_MAX = 2.2;
+  var Z_DEFAULT = 2;
   var view = { minX: 0, minY: 0, maxX: 2, maxY: 1, w: 3, h: 2 };
-  var cam = { x: 0, y: 0 };
+  var cam = { x: 0, y: 0, z: Z_DEFAULT };
   var camReady = false;
+  var pointers = {};
   var pid = null;
+  var pinch = null;
+  var gesturing = false;
+  var lastTapAt = 0;
+  var lastTapX = 0;
+  var lastTapY = 0;
   var pan = { sx: 0, sy: 0, cx: 0, cy: 0, moved: false };
   var lastBlotter = "";
   var lastWaitKey = "";
@@ -111,7 +120,15 @@
   }
 
   function applyCam() {
-    $("park").style.transform = "translate(" + Math.round(cam.x) + "px," + Math.round(cam.y) + "px)";
+    $("park").style.transform =
+      "translate(" + Math.round(cam.x) + "px," + Math.round(cam.y) + "px) scale(" + cam.z + ")";
+  }
+
+  function syncZoomBtns() {
+    var inn = $("btn-zoom-in");
+    var out = $("btn-zoom-out");
+    if (inn) inn.disabled = cam.z >= Z_MAX - 0.01;
+    if (out) out.disabled = cam.z <= Z_MIN + 0.01;
   }
 
   function clampCam() {
@@ -120,20 +137,47 @@
     if (!wrap || !park) return;
     var ww = wrap.clientWidth;
     var wh = wrap.clientHeight;
-    var pw = view.w * LOT;
-    var ph = view.h * LOT;
+    var z = cam.z || 1;
+    var pw = view.w * LOT * z;
+    var ph = view.h * LOT * z;
     if (pw <= ww) cam.x = Math.round((ww - pw) / 2);
     else cam.x = Math.min(0, Math.max(ww - pw, cam.x));
     if (ph <= wh) cam.y = Math.round((wh - ph) / 2);
     else cam.y = Math.min(0, Math.max(wh - ph, cam.y));
     applyCam();
+    syncZoomBtns();
+  }
+
+  function setZoom(nz, fx, fy) {
+    var wrap = $("house-wrap");
+    if (!wrap) return;
+    nz = Math.max(Z_MIN, Math.min(Z_MAX, nz));
+    var old = cam.z || 1;
+    if (!old) old = 1;
+    if (fx == null) fx = wrap.clientWidth / 2;
+    if (fy == null) fy = wrap.clientHeight / 2;
+    var wx = (fx - cam.x) / old;
+    var wy = (fy - cam.y) / old;
+    cam.z = nz;
+    cam.x = fx - wx * nz;
+    cam.y = fy - wy * nz;
+    clampCam();
+  }
+
+  function toggleZoom(ev) {
+    var wrap = $("house-wrap");
+    if (!wrap) return;
+    var box = wrap.getBoundingClientRect();
+    var next = cam.z >= 1.45 ? 1 : Z_DEFAULT;
+    setZoom(next, ev.clientX - box.left, ev.clientY - box.top);
   }
 
   function centerOn(x, y) {
     var wrap = $("house-wrap");
     if (!wrap) return;
-    var left = (x - view.minX) * LOT + LOT / 2;
-    var top = (view.maxY - y) * LOT + LOT / 2;
+    var z = cam.z || 1;
+    var left = ((x - view.minX) * LOT + LOT / 2) * z;
+    var top = ((view.maxY - y) * LOT + LOT / 2) * z;
     cam.x = wrap.clientWidth / 2 - left;
     cam.y = wrap.clientHeight / 2 - top;
     clampCam();
@@ -142,22 +186,25 @@
   function includeLot(x, y) {
     var wrap = $("house-wrap");
     if (!wrap) return;
-    var left = (x - view.minX) * LOT;
-    var top = (view.maxY - y) * LOT;
+    var z = cam.z || 1;
+    var left = (x - view.minX) * LOT * z;
+    var top = (view.maxY - y) * LOT * z;
     var sl = left + cam.x;
     var st = top + cam.y;
     var pad = 10;
+    var lot = LOT * z;
     if (sl < pad) cam.x += pad - sl;
     if (st < pad) cam.y += pad - st;
-    if (sl + LOT > wrap.clientWidth - pad) cam.x -= sl + LOT - (wrap.clientWidth - pad);
-    if (st + LOT > wrap.clientHeight - pad) cam.y -= st + LOT - (wrap.clientHeight - pad);
+    if (sl + lot > wrap.clientWidth - pad) cam.x -= sl + lot - (wrap.clientWidth - pad);
+    if (st + lot > wrap.clientHeight - pad) cam.y -= st + lot - (wrap.clientHeight - pad);
     clampCam();
   }
 
   function ensureCam(s) {
     view = T.parkBounds(s);
     if (!camReady) {
-      centerOn(1, 0);
+      cam.z = Z_DEFAULT;
+      centerOn(1, 0.5);
       camReady = true;
     } else {
       clampCam();
@@ -397,7 +444,7 @@
   function renderContext(s) {
     if (mode === "assign" && assignId) return;
     if (!selected) {
-      $("context").innerHTML = "<b>HABITAT GROUNDS</b> · drag to pan · we ask which grounds";
+      $("context").innerHTML = "<b>THE GROUNDS</b> · drag to pan · pinch or +/− to zoom";
       return;
     }
     var c = T.cell(s, selected.x, selected.y);
@@ -442,8 +489,9 @@
 
   function onParkTap(ev) {
     var wrap = $("house-wrap").getBoundingClientRect();
-    var px = ev.clientX - wrap.left - cam.x;
-    var py = ev.clientY - wrap.top - cam.y;
+    var z = cam.z || 1;
+    var px = (ev.clientX - wrap.left - cam.x) / z;
+    var py = (ev.clientY - wrap.top - cam.y) / z;
     if (px < 0 || py < 0 || px >= view.w * LOT || py >= view.h * LOT) return;
     var s = T.getState();
     var hit = W.hitTest(px, py, view);
@@ -751,7 +799,8 @@
       T.ownedCount(s) +
       ".</p>";
     if (s.flags.hint) html += '<p class="sheet-p">Hint: ' + s.flags.hint + "</p>";
-    html += '<p class="sheet-p muted">Long-press TYPEHOUSE to reset. Offline. No accounts. Fogged lots are BUY LAND, not BUILD.</p>';
+    html +=
+      '<p class="sheet-p muted">Pinch, double-tap, or the +/− buttons to zoom. Long-press THE GROUNDS to reset. Offline. No accounts. Fogged lots are BUY LAND, not BUILD.</p>';
     html += '<button class="fat" id="help-ok">BACK TO THE DESK</button>';
     showSheet(html);
     $("help-ok").onclick = hideSheet;
@@ -837,6 +886,7 @@
           T.reset();
           W.reset();
           selected = null;
+          cam.z = Z_DEFAULT;
           camReady = false;
           lastBlotter = "";
           lastWaitKey = "";
@@ -853,20 +903,68 @@
       });
     });
     var wrap = $("house-wrap");
-    wrap.addEventListener("pointerdown", function (ev) {
-      if (sheetOpen()) return;
-      if (pid != null) return;
-      pid = ev.pointerId;
-      wrap.setPointerCapture(pid);
-      pan.sx = ev.clientX;
-      pan.sy = ev.clientY;
+    function isZoomCtl(el) {
+      return !!(el && el.closest && el.closest("#zoom-dock"));
+    }
+    function pointerList() {
+      return Object.keys(pointers);
+    }
+    function pinchDist() {
+      var ids = pointerList();
+      if (ids.length < 2) return 0;
+      var a = pointers[ids[0]];
+      var b = pointers[ids[1]];
+      return Math.hypot(a.x - b.x, a.y - b.y);
+    }
+    function pinchMid() {
+      var ids = pointerList();
+      var a = pointers[ids[0]];
+      var b = pointers[ids[1]];
+      var box = wrap.getBoundingClientRect();
+      return { x: (a.x + b.x) / 2 - box.left, y: (a.y + b.y) / 2 - box.top };
+    }
+    function beginPanFrom(id) {
+      var p = pointers[id];
+      if (!p) return;
+      pid = id;
+      pan.sx = p.x;
+      pan.sy = p.y;
       pan.cx = cam.x;
       pan.cy = cam.y;
-      pan.moved = false;
+    }
+    wrap.addEventListener("pointerdown", function (ev) {
+      if (isZoomCtl(ev.target)) return;
+      if (sheetOpen()) return;
+      pointers[ev.pointerId] = { x: ev.clientX, y: ev.clientY };
+      try {
+        wrap.setPointerCapture(ev.pointerId);
+      } catch (e) {}
+      var n = pointerList().length;
+      if (n === 1) {
+        beginPanFrom(ev.pointerId);
+        pan.moved = false;
+        gesturing = false;
+      } else if (n >= 2) {
+        gesturing = true;
+        pan.moved = true;
+        pid = null;
+        pinch = { dist: Math.max(1, pinchDist()), z: cam.z };
+      }
     });
     wrap.addEventListener("pointermove", function (ev) {
-      if (ev.pointerId !== pid) return;
+      if (!pointers[ev.pointerId]) return;
       if (sheetOpen()) return;
+      pointers[ev.pointerId].x = ev.clientX;
+      pointers[ev.pointerId].y = ev.clientY;
+      if (pointerList().length >= 2 && pinch) {
+        var dist = pinchDist();
+        if (dist > 8) {
+          var mid = pinchMid();
+          setZoom(pinch.z * (dist / pinch.dist), mid.x, mid.y);
+        }
+        return;
+      }
+      if (ev.pointerId !== pid) return;
       var dx = ev.clientX - pan.sx;
       var dy = ev.clientY - pan.sy;
       if (!pan.moved && Math.hypot(dx, dy) > 8) pan.moved = true;
@@ -877,14 +975,67 @@
       }
     });
     function endPan(ev) {
-      if (ev.pointerId !== pid) return;
-      var was = pan.moved;
+      if (!pointers[ev.pointerId]) return;
+      delete pointers[ev.pointerId];
+      var left = pointerList();
+      if (left.length < 2) pinch = null;
+      if (left.length === 1) {
+        beginPanFrom(left[0]);
+        pan.moved = true;
+        gesturing = true;
+        return;
+      }
+      if (ev.pointerId !== pid && left.length) return;
+      var was = pan.moved || gesturing;
       pid = null;
+      gesturing = false;
       if (sheetOpen()) return;
-      if (!was) onParkTap(ev);
+      if (was) return;
+      var now = performance.now();
+      if (now - lastTapAt < 300 && Math.hypot(ev.clientX - lastTapX, ev.clientY - lastTapY) < 28) {
+        lastTapAt = 0;
+        toggleZoom(ev);
+        return;
+      }
+      lastTapAt = now;
+      lastTapX = ev.clientX;
+      lastTapY = ev.clientY;
+      onParkTap(ev);
     }
     wrap.addEventListener("pointerup", endPan);
     wrap.addEventListener("pointercancel", endPan);
+    wrap.addEventListener(
+      "wheel",
+      function (ev) {
+        if (sheetOpen() || isZoomCtl(ev.target)) return;
+        ev.preventDefault();
+        var box = wrap.getBoundingClientRect();
+        var step = ev.deltaY < 0 ? 1.12 : 1 / 1.12;
+        setZoom(cam.z * step, ev.clientX - box.left, ev.clientY - box.top);
+      },
+      { passive: false }
+    );
+    function zoomBy(dir, ev) {
+      if (ev) ev.stopPropagation();
+      var box = wrap.getBoundingClientRect();
+      setZoom(cam.z + dir * 0.25, box.width / 2, box.height / 2);
+    }
+    if ($("btn-zoom-in")) {
+      $("btn-zoom-in").onclick = function (ev) {
+        zoomBy(1, ev);
+      };
+      $("btn-zoom-in").addEventListener("pointerdown", function (ev) {
+        ev.stopPropagation();
+      });
+    }
+    if ($("btn-zoom-out")) {
+      $("btn-zoom-out").onclick = function (ev) {
+        zoomBy(-1, ev);
+      };
+      $("btn-zoom-out").addEventListener("pointerdown", function (ev) {
+        ev.stopPropagation();
+      });
+    }
     document.addEventListener("visibilitychange", function () {
       T.save(T.getState());
     });
