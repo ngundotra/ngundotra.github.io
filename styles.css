@@ -73,15 +73,6 @@ a:hover {
   top: 0.75rem;
 }
 
-.ink {
-  position: fixed;
-  inset: 0;
-  z-index: 25;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-}
-
 .grain,
 .vignette {
   position: fixed;
@@ -186,14 +177,14 @@ a:hover {
   color: var(--gold);
 }
 
-.room {
+.panel {
   position: relative;
   padding: 2.1rem var(--gutter) 3.4rem;
   border-bottom: 1px solid var(--line);
   scroll-margin-top: calc(var(--rail) + 0.55rem);
 }
 
-.room::before {
+.panel::before {
   content: "";
   position: absolute;
   inset: 0 auto 0 0;
@@ -201,14 +192,13 @@ a:hover {
   background: var(--pigment);
 }
 
-.room--foyer { --pigment: #d4a853; }
-.room--code2pix { --pigment: #3d9a96; }
-.room--notelet { --pigment: #a34b5c; }
-.room--sculptml { --pigment: #7a5aa8; }
-.room--lastweek { --pigment: #3d6eae; }
-.room--cabinet { --pigment: #8a6b3a; }
+.panel--foyer { --pigment: #d4a853; }
+.panel--code2pix { --pigment: #3d9a96; }
+.panel--notelet { --pigment: #a34b5c; }
+.panel--sculptml { --pigment: #7a5aa8; }
+.panel--lastweek { --pigment: #3d6eae; }
 
-.room--foyer {
+.panel--foyer {
   min-height: calc(100svh - var(--rail));
   display: flex;
   align-items: center;
@@ -217,37 +207,31 @@ a:hover {
     var(--ink);
 }
 
-.room--code2pix {
+.panel--code2pix {
   background:
     radial-gradient(ellipse at 88% 12%, rgba(61, 154, 150, 0.16), transparent 40%),
     var(--ink);
 }
 
-.room--notelet {
+.panel--notelet {
   background:
     radial-gradient(ellipse at 12% 80%, rgba(163, 75, 92, 0.16), transparent 42%),
     var(--ink);
 }
 
-.room--sculptml {
+.panel--sculptml {
   background:
     radial-gradient(ellipse at 90% 70%, rgba(122, 90, 168, 0.16), transparent 42%),
     var(--ink);
 }
 
-.room--lastweek {
+.panel--lastweek {
   background:
     radial-gradient(ellipse at 20% 20%, rgba(61, 110, 174, 0.16), transparent 42%),
     var(--ink);
 }
 
-.room--cabinet {
-  background:
-    radial-gradient(ellipse at 70% 30%, rgba(138, 107, 58, 0.14), transparent 42%),
-    var(--ink);
-}
-
-.room__inner {
+.panel__inner {
   position: relative;
   z-index: 1;
   max-width: 68rem;
@@ -255,7 +239,6 @@ a:hover {
 
 .accession,
 .kicker,
-.ink-note,
 .subhead,
 figcaption,
 .place {
@@ -320,14 +303,6 @@ figcaption,
 
 .links a {
   color: var(--gold);
-}
-
-.ink-note {
-  margin: 2.2rem 0 0;
-  color: var(--gold);
-  text-transform: none;
-  letter-spacing: 0.04em;
-  font-size: 0.8rem;
 }
 
 h2 {
@@ -452,36 +427,6 @@ h2 {
   background: #070605;
 }
 
-.drawers {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 1rem;
-}
-
-.drawer {
-  padding: 1.15rem 1.2rem 1.25rem;
-  border: 1px solid var(--line);
-  background:
-    linear-gradient(180deg, rgba(138, 107, 58, 0.12), transparent 42%),
-    rgba(0, 0, 0, 0.22);
-}
-
-.drawer h3 {
-  margin: 0 0 0.55rem;
-  font-family: var(--display);
-  font-size: 1.7rem;
-  font-weight: 500;
-}
-
-.drawer p {
-  margin: 0 0 0.85rem;
-  color: #d8ccb6;
-}
-
-.drawer .links {
-  margin-bottom: 0;
-}
-
 .colophon {
   padding: 1.6rem var(--gutter) 2.4rem;
   border-top: 1px solid var(--line);
@@ -501,7 +446,6 @@ h2 {
 @media (max-width: 860px) {
   .strip,
   .gallery,
-  .drawers,
   .phones {
     grid-template-columns: 1fr;
   }
@@ -547,7 +491,7 @@ h2 {
     display: none;
   }
 
-  .room {
+  .panel {
     padding-top: 1.6rem;
     padding-bottom: 2.4rem;
   }
@@ -570,7 +514,6 @@ h2 {
     scroll-behavior: auto;
   }
 
-  .ink,
   .grain {
     display: none;
   }

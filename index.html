@@ -13,28 +13,25 @@
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <a class="skip" href="#foyer">Skip to exhibits</a>
+  <a class="skip" href="#foyer">Skip to content</a>
 
-  <canvas id="ink" class="ink" aria-hidden="true"></canvas>
   <div class="grain" aria-hidden="true"></div>
   <div class="vignette" aria-hidden="true"></div>
 
   <header class="tickets" role="banner">
     <p class="tickets__mark">Toy Museum</p>
-    <nav class="tickets__rail" aria-label="Rooms">
-      <a class="ticket is-active" href="#foyer" data-room="foyer"><span class="ticket__n">01</span><span class="ticket__l">Foyer</span></a>
-      <a class="ticket" href="#code2pix" data-room="code2pix"><span class="ticket__n">02</span><span class="ticket__l">Code2Pix</span></a>
-      <a class="ticket" href="#notelet" data-room="notelet"><span class="ticket__n">03</span><span class="ticket__l">Notelet</span></a>
-      <a class="ticket" href="#sculptml" data-room="sculptml"><span class="ticket__n">04</span><span class="ticket__l">SculptML</span></a>
-      <a class="ticket" href="#lastweek" data-room="lastweek"><span class="ticket__n">05</span><span class="ticket__l">Last Week</span></a>
-      <a class="ticket" href="#cabinet" data-room="cabinet"><span class="ticket__n">06</span><span class="ticket__l">Cabinet</span></a>
+    <nav class="tickets__rail" aria-label="Projects">
+      <a class="ticket is-active" href="#foyer" data-section="foyer" aria-label="Foyer"><span class="ticket__n">01</span><span class="ticket__l">Foyer</span></a>
+      <a class="ticket" href="#code2pix" data-section="code2pix" aria-label="Code2Pix"><span class="ticket__n">02</span><span class="ticket__l">Code2Pix</span></a>
+      <a class="ticket" href="#notelet" data-section="notelet" aria-label="Notelet"><span class="ticket__n">03</span><span class="ticket__l">Notelet</span></a>
+      <a class="ticket" href="#sculptml" data-section="sculptml" aria-label="SculptML"><span class="ticket__n">04</span><span class="ticket__l">SculptML</span></a>
+      <a class="ticket" href="#lastweek" data-section="lastweek" aria-label="Last Week on X"><span class="ticket__n">05</span><span class="ticket__l">Last Week</span></a>
     </nav>
   </header>
 
   <main>
-    <section id="foyer" class="room room--foyer" data-room="foyer" aria-labelledby="foyer-title">
-      <div class="room__inner foyer">
-        <p class="accession">Room 01 · Foyer</p>
+    <section id="foyer" class="panel panel--foyer" data-section="foyer" aria-labelledby="foyer-title">
+      <div class="panel__inner foyer">
         <p class="kicker">Things I built that I still think are cool.</p>
         <h1 id="foyer-title" class="name">
           <span class="name__given">Noah</span>
@@ -45,13 +42,12 @@
           <li><a href="https://github.com/ngundotra">github.com/ngundotra</a></li>
           <li><a href="https://www.linkedin.com/in/ngundotra">linkedin.com/in/ngundotra</a></li>
         </ul>
-        <p class="ink-note">Please touch the exhibits. Cursor leaves ink.</p>
       </div>
     </section>
 
-    <section id="code2pix" class="room room--code2pix" data-room="code2pix" aria-labelledby="code2pix-title">
-      <div class="room__inner">
-        <p class="accession">Room 02 · 2018 · Jupyter · 141 stars</p>
+    <section id="code2pix" class="panel panel--code2pix" data-section="code2pix" aria-labelledby="code2pix-title">
+      <div class="panel__inner">
+        <p class="accession">02 · 2018 · Jupyter · 141 stars</p>
         <h2 id="code2pix-title">Code2Pix</h2>
         <p class="lede">A differentiable compiler: textual GUI descriptions become pixels. Built with Uizard and Berkeley SUSA (Statistics Undergraduate Student Association).</p>
         <ul class="links">
@@ -82,11 +78,11 @@
       </div>
     </section>
 
-    <section id="notelet" class="room room--notelet" data-room="notelet" aria-labelledby="notelet-title">
-      <div class="room__inner">
-        <p class="accession">Room 03 · Devpost</p>
+    <section id="notelet" class="panel panel--notelet" data-section="notelet" aria-labelledby="notelet-title">
+      <div class="panel__inner">
+        <p class="accession">03 · Devpost</p>
         <h2 id="notelet-title">Notelet</h2>
-        <p class="lede">Handwritten notes compile to LaTeX. Select a stretch of math and Wolfram plots it. No public GitHub — the exhibit lives on Devpost.</p>
+        <p class="lede">Handwritten notes compile to LaTeX. Select a stretch of math and Wolfram plots it. No public GitHub — the writeup lives on Devpost.</p>
         <ul class="links">
           <li><a href="https://devpost.com/software/notelet-f5x0w6">devpost.com/software/notelet-f5x0w6</a></li>
         </ul>
@@ -118,9 +114,9 @@
       </div>
     </section>
 
-    <section id="sculptml" class="room room--sculptml" data-room="sculptml" aria-labelledby="sculptml-title">
-      <div class="room__inner">
-        <p class="accession">Room 04 · iOS + Flask · CoreML</p>
+    <section id="sculptml" class="panel panel--sculptml" data-section="sculptml" aria-labelledby="sculptml-title">
+      <div class="panel__inner">
+        <p class="accession">04 · iOS + Flask · CoreML</p>
         <h2 id="sculptml-title">SculptML</h2>
         <p class="lede">Visually build a net on your phone, train it on a Flask server, deploy as CoreML. Graph Builder on the left; a drawn 6 predicted as 6 on the right.</p>
         <ul class="links">
@@ -142,9 +138,9 @@
       </div>
     </section>
 
-    <section id="lastweek" class="room room--lastweek" data-room="lastweek" aria-labelledby="lastweek-title">
-      <div class="room__inner">
-        <p class="accession">Room 05 · Devpost</p>
+    <section id="lastweek" class="panel panel--lastweek" data-section="lastweek" aria-labelledby="lastweek-title">
+      <div class="panel__inner">
+        <p class="accession">05 · Devpost</p>
         <h2 id="lastweek-title">Last Week on X</h2>
         <p class="lede">Grok turns the last 7 days of X into a spoken podcast. Devpost only.</p>
         <p class="notice">The timeline in these shots is a Devpost product demo (Anitej Thamma), not Noah’s feed.</p>
@@ -171,32 +167,6 @@
               <span>Landing</span>
             </button>
           </div>
-        </div>
-      </div>
-    </section>
-
-    <section id="cabinet" class="room room--cabinet" data-room="cabinet" aria-labelledby="cabinet-title">
-      <div class="room__inner">
-        <p class="accession">Room 06 · Cabinet</p>
-        <h2 id="cabinet-title">Cabinet</h2>
-        <p class="lede">Two smaller pieces, still on the shelf.</p>
-
-        <div class="drawers">
-          <article class="drawer">
-            <h3>Spyglass</h3>
-            <p>Search and reuse Solana code. Extracts and parses Rust functions from program source — a specific repository, or verified programs uploaded by a signer on chain.</p>
-            <ul class="links">
-              <li><a href="https://github.com/ngundotra/spyglass-solana">github.com/ngundotra/spyglass-solana</a></li>
-              <li><a href="https://spyglass-solana.vercel.app">spyglass-solana.vercel.app</a></li>
-            </ul>
-          </article>
-          <article class="drawer">
-            <h3>RubberLander</h3>
-            <p>Topological data analysis of state space for trained and untrained agents in LunarLander.</p>
-            <ul class="links">
-              <li><a href="https://github.com/ngundotra/RubberLander">github.com/ngundotra/RubberLander</a></li>
-            </ul>
-          </article>
         </div>
       </div>
     </section>
