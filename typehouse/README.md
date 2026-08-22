@@ -1,10 +1,10 @@
-# Typehouse
+# Typehouse — Habitat Grounds
 
-A phone-first idle boarding house. You are the night clerk. Guests are slightly-wrong house-spirits. Types are weather in the walls.
+A phone-first idle park. You are the night clerk. Guests are slightly-wrong house-spirits. They walk inside fenced habitats. Types are weather in the walls.
 
-We do not ask what they are. We ask which room.
+We do not ask what they are. We ask which grounds.
 
-This is original IP. Not a farm, not a battler, not Nintendo, not Pokémon.
+This is original IP. Not a farm, not a battler, not Nintendo, not Pokémon, not 3D.
 
 ## Run locally
 
@@ -19,25 +19,28 @@ Add to Home Screen: the folder ships a PWA manifest (`Typehouse`, theme `#1a1210
 
 ## How to play
 
-1. The **Lobby** is already open at the front door. **Wicknoll** waits. Wallet starts **12 Tally / 6 Scrap / 0 Hush-dust**.
-2. Tap the Lobby. **BUILD A HEARTH** on an adjacent empty cell (prefer the cell above, `1,1`) for 8 Tally.
-3. **ASSIGN** Wicknoll. It sits down. Tally ticks.
-4. After about a minute the house offers a **soot handshake**. Keep the soot.
-5. Then **Cistern** and **Conservatory** unlatch. Types press each other through the walls. HOME is a rug. FRICTION is an ember tick. NOURISH is moss.
+1. The **Gatehouse** is already open at the front gate. **Wicknoll** waits. Wallet starts **12 Tally / 6 Scrap / 0 Hush-dust**. The park is a **3×2** deed with fogged lots around it.
+2. Tap the Gatehouse. **BUILD EMBER GROUNDS** on an adjacent empty lot (prefer the lot above, `1,1`) for 8 Tally.
+3. **ASSIGN** Wicknoll. It walks in. Tally ticks.
+4. After about a minute the grounds offer a **soot handshake**. Keep the soot.
+5. Then **Tide Basin** and **Moss Plot** unlatch. Types press each other through the fence. HOME is a rug. FRICTION is an ember post. NOURISH is moss on the rail.
+6. After Wicknoll is seated, tap fog to **BUY LAND**. First lot is 12 scrap, next is 20. Pan with one thumb. The park is supposed to overflow the screen.
 
-Dock: **BUILD** / **ASSIGN** / **?**. Tap a room for the sheet (guest, live tally/s, upgrade, assign). Long-press the title only if you truly want a new house.
+Dock: **BUILD** / **ASSIGN** / **?**. Tap a habitat for the sheet (guest, live tally/s, upgrade, assign). Tap fog for BUY LAND, not BUILD. Long-press the title only if you truly want new grounds.
 
-Away time keeps the inn alive (capped at 8 hours, taxed 0.85). Come back after two minutes and the Night Desk has a recap.
+Away time keeps the park alive (capped at 8 hours, taxed 0.85). Come back after two minutes and the Night Desk has a recap.
 
 ## Debug (off by default)
 
 - `?debug=1` — rich wallet and faster arrivals
 - `?catchup=120` — apply 120 seconds of away catch-up
 - `?evt=evt_soot_handshake` — fire a named event
-- `?demo=seated` / `?demo=friction` — seed Hearth+Wicknoll, or Cistern beside it
+- `?demo=seated` / `?demo=friction` — seed Ember Grounds+Wicknoll, or Tide Basin beside it
+- `?meet=1` — force the next fence-meet
+- `?lots=3` — grant 3 legal fog lots free
 
-Console: `Typehouse.selfCheck()` runs the 60s script (soot, friction drop, away tax, save).
+Console: `Typehouse.selfCheck()` runs the 60s script (soot, friction drop, away tax, save, buyLot, v1 migrate).
 
 ## Save
 
-`localStorage` key `typehouse.v1`. Corrupt save starts a new house. Offline-first. No accounts, no backend, no real money.
+`localStorage` key `typehouse.v1`. `s.v` 1→2 migrator turns old 4×4 cells into owned land plus a fog halo. Wallets are never wiped. Corrupt save starts new grounds. Offline-first. No accounts, no backend, no real money.

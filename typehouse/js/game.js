@@ -52,18 +52,17 @@
   function fresh() {
     var t = now();
     var s = {
-      v: 1,
+      v: 2,
       tally: 12,
       scrap: 6,
       dust: 0,
       lifetimeTally: 0,
       openSec: 0,
       lastSeen: t,
-      gridW: 4,
-      gridH: 4,
-      expandRow: false,
-      expandCol: false,
-      cells: makeGrid(4, 4),
+      gridW: 3,
+      gridH: 2,
+      lotsBought: 0,
+      cells: makeGrid(3, 2),
       denizens: [],
       flags: {},
       unlocks: { hearth: true },
@@ -190,6 +189,142 @@
       [0, 1],
       [0, -1],
     ];
+  }
+
+  function ownedCount(s) {
+    return Object.keys(s.cells).length;
+  }
+
+  function syncGrid(s) {
+    var minX = Infinity;
+    var minY = Infinity;
+    var maxX = -Infinity;
+    var maxY = -Infinity;
+    eachCell(s, function (c) {
+      if (c.x < minX) minX = c.x;
+      if (c.y < minY) minY = c.y;
+      if (c.x > maxX) maxX = c.x;
+      if (c.y > maxY) maxY = c.y;
+    });
+    if (minX === Infinity) {
+      s.gridW = 3;
+      s.gridH = 2;
+      return;
+    }
+    s.gridW = maxX - minX + 1;
+    s.gridH = maxY - minY + 1;
+  }
+
+  function fogOf(s) {
+    var out = [];
+    var seen = {};
+    eachCell(s, function (c) {
+      dirs().forEach(function (dir) {
+        var x = c.x + dir[0];
+        var y = c.y + dir[1];
+        var k = key(x, y);
+        if (s.cells[k] || seen[k]) return;
+        seen[k] = true;
+        out.push({ x: x, y: y });
+      });
+    });
+    return out;
+  }
+
+  function parkBounds(s) {
+    var minX = Infinity;
+    var minY = Infinity;
+    var maxX = -Infinity;
+    var maxY = -Infinity;
+    function acc(x, y) {
+      if (x < minX) minX = x;
+      if (y < minY) minY = y;
+      if (x > maxX) maxX = x;
+      if (y > maxY) maxY = y;
+    }
+    eachCell(s, function (c) {
+      acc(c.x, c.y);
+    });
+    fogOf(s).forEach(function (f) {
+      acc(f.x, f.y);
+    });
+    if (minX === Infinity) return { minX: 0, minY: 0, maxX: 2, maxY: 1, w: 3, h: 2 };
+    return { minX: minX, minY: minY, maxX: maxX, maxY: maxY, w: maxX - minX + 1, h: maxY - minY + 1 };
+  }
+
+  function isFenced(room) {
+    return !!(room && room !== "lobby" && room !== "larder" && room !== "transom");
+  }
+
+  function buyUnlocked(s) {
+    var w = denizen(s, "Wicknoll");
+    if (!w || w.x == null) return false;
+    var c = cell(s, w.x, w.y);
+    return !!(c && c.room === "hearth");
+  }
+
+  function buyGeometry(s, x, y) {
+    if (cell(s, x, y)) return "Already owned.";
+    var adj = false;
+    dirs().forEach(function (dir) {
+      if (cell(s, x + dir[0], y + dir[1])) adj = true;
+    });
+    if (!adj) return "Only adjacent fog.";
+    var minX = x;
+    var minY = y;
+    var maxX = x;
+    var maxY = y;
+    eachCell(s, function (c) {
+      if (c.x < minX) minX = c.x;
+      if (c.y < minY) minY = c.y;
+      if (c.x > maxX) maxX = c.x;
+      if (c.y > maxY) maxY = c.y;
+    });
+    if (maxX - minX + 1 > 6) return "The park will not stretch that wide.";
+    if (maxY - minY + 1 > 4) return "The park will not stretch that far.";
+    return "ok";
+  }
+
+  function buyLot(s, x, y) {
+    if (!buyUnlocked(s)) return "Seat Wicknoll in Ember Grounds first.";
+    if (ownedCount(s) >= 16) return "Sixteen lots is the fence.";
+    var geo = buyGeometry(s, x, y);
+    if (geo !== "ok") return geo;
+    var cost = D.lotCost(s.lotsBought || 0);
+    if (!canPay(s, cost)) return "The desk refuses the receipt.";
+    pay(s, cost);
+    s.cells[key(x, y)] = emptyCell(x, y);
+    s.lotsBought = (s.lotsBought || 0) + 1;
+    syncGrid(s);
+    blot(s, "The fog lifts.");
+    toast(s, "New grounds.");
+    return "ok";
+  }
+
+  function grantLot(s, x, y) {
+    if (cell(s, x, y)) return false;
+    if (buyGeometry(s, x, y) !== "ok") return false;
+    if (ownedCount(s) >= 16) return false;
+    s.cells[key(x, y)] = emptyCell(x, y);
+    s.lotsBought = (s.lotsBought || 0) + 1;
+    syncGrid(s);
+    return true;
+  }
+
+  function migrateV1(s) {
+    if (!s) return s;
+    if (s.v === 1) {
+      s.v = 2;
+      if (s.lotsBought == null) s.lotsBought = Math.max(0, Object.keys(s.cells).length - 6);
+      delete s.expandRow;
+      delete s.expandCol;
+    }
+    if (s.v !== 2) s.v = 2;
+    if (s.lotsBought == null) s.lotsBought = Math.max(0, Object.keys(s.cells).length - 6);
+    if (!s.flags) s.flags = {};
+    if (!s.unlocks) s.unlocks = { hearth: true };
+    syncGrid(s);
+    return s;
   }
 
   function neighborWeather(s, x, y) {
@@ -374,7 +509,7 @@
       y: null,
       exhaustedUntil: 0,
     });
-    blot(s, kind + " waits in the lobby.");
+    blot(s, kind + " waits at the Gatehouse.");
     toast(s, kind + " in the void.");
     return kind;
   }
@@ -443,12 +578,12 @@
       s.unlocks.conservatory = true;
       if (choiceId === "keep") {
         add(s, "dust", 1);
-        msg = "We keep the soot. Hush-dust: 1. Cistern and Conservatory unlatch.";
+        msg = "We keep the soot. Hush-dust: 1. Tide Basin and Moss Plot unlatch.";
       } else {
         add(s, "tally", 3);
-        msg = "The grate shines. Cistern and Conservatory unlatch anyway.";
+        msg = "The grate shines. Tide Basin and Moss Plot unlatch anyway.";
       }
-      blot(s, "The house will take water and leaf now.");
+      blot(s, "The grounds will take water and leaf now.");
     } else if (evId === "evt_leak_blotter") {
       if (choiceId === "mop") {
         add(s, "scrap", 2);
@@ -457,7 +592,7 @@
         var c = roomsOf(s, "cistern")[0] || roomsOf(s, "hearth")[0];
         if (c) c.leaking = true;
         add(s, "tally", 4);
-        msg = "The leak signs its name. A room drips ember. Four tally for the autograph.";
+        msg = "The leak signs its name. A habitat drips ember. Four tally for the autograph.";
       }
     } else if (evId === "evt_dry_inspector") {
       var rooms = roomCount(s);
@@ -480,7 +615,7 @@
           msg = "The kettle is hush enough. They leave dust on the saucer.";
         } else {
           add(s, "tally", -4);
-          msg = "Tea without a Dormer. They fine the thirst.";
+          msg = "Tea without a Hush Loft. They fine the thirst.";
         }
       }
     } else if (evId === "evt_type_bath") {
@@ -528,7 +663,7 @@
         roomsOf(s, "dynamo").forEach(function (c) {
           c.unpowered = true;
         });
-        msg = "No dust. The Dynamo goes dim on its own.";
+        msg = "No dust. The Spark Pen goes dim on its own.";
       }
     } else if (evId === "evt_quiet_contest") {
       if (choiceId === "honor") {
@@ -570,7 +705,7 @@
       } else {
         add(s, "tally", 6);
         s.flags.mossSulk = s.openSec + 80;
-        msg = "Six tally. Moss rooms take the minutes personally.";
+        msg = "Six tally. Moss plots take the minutes personally.";
       }
     } else if (evId === "rust_wedding") {
       if (choiceId === "lid") {
@@ -583,7 +718,7 @@
     } else if (evId === "draft_census") {
       if (choiceId === "window") {
         s.weather = { type: "draft", until: s.openSec + 90 };
-        msg = "A window stays honest. Draft walks the halls for 90s.";
+        msg = "A window stays honest. Draft walks the lanes for 90s.";
       } else {
         add(s, "scrap", 2);
         msg = "Books closed. Two scrap for the trouble of counting.";
@@ -626,7 +761,7 @@
       if (choiceId === "dim") {
         s.weather = { type: "hush", until: s.openSec + 70 };
         add(s, "dust", 0.5);
-        msg = "The house goes hush-colored. Half a dust on the glass.";
+        msg = "The grounds go hush-colored. Half a dust on the glass.";
       } else if (pay(s, { tally: 4, scrap: 0, dust: 0 })) {
         add(s, "scrap", 2);
         msg = "A wick for four tally. Two scrap change.";
@@ -644,19 +779,19 @@
         })[0];
         if (older && seatedRoom) {
           place(s, older.id, seatedRoom.x, seatedRoom.y, true);
-          msg = older.kind + " takes the room. The other learns hallway.";
-        } else msg = "No room would have them.";
+          msg = older.kind + " takes the habitat. The other learns hallway.";
+        } else msg = "No habitat would have them.";
       } else {
         s.flags.owedRoom = true;
         add(s, "tally", 3);
-        msg = "A promise and three tally. The blotter writes OWE ROOM.";
+        msg = "A promise and three tally. The blotter writes OWE GROUNDS.";
       }
     } else if (evId === "tarnish_banquet") {
       if (choiceId === "serve") {
         add(s, "scrap", 6);
         var sc = roomsOf(s, "scullery")[0];
         if (sc) sc.leaking = true;
-        msg = "Six scrap. The Scullery is a little worse and a little richer.";
+        msg = "Six scrap. The Rust Yard is a little worse and a little richer.";
       } else {
         add(s, "tally", 8);
         msg = "Door locked. Eight tally, no plates.";
@@ -763,7 +898,7 @@
     recap.roomWeird = null;
     recap.event = null;
     eachCell(s, function (c) {
-      if (c.haunted || c.leaking) recap.roomWeird = (D.ROOMS[c.room] ? D.ROOMS[c.room].name : "A room") + (c.haunted ? " is twice-named." : " is leaking.");
+      if (c.haunted || c.leaking) recap.roomWeird = (D.ROOMS[c.room] ? D.ROOMS[c.room].name : "A habitat") + (c.haunted ? " is twice-named." : " is leaking.");
     });
     if (secs >= D.RECAP_AFTER) {
       if (!s.pendingEvent) {
@@ -778,15 +913,16 @@
   function build(s, x, y, kind) {
     var c = cell(s, x, y);
     var def = D.ROOMS[kind];
-    if (!c || !def) return "No such cell.";
-    if (c.room) return "Already a room.";
-    if (def.unbuildable) return "The lobby is not built. It simply is.";
-    if (kind === "larder" && roomsOf(s, "larder").length) return "One larder.";
-    if (!canUnlock(s, kind)) return "The house is not ready for that.";
-    if (s.onboard === 0 && kind !== "hearth") return "Build a Hearth first.";
+    if (!c || !def) return "No such lot.";
+    if (c.room) return "Already a habitat.";
+    if (def.unbuildable) return "The Gatehouse is not built. It simply is.";
+    if (kind === "larder" && roomsOf(s, "larder").length) return "One Tack Shed.";
+    if (!canUnlock(s, kind)) return "The grounds are not ready for that.";
+    if (kind !== "lobby" && roomCount(s) >= 12) return "Twelve habitats is enough for now.";
+    if (s.onboard === 0 && kind !== "hearth") return "Build Ember Grounds first.";
     if (s.onboard === 0 && kind === "hearth") {
       var adjLobby = Math.abs(x - 1) + Math.abs(y - 0) === 1;
-      if (!adjLobby) return "First Hearth wants a cell beside the Lobby.";
+      if (!adjLobby) return "First Ember Grounds wants a lot beside the Gatehouse.";
     }
     if (!canPay(s, def.cost)) return "The desk refuses the receipt.";
     pay(s, def.cost);
@@ -794,7 +930,7 @@
     c.level = 1;
     if (kind === "hearth" && s.onboard === 0) {
       s.onboard = 1;
-      blot(s, "Hearth is open. Seat Wicknoll.");
+      blot(s, "Ember Grounds is open. Seat Wicknoll.");
     }
     toast(s, def.name + " stands.");
     return "ok";
@@ -803,7 +939,7 @@
   function upgrade(s, x, y) {
     var c = cell(s, x, y);
     if (!c || !c.room || c.room === "lobby") return "Nothing to raise.";
-    if (c.level >= 3) return "Already as far along as a room gets.";
+    if (c.level >= 3) return "Already as far along as a habitat gets.";
     var cost = D.UPGRADE[c.level + 1];
     if (!canPay(s, cost)) return "Not enough leftovers.";
     pay(s, cost);
@@ -813,27 +949,6 @@
       if (d && d.stage < c.level - 1) d.stage = Math.min(3, c.level - 1);
     }
     blot(s, D.ROOMS[c.room].name + " is now level " + c.level + ".");
-    return "ok";
-  }
-
-  function expand(s, which) {
-    if (which === "row") {
-      if (s.expandRow || s.gridH >= 5) return "No more row.";
-      if (!canPay(s, D.EXPAND_COST)) return "Need 40 scrap.";
-      pay(s, D.EXPAND_COST);
-      for (var x = 0; x < s.gridW; x++) s.cells[key(x, s.gridH)] = emptyCell(x, s.gridH);
-      s.gridH += 1;
-      s.expandRow = true;
-      blot(s, "A higher floor of night unlatches.");
-      return "ok";
-    }
-    if (s.expandCol || s.gridW >= 5) return "No more column.";
-    if (!canPay(s, D.EXPAND_COST)) return "Need 40 scrap.";
-    pay(s, D.EXPAND_COST);
-    for (var y = 0; y < s.gridH; y++) s.cells[key(s.gridW, y)] = emptyCell(s.gridW, y);
-    s.gridW += 1;
-    s.expandCol = true;
-    blot(s, "The lot grows a shoulder.");
     return "ok";
   }
 
@@ -849,13 +964,13 @@
     var d = denizen(s, id);
     var c = cell(s, x, y);
     if (!d || !c || !c.room) return "No seat there.";
-    if (c.room === "larder") return "The Larder does not sit anyone.";
-    if (c.room === "lobby") return "Lobby is for waiting, not sitting.";
+    if (c.room === "larder") return "The Tack Shed does not sit anyone.";
+    if (c.room === "lobby") return "Gatehouse is for waiting, not sitting.";
     if (c.haunted && defOf(d).types.indexOf("hush") === -1 && !force && Math.random() < 0.5) {
-      return d.kind + " refuses the twice-named room.";
+      return d.kind + " refuses the twice-named habitat.";
     }
     if (c.denizen && c.denizen !== id) {
-      if (!force) return "That room is taken.";
+      if (!force) return "That habitat is taken.";
       clearSeat(s, denizen(s, c.denizen));
     }
     clearSeat(s, d);
@@ -888,9 +1003,9 @@
       var raw = localStorage.getItem(D.SAVE_KEY);
       if (!raw) return null;
       var s = JSON.parse(raw);
-      if (!s || s.v !== 1 || typeof s.tally !== "number" || !s.cells) return null;
+      if (!s || (s.v !== 1 && s.v !== 2) || typeof s.tally !== "number" || !s.cells) return null;
       if (!s.denizens || !s.denizens.length) return null;
-      return s;
+      return migrateV1(s);
     } catch (e) {
       return null;
     }
@@ -926,6 +1041,18 @@
       s.tally = Math.max(s.tally, 20);
       s.scrap = Math.max(s.scrap, 4);
       if (!cell(s, 2, 1).room) build(s, 2, 1, "cistern");
+    }
+    if (q.lots) {
+      var lotsN = parseInt(q.lots, 10);
+      if (lotsN > 0) {
+        for (var li = 0; li < lotsN; li++) {
+          var legal = fogOf(s).filter(function (f) {
+            return buyGeometry(s, f.x, f.y) === "ok" && ownedCount(s) < 16;
+          });
+          if (!legal.length) break;
+          grantLot(s, legal[0].x, legal[0].y);
+        }
+      }
     }
   }
 
@@ -999,8 +1126,18 @@
     var s = fresh();
     if (s.tally !== 12 || s.scrap !== 6 || s.dust !== 0) fail("wallet start");
     else pass("wallet 12/6/0");
-    if (!cell(s, 1, 0) || cell(s, 1, 0).room !== "lobby") fail("lobby at 1,0");
-    else pass("lobby at 1,0");
+    if (s.v !== 2) fail("fresh v=2");
+    else pass("fresh v=2");
+    if (ownedCount(s) !== 6 || s.gridW !== 3 || s.gridH !== 2) fail("3x2 owned " + ownedCount(s));
+    else pass("3x2 owned");
+    if (!cell(s, 1, 0) || cell(s, 1, 0).room !== "lobby") fail("gatehouse at 1,0");
+    else pass("gatehouse at 1,0");
+    if (!fogOf(s).length) fail("fog halo");
+    else pass("fog halo " + fogOf(s).length);
+    var earlyFog = fogOf(s)[0];
+    var earlyBuy = buyLot(s, earlyFog.x, earlyFog.y);
+    if (earlyBuy === "ok") fail("bought before Wicknoll seated");
+    else pass("buy locked until Wicknoll seated");
     if (waiting(s).length !== 1 || waiting(s)[0].kind !== "Wicknoll") fail("Wicknoll waiting");
     else pass("Wicknoll waiting");
     var b = build(s, 1, 1, "hearth");
@@ -1042,8 +1179,50 @@
     else pass("away = sumYield*secs*0.85");
     save(s);
     var loaded = loadRaw();
-    if (!loaded || !cell(loaded, 1, 1) || cell(loaded, 1, 1).room !== "hearth") fail("save/load");
+    if (!loaded || loaded.v !== 2 || !cell(loaded, 1, 1) || cell(loaded, 1, 1).room !== "hearth") fail("save/load");
     else pass("save restores hearth");
+    add(s, "scrap", 20);
+    var lot0 = fogOf(s)[0];
+    var cost0 = D.lotCost(s.lotsBought || 0);
+    if (cost0.scrap !== 12) fail("first lot cost " + cost0.scrap);
+    else pass("first lot 12 scrap");
+    var bought = buyLot(s, lot0.x, lot0.y);
+    if (bought !== "ok") fail("buyLot: " + bought);
+    else pass("buyLot " + lot0.x + "," + lot0.y);
+    if (!cell(s, lot0.x, lot0.y)) fail("owned after buy");
+    var cost1 = D.lotCost(s.lotsBought || 0);
+    if (cost1.scrap !== 20) fail("second lot cost " + cost1.scrap);
+    else pass("next lot 20 scrap");
+    var v1 = {
+      v: 1,
+      tally: 99,
+      scrap: 7,
+      dust: 2,
+      lifetimeTally: 40,
+      openSec: 10,
+      lastSeen: now(),
+      gridW: 4,
+      gridH: 4,
+      expandRow: false,
+      expandCol: false,
+      cells: makeGrid(4, 4),
+      denizens: [{ id: "Wicknoll", kind: "Wicknoll", stage: 0, progress: 0, x: null, y: null, exhaustedUntil: 0 }],
+      flags: {},
+      unlocks: { hearth: true },
+      onboard: 0,
+    };
+    v1.cells[key(1, 0)].room = "lobby";
+    var migrated = migrateV1(JSON.parse(JSON.stringify(v1)));
+    if (migrated.v !== 2) fail("migrate v");
+    else pass("migrate v1→2");
+    if (migrated.tally !== 99 || migrated.scrap !== 7 || migrated.dust !== 2) fail("migrate wiped wallet");
+    else pass("migrate keeps wallet");
+    if (Object.keys(migrated.cells).length !== 16) fail("v1 cells not owned");
+    else pass("v1 4x4 becomes owned");
+    if (!fogOf(migrated).length) fail("migrated fog halo");
+    else pass("migrated fog halo");
+    if (D.ROOMS.hearth.name !== "Ember Grounds" || D.ROOMS.lobby.name !== "Gatehouse") fail("display names");
+    else pass("habitat display names");
     state = s;
     return report;
   }
@@ -1057,7 +1236,14 @@
     cell: cell,
     build: build,
     upgrade: upgrade,
-    expand: expand,
+    buyLot: buyLot,
+    buyUnlocked: buyUnlocked,
+    buyGeometry: buyGeometry,
+    fogOf: fogOf,
+    parkBounds: parkBounds,
+    ownedCount: ownedCount,
+    isFenced: isFenced,
+    migrateV1: migrateV1,
     place: place,
     waiting: waiting,
     denizen: denizen,

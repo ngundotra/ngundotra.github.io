@@ -1,4 +1,4 @@
-/* Typehouse — locked content. Original boarding-house IP. */
+/* Typehouse — Habitat Grounds content. Original boarding-house IP. */
 (function (G) {
   const PAL = {
     ink: "#1a1210",
@@ -42,10 +42,10 @@
   const ROOMS = {
     lobby: {
       id: "lobby",
-      name: "Lobby",
+      name: "Gatehouse",
       type: "none",
       cost: { tally: 0, scrap: 0, dust: 0 },
-      blurb: "Holds four waiting. Pays nothing. The night desk lives here.",
+      blurb: "The gate. Holds four waiting. Pays nothing. The night desk lives here.",
       unique: true,
       noSeat: false,
       waitCap: 4,
@@ -53,23 +53,23 @@
     },
     hearth: {
       id: "hearth",
-      name: "Hearth",
+      name: "Ember Grounds",
       type: "ember",
       cost: { tally: 8, scrap: 0, dust: 0 },
-      blurb: "A kiln that remembers hands.",
+      blurb: "A kiln that remembers hands. Ember underfoot.",
       start: true,
     },
     cistern: {
       id: "cistern",
-      name: "Cistern",
+      name: "Tide Basin",
       type: "tide",
       cost: { tally: 14, scrap: 2, dust: 0 },
-      blurb: "A throat of standing water.",
+      blurb: "A throat of standing water behind a rail.",
       afterHearth: true,
     },
     conservatory: {
       id: "conservatory",
-      name: "Conservatory",
+      name: "Moss Plot",
       type: "moss",
       cost: { tally: 14, scrap: 2, dust: 0 },
       blurb: "Glass and leaf. The leaf is winning.",
@@ -77,43 +77,43 @@
     },
     dynamo: {
       id: "dynamo",
-      name: "Dynamo",
+      name: "Spark Pen",
       type: "spark",
       cost: { tally: 28, scrap: 6, dust: 0 },
       blurb: "A wheel that argues with darkness.",
     },
     dormer: {
       id: "dormer",
-      name: "Dormer",
+      name: "Hush Loft",
       type: "hush",
       cost: { tally: 22, scrap: 4, dust: 1 },
-      blurb: "A window that sleeps sitting up.",
+      blurb: "A loft that sleeps sitting up.",
     },
     scullery: {
       id: "scullery",
-      name: "Scullery",
+      name: "Rust Yard",
       type: "rust",
       cost: { tally: 22, scrap: 8, dust: 0 },
       blurb: "Pans that have outlived their meals.",
     },
     vitrine: {
       id: "vitrine",
-      name: "Vitrine",
+      name: "Gleam Case",
       type: "gleam",
       cost: { tally: 36, scrap: 8, dust: 0 },
       blurb: "A cabinet of things that look back.",
     },
     transom: {
       id: "transom",
-      name: "Transom",
+      name: "Draft Lane",
       type: "draft",
       cost: { tally: 18, scrap: 4, dust: 0 },
-      blurb: "A hallway with opinions about weather.",
+      blurb: "A lane with opinions about weather. No fence.",
       hallway: true,
     },
     larder: {
       id: "larder",
-      name: "Larder",
+      name: "Tack Shed",
       type: "none",
       cost: { tally: 30, scrap: 10, dust: 0 },
       blurb: "No seat. Neighbors eat better.",
@@ -127,7 +127,13 @@
     3: { tally: 50, scrap: 12, dust: 2 },
   };
 
-  const EXPAND_COST = { tally: 0, scrap: 40, dust: 0 };
+  function lotCost(n) {
+    n = n || 0;
+    var cost = { tally: 0, scrap: 12 + 8 * n, dust: 0 };
+    if (n >= 3) cost.tally = 10 + 6 * (n - 3);
+    if (n >= 7) cost.dust = 1 + (n - 7);
+    return cost;
+  }
 
   const DENIZENS = {
     Wicknoll: {
@@ -267,7 +273,7 @@
     {
       id: "evt_dry_inspector",
       title: "DRY INSPECTOR",
-      body: "They taste the air and count the rooms. Their badge might be real. Their thirst is.",
+      body: "They taste the air and count the habitats. Their badge might be real. Their thirst is.",
       rarity: "rare",
       choices: [
         { id: "tour", label: "SHOW THEM IN" },
@@ -277,7 +283,7 @@
     {
       id: "evt_type_bath",
       title: "A TYPE TAKES A BATH",
-      body: "Someone sits in the Cistern until their weather loosens. The house will feel it next door.",
+      body: "Someone sits in the Tide Basin until their weather loosens. The grounds will feel it next door.",
       rarity: "common",
       choices: [
         { id: "soak", label: "LET THEM SOAK" },
@@ -297,7 +303,7 @@
     {
       id: "evt_fuse_famine",
       title: "FUSE FAMINE",
-      body: "The Dynamo eats its own spark and goes polite. Unpowered spark pays a quarter until we feed it.",
+      body: "The Spark Pen eats its own spark and goes polite. Unpowered spark pays a quarter until we feed it.",
       rarity: "rare",
       choices: [
         { id: "ration", label: "RATION THE SPARK" },
@@ -307,7 +313,7 @@
     {
       id: "evt_quiet_contest",
       title: "QUIET CONTEST",
-      body: "The inn holds its breath on purpose. Yield takes the minute off. Hush-dust gathers like dew.",
+      body: "The grounds hold their breath on purpose. Yield takes the minute off. Hush-dust gathers like dew.",
       rarity: "common",
       choices: [
         { id: "honor", label: "HONOR THE QUIET" },
@@ -337,7 +343,7 @@
     {
       id: "moss_union",
       title: "MOSS UNION",
-      body: "The green things have a meeting. They want the Conservatory recognized as a workplace.",
+      body: "The green things have a meeting. They want the Moss Plot recognized as a workplace.",
       rarity: "common",
       choices: [
         { id: "recognize", label: "RECOGNIZE THEM" },
@@ -347,7 +353,7 @@
     {
       id: "rust_wedding",
       title: "RUST WEDDING",
-      body: "Two pans decide they are married. The Scullery wants a witness or a lid.",
+      body: "Two pans decide they are married. The Rust Yard wants a witness or a lid.",
       rarity: "rare",
       choices: [
         { id: "lid", label: "GIVE A LID" },
@@ -407,7 +413,7 @@
     {
       id: "bulb_famine",
       title: "BULB FAMINE",
-      body: "The good wicks have walked off. Every room is one honesty darker.",
+      body: "The good wicks have walked off. Every habitat is one honesty darker.",
       rarity: "common",
       choices: [
         { id: "dim", label: "DIM THE HOUSE" },
@@ -417,7 +423,7 @@
     {
       id: "nest_claim",
       title: "NEST CLAIM",
-      body: "Two denizens have independently decided one room is the plot. The room is too small to share.",
+      body: "Two denizens have independently decided one habitat is the plot. The lot is too small to share.",
       rarity: "common",
       choices: [
         { id: "older", label: "SEAT THE OLDER" },
@@ -447,16 +453,16 @@
   ];
 
   const HINTS = [
-    "Cistern beside Hearth is tide on ember. That is friction. Wicknoll will pay less and show a tick.",
+    "Tide Basin beside Ember Grounds is tide on ember. That is friction. Wicknoll will pay less and show a tick.",
     "Nourish is when a denizen presses the neighbor. Friction is when the neighbor presses them.",
-    "Larder does not sit anyone. It feeds the rooms that touch it.",
-    "Transom walks one cell further at half weather.",
-    "We do not ask what they are. We ask which room.",
+    "Tack Shed does not sit anyone. It feeds the habitats that touch it.",
+    "Draft Lane walks one lot further at half weather.",
+    "We do not ask what they are. We ask which grounds.",
     "Hush-dust is for nights when Tally feels too honest.",
     "A haunted sash pays hush and taxes everyone else.",
-    "Dynamo gone dark makes spark work at a quarter.",
-    "Long-press the title only if you truly want a new house.",
-    "Later denizens wait until five rooms, or two hundred lifetime Tally.",
+    "Spark Pen gone dark makes spark work at a quarter.",
+    "Long-press the title only if you truly want new grounds.",
+    "Later denizens wait until five habitats, or two hundred lifetime Tally.",
   ];
 
   const SAVE_KEY = "typehouse.v1";
@@ -485,7 +491,7 @@
     LEVEL_YIELD: LEVEL_YIELD,
     ROOMS: ROOMS,
     UPGRADE: UPGRADE,
-    EXPAND_COST: EXPAND_COST,
+    lotCost: lotCost,
     DENIZENS: DENIZENS,
     MVP_ORDER: MVP_ORDER,
     LATER_ORDER: LATER_ORDER,
