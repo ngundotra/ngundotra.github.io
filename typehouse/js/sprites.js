@@ -322,14 +322,14 @@
     return ((n ^ (n >>> 16)) >>> 0) / 4294967296;
   }
 
-  function dirtColor(wx, wy) {
+  function grassColor(wx, wy) {
     var n = hash2(wx, wy);
-    if (n < 0.08) return "#1a1210";
-    if (n < 0.16) return "#231610";
-    if (n < 0.22) return "#2c1e16";
-    if (n < 0.26) return "#1e2418";
-    if (n < 0.3) return "#332218";
-    return "#241810";
+    if (n < 0.07) return "#3d8c28";
+    if (n < 0.14) return "#6bb844";
+    if (n < 0.19) return "#c8b83a";
+    if (n < 0.26) return "#4aa030";
+    if (n < 0.33) return "#7ed056";
+    return "#58b03c";
   }
 
   function fillDisk(ctx, cx, cy, r, col) {
@@ -395,7 +395,7 @@
       x = Math.round(x0 + ux * i);
       y = Math.round(y0 + uy * i);
       for (k = -hw; k <= hw; k++) {
-        ctx.fillStyle = Math.abs(k) >= hw - 1 ? "#2a1c14" : k === 0 ? "#3d2a1c" : "#342418";
+        ctx.fillStyle = Math.abs(k) >= hw - 1 ? "#8a6238" : k === 0 ? "#e0c488" : "#c9a86a";
         ctx.fillRect(x + Math.round(px * k), y + Math.round(py * k), 1, 1);
       }
     }
@@ -410,20 +410,20 @@
     var bounds = opt.bounds || { minX: 0, minY: 0, maxX: 2, maxY: 1 };
     var owned = opt.owned || {};
     ctx.imageSmoothingEnabled = false;
-    ctx.fillStyle = "#1e1610";
+    ctx.fillStyle = "#58b03c";
     ctx.fillRect(0, 0, w, h);
     var x;
     var y;
     for (y = 0; y < h; y += 2) {
       for (x = 0; x < w; x += 2) {
-        ctx.fillStyle = dirtColor(x + bounds.minX * 17, y + bounds.minY * 13);
+        ctx.fillStyle = grassColor(x + bounds.minX * 17, y + bounds.minY * 13);
         ctx.fillRect(x, y, 2, 2);
       }
     }
     for (y = 3; y < h; y += 7) {
       for (x = 2; x < w; x += 9) {
         if (hash2(x + 3, y + 5) < 0.22) {
-          ctx.fillStyle = "#24301c";
+          ctx.fillStyle = hash2(x, y) < 0.55 ? "#3d9c28" : "#f0d060";
           ctx.fillRect(x, y, 2, 1);
           ctx.fillRect(x + 1, y - 1, 1, 1);
         }
@@ -541,34 +541,93 @@
 
   function paintTypeFloor(ctx, cx, cy, r, type) {
     var col = G.THData.TYPE_COLOR[type] || P.copper;
-    fillDisk(ctx, cx, cy, r, "#2a1c14");
-    fillDisk(ctx, cx, cy, r - 1, shade(col, type === "tide" ? 0.55 : 0.36));
+    fillDisk(ctx, cx, cy, r, "#6aaa44");
+    fillDisk(ctx, cx, cy, r - 1, shade(col, 0.62));
     var x;
     var y;
     var d2;
     var r2 = (r - 2) * (r - 2);
     if (type === "ember") {
+      fillDisk(ctx, cx, cy, r - 2, "#d45a18");
       for (y = -r + 3; y <= r - 3; y += 3) {
         for (x = -r + 3; x <= r - 3; x += 4) {
           if (x * x + y * y > r2) continue;
-          ctx.fillStyle = hash2(x, y) < 0.45 ? P.ember : "#3d2010";
+          ctx.fillStyle = hash2(x, y) < 0.45 ? "#ff8a28" : "#a83810";
           ctx.fillRect(cx + x, cy + y, 2, 1);
         }
       }
-      fillDisk(ctx, cx, cy + 2, 7, shade(P.ember, 0.45));
+      fillDisk(ctx, cx, cy + 2, 8, "#ff7a18");
+      fillDisk(ctx, cx, cy + 1, 4, "#ffe080");
     } else if (type === "tide") {
-      fillDisk(ctx, cx, cy + 1, r - 4, "#1a2836");
-      fillDisk(ctx, cx - 1, cy, r - 8, shade(P.dusk, 0.8));
-      ctx.fillStyle = shade(P.lamp, 0.35);
+      fillDisk(ctx, cx, cy + 1, r - 3, "#1e88d0");
+      fillDisk(ctx, cx - 1, cy, r - 8, "#4ec8f0");
+      ctx.fillStyle = "#d8f4ff";
       ctx.fillRect(cx - 6, cy - 4, 8, 1);
       ctx.fillRect(cx + 2, cy + 5, 5, 1);
     } else if (type === "moss") {
+      fillDisk(ctx, cx, cy, r - 2, "#2e8a38");
       for (y = -r + 2; y <= r - 2; y += 3) {
         for (x = -r + 2; x <= r - 2; x += 3) {
           if (x * x + y * y > r2) continue;
           if (hash2(x + 2, y) < 0.55) {
-            ctx.fillStyle = hash2(x, y + 1) < 0.4 ? P.moss : "#3d4a38";
+            ctx.fillStyle = hash2(x, y + 1) < 0.4 ? "#5ad050" : "#1e6a28";
             ctx.fillRect(cx + x, cy + y, 2, 2);
+          }
+        }
+      }
+    } else if (type === "spark") {
+      fillDisk(ctx, cx, cy, r - 2, "#f0d020");
+      for (y = -r + 4; y <= r - 4; y += 5) {
+        for (x = -r + 4; x <= r - 4; x += 5) {
+          if (x * x + y * y > r2) continue;
+          if (hash2(x, y) < 0.45) {
+            ctx.fillStyle = hash2(x + 1, y) < 0.5 ? "#fff06a" : "#d4a010";
+            ctx.fillRect(cx + x, cy + y, 2, 2);
+          }
+        }
+      }
+    } else if (type === "hush") {
+      fillDisk(ctx, cx, cy, r - 2, "#c4a0e0");
+      for (y = -r + 4; y <= r - 4; y += 5) {
+        for (x = -r + 4; x <= r - 4; x += 5) {
+          if (x * x + y * y > r2) continue;
+          if (hash2(x, y) < 0.4) {
+            ctx.fillStyle = "#e8d4f8";
+            ctx.fillRect(cx + x, cy + y, 1, 2);
+          }
+        }
+      }
+    } else if (type === "rust") {
+      fillDisk(ctx, cx, cy, r - 2, "#d86a2c");
+      for (y = -r + 4; y <= r - 4; y += 5) {
+        for (x = -r + 4; x <= r - 4; x += 5) {
+          if (x * x + y * y > r2) continue;
+          if (hash2(x, y) < 0.4) {
+            ctx.fillStyle = "#f08840";
+            ctx.fillRect(cx + x, cy + y, 2, 1);
+          }
+        }
+      }
+    } else if (type === "gleam") {
+      fillDisk(ctx, cx, cy, r - 2, "#e8c428");
+      for (y = -r + 4; y <= r - 4; y += 5) {
+        for (x = -r + 4; x <= r - 4; x += 5) {
+          if (x * x + y * y > r2) continue;
+          if (hash2(x, y) < 0.45) {
+            ctx.fillStyle = "#fff3a0";
+            ctx.fillRect(cx + x, cy + y, 2, 2);
+          }
+        }
+      }
+    } else if (type === "draft") {
+      fillDisk(ctx, cx, cy, r - 2, "#b8dcf0");
+      for (y = -r + 4; y <= r - 4; y += 5) {
+        for (x = -r + 4; x <= r - 4; x += 5) {
+          d2 = x * x + y * y;
+          if (d2 > r2) continue;
+          if (hash2(x, y) < 0.4) {
+            ctx.fillStyle = "#e8f6ff";
+            ctx.fillRect(cx + x, cy + y, 1, 2);
           }
         }
       }
@@ -809,7 +868,7 @@
   function paintLane(ctx, w, h) {
     paintPathStrip(ctx, Math.floor(w / 2), 6, Math.floor(w / 2), h - 6, 14);
     paintPathStrip(ctx, 8, Math.floor(h * 0.56), w - 8, Math.floor(h * 0.56), 12);
-    ctx.fillStyle = P.dusk;
+    ctx.fillStyle = G.THData.TYPE_COLOR.draft;
     ctx.fillRect(Math.floor(w / 2) - 1, 10, 2, h - 20);
     paintLantern(ctx, Math.floor(w * 0.32), 16);
     paintLantern(ctx, Math.floor(w * 0.66), h - 22);
@@ -831,12 +890,12 @@
     var fenceR = 39;
 
     if (kind === "lobby") {
-      fillDisk(ctx, cx, cy + 2, 26, "#2a1c14");
+      fillDisk(ctx, cx, cy + 2, 26, "#c4a878");
       paintPathStrip(ctx, cx, cy + 8, cx, h - 2, 12);
       paintProp(ctx, "lobby", cx, cy - 2);
       paintCottageExtras(ctx, w, h);
     } else if (kind === "larder") {
-      fillDisk(ctx, cx, cy + 4, 18, "#2a1c14");
+      fillDisk(ctx, cx, cy + 4, 18, "#c4a060");
       paintProp(ctx, "larder", cx, cy + 2);
     } else if (kind === "transom") {
       paintLane(ctx, w, h);
@@ -851,8 +910,7 @@
       ctx.fillRect(cx - 18, cy - 4, 3, 22);
     }
     if (opt.haunted) {
-      ctx.fillStyle = "rgba(61,42,36,0.28)";
-      fillDisk(ctx, cx, cy, floorR + 2, "rgba(61,42,36,0.28)");
+      fillDisk(ctx, cx, cy, floorR + 2, "rgba(90,50,120,0.22)");
     }
     if (opt.unpowered) {
       ctx.fillStyle = P.ink;
@@ -880,15 +938,15 @@
     ctx.clearRect(0, 0, w, h);
     var cx = Math.floor(w / 2);
     var cy = Math.floor(h / 2);
-    fillDisk(ctx, cx, cy, 32, "#2a1c14");
-    fillDisk(ctx, cx, cy, 29, "#261810");
+    fillDisk(ctx, cx, cy, 32, "#6aaa44");
+    fillDisk(ctx, cx, cy, 29, "#5a9c38");
     var i;
     var j;
     for (i = -20; i <= 20; i += 6) {
       for (j = -18; j <= 18; j += 7) {
         if (i * i + j * j > 700) continue;
         if (hash2(i + 4, j + 2) < 0.35) {
-          ctx.fillStyle = "#1e1610";
+          ctx.fillStyle = "#4a8c30";
           ctx.fillRect(cx + i, cy + j, 2, 2);
         }
       }
@@ -940,7 +998,7 @@
       half = Math.max(1, Math.floor(((hgt - i) / hgt) * (hgt * 0.45)));
       ctx.fillRect(x - half, y + i, half * 2 + 1, 1);
     }
-    ctx.fillStyle = "#1a1210";
+    ctx.fillStyle = "#2a4a1c";
     ctx.fillRect(x, y + hgt - 1, 2, 5);
   }
 
@@ -983,7 +1041,7 @@
       for (j = 0; j < h; j += 2) {
         n = hash2(i + seedX, j + seedY);
         if (n > 0.62) continue;
-        ctx.fillStyle = n < 0.2 ? "rgba(12,16,22,0.55)" : n < 0.4 ? "rgba(20,28,36,0.4)" : "rgba(26,18,16,0.28)";
+        ctx.fillStyle = n < 0.2 ? "rgba(210,230,200,0.5)" : n < 0.4 ? "rgba(190,215,180,0.35)" : "rgba(240,250,230,0.22)";
         ctx.fillRect(i, j, 2, 2);
       }
     }
@@ -995,7 +1053,7 @@
       [Math.floor(w * 0.38), 6, 16],
     ];
     pines.forEach(function (p, idx) {
-      var col = idx % 2 ? "#151c18" : "#101614";
+      var col = idx % 2 ? "#245a28" : "#1a4a20";
       if (hash2(seedX + idx, seedY) > 0.18) paintPine(ctx, p[0], p[1], p[2], col);
     });
     if (!opt.inert) paintStake(ctx, Math.floor(w / 2), Math.floor(h / 2) + 4, opt.cost);

@@ -12,14 +12,14 @@
   };
 
   const TYPE_COLOR = {
-    ember: PAL.ember,
-    tide: PAL.dusk,
-    moss: PAL.moss,
-    spark: PAL.lamp,
-    hush: PAL.timber,
-    rust: PAL.copper,
-    gleam: PAL.parchment,
-    draft: PAL.dusk,
+    ember: "#e86a1c",
+    tide: "#3aa8e0",
+    moss: "#3db84a",
+    spark: "#f0d020",
+    hush: "#b48ad4",
+    rust: "#d86a2c",
+    gleam: "#e8c428",
+    draft: "#9ecce8",
     none: PAL.copper,
   };
 

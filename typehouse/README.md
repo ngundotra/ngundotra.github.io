@@ -1,6 +1,6 @@
 # Typehouse — Habitat Grounds
 
-A phone-first idle park. You are the night clerk. Guests are slightly-wrong house-spirits. They walk inside fenced habitats. Types are weather in the walls.
+A phone-first idle park. You are the clerk of a bright little zoo. Guests are slightly-wrong house-spirits. They walk inside fenced habitats. Types are weather in the walls.
 
 We do not ask what they are. We ask which grounds.
 
@@ -15,7 +15,7 @@ Zero build. Relative paths only.
 
 After merge, the phone URL is https://ngundotra.github.io/typehouse/
 
-Add to Home Screen: the folder ships a PWA manifest (`Typehouse`, theme `#1a1210`) and apple-touch-icon.
+Add to Home Screen: the folder ships a PWA manifest (`Typehouse`, theme `#6aaa48`) and apple-touch-icon.
 
 ## How to play
 
@@ -24,7 +24,7 @@ Add to Home Screen: the folder ships a PWA manifest (`Typehouse`, theme `#1a1210
 3. **ASSIGN** Wicknoll. It walks in. Tally ticks.
 4. After about a minute the grounds offer a **soot handshake**. Keep the soot.
 5. Then **Tide Basin** and **Moss Plot** unlatch. Types press each other through the fence. HOME is a rug. FRICTION is an ember post. NOURISH is moss on the rail.
-6. After Wicknoll is seated, tap fog to **BUY LAND**. First lot is 12 scrap, next is 20. Pan with one thumb. The park is supposed to overflow the screen.
+6. After Wicknoll is seated, tap fog to **BUY LAND**. First lot is 12 scrap, next is 20. Pan with one thumb. Pinch, double-tap, or the fat **+ / −** buttons to zoom (0.7×–2.2×). The park starts zoomed in on the Gatehouse.
 
 Dock: **BUILD** / **ASSIGN** / **?**. Tap a habitat for the sheet (guest, live tally/s, upgrade, assign). Tap fog for BUY LAND, not BUILD. Long-press the title only if you truly want new grounds.
 
