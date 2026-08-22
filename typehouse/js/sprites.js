@@ -492,14 +492,17 @@
   }
 
   function paintLantern(ctx, x, y) {
-    R(ctx, x, y, 3, 16, C.wood2);
-    R(ctx, x + 1, y, 1, 16, C.wood3);
-    R(ctx, x - 3, y - 2, 9, 3, C.wood4);
-    R(ctx, x - 2, y - 8, 7, 7, C.ink);
-    R(ctx, x - 1, y - 7, 5, 5, C.fire3);
-    R(ctx, x, y - 6, 3, 3, C.fire2);
-    R(ctx, x - 2, y - 9, 7, 2, C.wood);
-    R(ctx, x - 1, y - 10, 5, 1, C.wood2);
+    R(ctx, x, y, 3, 18, C.wood4);
+    R(ctx, x + 1, y, 1, 18, C.wood3);
+    R(ctx, x - 1, y + 6, 5, 2, C.wood);
+    R(ctx, x - 4, y - 3, 11, 3, C.wood2);
+    R(ctx, x - 3, y - 11, 9, 9, C.ink);
+    R(ctx, x - 2, y - 10, 7, 7, C.fire3);
+    R(ctx, x - 1, y - 8, 5, 4, C.fire2);
+    R(ctx, x, y - 7, 3, 2, C.white);
+    R(ctx, x - 4, y - 12, 11, 2, C.wood);
+    R(ctx, x - 2, y - 14, 7, 2, C.wood2);
+    R(ctx, x, y - 15, 3, 1, C.wood4);
   }
 
   function paintPathStrip(ctx, x0, y0, x1, y1, wide) {
@@ -540,14 +543,17 @@
     var y;
     var x;
     for (y = 0; y < h; y++) {
-      if (y < northH * 0.42) ctx.fillStyle = y < 10 ? C.sky : C.sky2;
+      if (y < northH * 0.55) ctx.fillStyle = y < 18 ? C.sky : C.sky2;
       else ctx.fillStyle = C.grass;
       ctx.fillRect(0, y, w, 1);
     }
-    paintCloud(ctx, 18, 6, 36);
-    paintCloud(ctx, Math.floor(w * 0.42), 10, 44);
-    paintCloud(ctx, w - 70, 4, 40);
-    paintGrass(ctx, 0, Math.floor(northH * 0.38), w, h - Math.floor(northH * 0.38), bounds.minX * 17, bounds.minY * 13);
+    paintCloud(ctx, 18, 8, 40);
+    paintCloud(ctx, Math.floor(w * 0.38), 14, 52);
+    paintCloud(ctx, w - 80, 6, 46);
+    paintGrass(ctx, 0, Math.floor(northH * 0.48), w, h - Math.floor(northH * 0.48), bounds.minX * 17, bounds.minY * 13);
+    for (x = 10; x < w; x += 36) {
+      paintTree(ctx, x + ((hash2(x, 3) * 8) | 0), 16, 34 + ((x * 3) % 12), x);
+    }
     for (y = Math.floor(northH * 0.4); y < h; y += 9) {
       for (x = 3; x < w; x += 11) {
         if (hash2(x + 4, y + 2) < 0.16) {
@@ -601,9 +607,25 @@
     }
   }
 
+  function woodRail(ctx, x0, y0, x1, y1) {
+    var dx = x1 - x0;
+    var dy = y1 - y0;
+    var len = Math.hypot(dx, dy) || 1;
+    var ux = dx / len;
+    var uy = dy / len;
+    var i;
+    for (i = 0; i <= len; i++) {
+      var x = Math.round(x0 + ux * i);
+      var y = Math.round(y0 + uy * i);
+      R(ctx, x - 1, y - 1, 3, 3, C.wood4);
+      R(ctx, x, y, 2, 2, C.wood);
+      R(ctx, x, y, 1, 1, C.wood3);
+    }
+  }
+
   function paintRoundFence(ctx, cx, cy, r, col, opt) {
     opt = opt || {};
-    var n = 16;
+    var n = 18;
     var posts = [];
     var i;
     var a;
@@ -613,19 +635,18 @@
     var edge;
     var postCol;
     for (i = 0; i < n; i++) {
-      a = (i / n) * Math.PI * 2 + Math.PI / 2;
-      if (Math.abs(Math.atan2(Math.sin(a), Math.cos(a)) - Math.PI / 2) < 0.38 && Math.sin(a) > 0.55) continue;
+      a = (i / n) * Math.PI * 2;
+      if (a > 0.42 * Math.PI && a < 0.58 * Math.PI) continue;
       px = cx + Math.round(Math.cos(a) * r);
       py = cy + Math.round(Math.sin(a) * r);
       posts.push({ x: px, y: py, a: a });
     }
-    for (i = 0; i < posts.length; i++) {
+    for (i = 0; i < posts.length - 1; i++) {
       var a0 = posts[i];
-      var a1 = posts[(i + 1) % posts.length];
-      var da = Math.hypot(a1.x - a0.x, a1.y - a0.y);
-      if (da > r * 0.7) continue;
-      paintPathStrip(ctx, a0.x, a0.y - 2, a1.x, a1.y - 2, 3);
-      R(ctx, a0.x, a0.y - 5, 1, 3, C.wood3);
+      var a1 = posts[i + 1];
+      if (Math.hypot(a1.x - a0.x, a1.y - a0.y) > r * 0.55) continue;
+      woodRail(ctx, a0.x, a0.y - 3, a1.x, a1.y - 3);
+      woodRail(ctx, a0.x, a0.y + 1, a1.x, a1.y + 1);
     }
     for (i = 0; i < posts.length; i++) {
       a = posts[i].a;
@@ -634,12 +655,12 @@
       key = Math.abs(Math.cos(a)) > Math.abs(Math.sin(a)) ? (Math.cos(a) > 0 ? "e" : "w") : Math.sin(a) > 0 ? "s" : "n";
       edge = (opt.edges || {})[key] || {};
       postCol = edge.friction ? "#e86a1c" : edge.nourish ? "#3db84a" : C.wood;
-      R(ctx, px - 2, py - 8, 5, 12, C.ink);
-      R(ctx, px - 1, py - 7, 3, 10, postCol);
-      R(ctx, px, py - 6, 1, 8, C.wood3);
-      if ((opt.level || 1) >= 3) R(ctx, px - 2, py - 8, 5, 2, C.gold2);
+      R(ctx, px - 2, py - 9, 5, 14, C.ink);
+      R(ctx, px - 1, py - 8, 3, 12, postCol);
+      R(ctx, px, py - 7, 1, 10, C.wood3);
+      if ((opt.level || 1) >= 3) R(ctx, px - 2, py - 9, 5, 2, C.gold2);
     }
-    paintPlaque(ctx, cx, cy + r - 4, opt.kind, col);
+    paintPlaque(ctx, cx, cy + r - 2, opt.kind, col);
   }
 
   function paintSandPatch(ctx, cx, cy, r) {
@@ -986,14 +1007,14 @@
   }
 
   function paintStake(ctx, cx, cy, cost) {
-    R(ctx, cx - 1, cy + 6, 3, 22, C.ink);
-    R(ctx, cx, cy + 7, 1, 20, C.wood3);
-    R(ctx, cx - 16, cy - 16, 33, 24, C.ink);
-    R(ctx, cx - 15, cy - 15, 31, 22, C.wood);
-    R(ctx, cx - 13, cy - 13, 27, 18, C.wood4);
-    paintText(ctx, "BUY", cx - 6, cy - 10, C.white);
-    paintText(ctx, "LAND", cx - 8, cy - 3, C.white);
-    paintText(ctx, String((cost && cost.scrap) || 12), cx - 4, cy + 4, C.gold);
+    R(ctx, cx - 1, cy + 10, 3, 20, C.ink);
+    R(ctx, cx, cy + 11, 1, 18, C.wood3);
+    R(ctx, cx - 18, cy - 18, 37, 30, C.ink);
+    R(ctx, cx - 17, cy - 17, 35, 28, C.wood);
+    R(ctx, cx - 15, cy - 15, 31, 24, C.wood4);
+    paintText(ctx, "BUY", cx - 6, cy - 12, C.white);
+    paintText(ctx, "LAND", cx - 8, cy - 5, C.white);
+    paintText(ctx, String((cost && cost.scrap) || 12), cx - 4, cy + 3, C.gold);
   }
 
   function paintFog(canvas, opt) {

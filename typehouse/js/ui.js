@@ -17,7 +17,7 @@
   var LOT = 128;
   var Z_MIN = 0.7;
   var Z_MAX = 2.2;
-  var Z_DEFAULT = 2;
+  var Z_DEFAULT = 1.7;
   var view = { minX: 0, minY: 0, maxX: 2, maxY: 1, w: 3, h: 2 };
   var cam = { x: 0, y: 0, z: Z_DEFAULT };
   var camReady = false;

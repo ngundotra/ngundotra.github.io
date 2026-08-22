@@ -9,8 +9,8 @@
   var frame = 0;
   var tmp = null;
   var LOT = 128;
-  var GW = 28;
-  var GH = 28;
+  var GW = 40;
+  var GH = 40;
 
   function rng() {
     seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0;
@@ -320,8 +320,8 @@
   function scratch() {
     if (!tmp) {
       tmp = document.createElement("canvas");
-      tmp.width = 28;
-      tmp.height = 28;
+      tmp.width = 48;
+      tmp.height = 48;
     }
     return tmp;
   }
