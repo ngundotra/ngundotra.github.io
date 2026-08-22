@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Noah Gundotra — Toy Museum</title>
-  <meta name="description" content="Things I built that I still think are cool.">
+  <title>Noah Gundotra</title>
+  <meta name="description" content="Security engineer on Starship. Previously Solana Labs and Goldman Sachs.">
   <meta name="theme-color" content="#100e0c">
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -13,204 +13,86 @@
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <a class="skip" href="#foyer">Skip to content</a>
+  <a class="skip" href="#work">Skip to work</a>
 
-  <div class="grain" aria-hidden="true"></div>
-  <div class="vignette" aria-hidden="true"></div>
+  <div class="ledger">
+    <header class="identity">
+      <p class="mark" aria-hidden="true">NG</p>
+      <h1 class="name">
+        <span class="name__given">Noah</span>
+        <span class="name__family">Gundotra</span>
+      </h1>
+      <p class="bio">Security engineer on Starship. Previously Solana Labs and Goldman Sachs.</p>
+      <ul class="links">
+        <li><a href="https://github.com/ngundotra">github.com/ngundotra</a></li>
+        <li><a href="https://www.linkedin.com/in/ngundotra">linkedin.com/in/ngundotra</a></li>
+      </ul>
+      <p class="paper">
+        <a href="https://proceedings.mlr.press/v97/shah19a.html">ICML 2019</a>
+      </p>
+    </header>
 
-  <header class="tickets" role="banner">
-    <p class="tickets__mark">Toy Museum</p>
-    <nav class="tickets__rail" aria-label="Projects">
-      <a class="ticket is-active" href="#foyer" data-section="foyer" aria-label="Foyer"><span class="ticket__n">01</span><span class="ticket__l">Foyer</span></a>
-      <a class="ticket" href="#code2pix" data-section="code2pix" aria-label="Code2Pix"><span class="ticket__n">02</span><span class="ticket__l">Code2Pix</span></a>
-      <a class="ticket" href="#notelet" data-section="notelet" aria-label="Notelet"><span class="ticket__n">03</span><span class="ticket__l">Notelet</span></a>
-      <a class="ticket" href="#sculptml" data-section="sculptml" aria-label="SculptML"><span class="ticket__n">04</span><span class="ticket__l">SculptML</span></a>
-      <a class="ticket" href="#solana-gym" data-section="solana-gym" aria-label="Solana Gym"><span class="ticket__n">05</span><span class="ticket__l">Solana Gym</span></a>
-      <a class="ticket" href="#lastweek" data-section="lastweek" aria-label="Last Week on X"><span class="ticket__n">06</span><span class="ticket__l">Last Week</span></a>
-    </nav>
-  </header>
-
-  <main>
-    <section id="foyer" class="panel panel--foyer" data-section="foyer" aria-labelledby="foyer-title">
-      <div class="panel__inner foyer">
-        <p class="kicker">Things I built that I still think are cool.</p>
-        <h1 id="foyer-title" class="name">
-          <span class="name__given">Noah</span>
-          <span class="name__family">Gundotra</span>
-        </h1>
+    <main id="work" class="work">
+      <article class="dossier dossier--moss" id="solana-gym">
+        <div class="still">
+          <img src="assets/solana-gym-01-bench.png" width="1440" height="900" alt="Solana Bench writeup: How Well Can LLMs Build Complex Transactions.">
+        </div>
+        <h2>Solana Gym</h2>
+        <p>An RL gym for LLMs on Solana. Agents write TypeScript on a Surfpool mainnet fork and score unique instructions that land.</p>
         <ul class="links">
-          <li><a href="https://github.com/ngundotra">github.com/ngundotra</a></li>
-          <li><a href="https://www.linkedin.com/in/ngundotra">linkedin.com/in/ngundotra</a></li>
+          <li><a href="https://github.com/solana-foundation/solana-gym-env">github.com/solana-foundation/solana-gym-env</a></li>
+          <li><a href="https://solana-foundation.github.io/solana-gym-env/">solana-foundation.github.io/solana-gym-env</a></li>
         </ul>
-      </div>
-    </section>
+      </article>
 
-    <section id="code2pix" class="panel panel--code2pix" data-section="code2pix" aria-labelledby="code2pix-title">
-      <div class="panel__inner">
-        <p class="accession">02 · 2018 · Jupyter · 141 stars</p>
-        <h2 id="code2pix-title">Code2Pix</h2>
-        <p class="lede">A differentiable compiler: textual GUI descriptions become pixels. Built with Uizard and Berkeley SUSA (Statistics Undergraduate Student Association).</p>
+      <article class="dossier dossier--teal" id="code2pix">
+        <div class="still">
+          <img src="assets/code2pix-06-hydra-cross-platform.png" width="1200" height="800" alt="Code2Pix Hydra 3 by 3 grid of generated Android, iOS, and Web GUIs.">
+        </div>
+        <h2>Code2Pix</h2>
+        <p>A differentiable compiler that turns textual GUI descriptions into pixels.</p>
         <ul class="links">
           <li><a href="https://github.com/ngundotra/code2pix">github.com/ngundotra/code2pix</a></li>
           <li><a href="https://medium.com/data-science/code2pix-deep-learning-compiler-for-graphical-user-interfaces-1256c346950b">Medium writeup</a></li>
         </ul>
+      </article>
 
-        <figure class="frame frame--hero">
-          <img src="assets/code2pix-06-hydra-cross-platform.png" width="1200" height="800" alt="Hydra 3 by 3 grid of generated GUIs. Columns are Android, iOS, and Web GUIs. Rows are Android, iOS, and Web decoder heads.">
-          <figcaption>Hydra 3×3. Columns: Android / iOS / Web GUIs. Rows: Android / iOS / Web decoder heads.</figcaption>
-        </figure>
-
-        <h3 class="subhead">Predicted vs actual</h3>
-        <div class="strip">
-          <figure class="frame">
-            <img src="assets/code2pix-10-result-web.png" width="432" height="288" alt="Predicted versus actual web GUI.">
-            <figcaption>Web</figcaption>
-          </figure>
-          <figure class="frame">
-            <img src="assets/code2pix-11-result-android.png" width="432" height="288" alt="Predicted versus actual Android GUI.">
-            <figcaption>Android</figcaption>
-          </figure>
-          <figure class="frame">
-            <img src="assets/code2pix-12-result-ios.png" width="432" height="288" alt="Predicted versus actual iOS GUI.">
-            <figcaption>iOS</figcaption>
-          </figure>
+      <article class="dossier dossier--wine" id="notelet">
+        <div class="still">
+          <img src="assets/notelet-04-wolfram-equation.png" width="1612" height="2100" alt="Notelet iPad canvas with a handwritten equation and a Wolfram plot.">
         </div>
-      </div>
-    </section>
-
-    <section id="notelet" class="panel panel--notelet" data-section="notelet" aria-labelledby="notelet-title">
-      <div class="panel__inner">
-        <p class="accession">03 · Devpost</p>
-        <h2 id="notelet-title">Notelet</h2>
-        <p class="lede">Handwritten notes compile to LaTeX. Select a stretch of math and Wolfram plots it. No public GitHub — the writeup lives on Devpost.</p>
+        <h2>Notelet</h2>
+        <p>Handwritten notes compile to LaTeX. Select a stretch of math and Wolfram plots it.</p>
         <ul class="links">
           <li><a href="https://devpost.com/software/notelet-f5x0w6">devpost.com/software/notelet-f5x0w6</a></li>
         </ul>
+      </article>
 
-        <div class="gallery" data-gallery="notelet">
-          <figure class="frame frame--hero">
-            <img id="notelet-hero" src="assets/notelet-04-wolfram-equation.png" width="1612" height="2100" alt="iPad Notelet canvas with a handwritten equation and a Wolfram plot overlay.">
-            <figcaption id="notelet-caption">iPad: select the handwritten equation, Wolfram plots it.</figcaption>
-          </figure>
-          <div class="thumbs" role="list">
-            <button type="button" class="thumb is-active" role="listitem" aria-pressed="true" data-src="assets/notelet-04-wolfram-equation.png" data-alt="iPad Notelet canvas with a handwritten equation and a Wolfram plot overlay." data-caption="iPad: select the handwritten equation, Wolfram plots it.">
-              <img src="assets/notelet-04-wolfram-equation.png" width="1612" height="2100" alt="" aria-hidden="true">
-              <span>Wolfram</span>
-            </button>
-            <button type="button" class="thumb" role="listitem" aria-pressed="false" data-src="assets/notelet-05-wolfram-function.png" data-alt="iPad Notelet canvas with a handwritten multivariable function and Wolfram 3D surface plots." data-caption="3D plots from a selected handwritten function.">
-              <img src="assets/notelet-05-wolfram-function.png" width="1584" height="2096" alt="" aria-hidden="true">
-              <span>3D plots</span>
-            </button>
-            <button type="button" class="thumb" role="listitem" aria-pressed="false" data-src="assets/notelet-02-latex.png" data-alt="Compiled LaTeX PDF snippet generated from handwritten notes." data-caption="Compiled LaTeX from the handwritten page.">
-              <img src="assets/notelet-02-latex.png" width="1406" height="488" alt="" aria-hidden="true">
-              <span>Compiled</span>
-            </button>
-            <button type="button" class="thumb" role="listitem" aria-pressed="false" data-src="assets/notelet-03-latex-document.png" data-alt="LaTeX source editor showing the generated .tex document." data-caption="The .tex editor view of the compiled notes.">
-              <img src="assets/notelet-03-latex-document.png" width="1356" height="992" alt="" aria-hidden="true">
-              <span>.tex</span>
-            </button>
-          </div>
+      <article class="dossier dossier--purple" id="sculptml">
+        <div class="still">
+          <img src="assets/sculptml-01-main-screen.png" width="862" height="1734" alt="SculptML Graph Builder on iPhone.">
         </div>
-      </div>
-    </section>
-
-    <section id="sculptml" class="panel panel--sculptml" data-section="sculptml" aria-labelledby="sculptml-title">
-      <div class="panel__inner">
-        <p class="accession">04 · iOS + Flask · CoreML</p>
-        <h2 id="sculptml-title">SculptML</h2>
-        <p class="lede">Visually build a net on your phone, train it on a Flask server, deploy as CoreML. Graph Builder on the left; a drawn 6 predicted as 6 on the right.</p>
+        <h2>SculptML</h2>
+        <p>Build a network on iPhone, train it on a server, deploy as CoreML.</p>
         <ul class="links">
-          <li><a href="https://github.com/ngundotra/sculptml">sculptml</a></li>
-          <li><a href="https://github.com/ngundotra/sculptml-ios-app">sculptml-ios-app</a></li>
-          <li><a href="https://github.com/ngundotra/sculptml-flask-app">sculptml-flask-app</a></li>
+          <li><a href="https://github.com/ngundotra/sculptml">github.com/ngundotra/sculptml</a></li>
+          <li><a href="https://github.com/ngundotra/sculptml-ios-app">github.com/ngundotra/sculptml-ios-app</a></li>
+          <li><a href="https://github.com/ngundotra/sculptml-flask-app">github.com/ngundotra/sculptml-flask-app</a></li>
         </ul>
+      </article>
 
-        <div class="phones">
-          <figure class="phone">
-            <img src="assets/sculptml-01-main-screen.png" width="862" height="1734" alt="SculptML Graph Builder on iPhone, assembling a CNN for MNIST.">
-            <figcaption>Graph Builder</figcaption>
-          </figure>
-          <figure class="phone">
-            <img src="assets/sculptml-04-normal-deploy.png" width="878" height="1730" alt="SculptML notepad: a drawn 6 classified as 6.">
-            <figcaption>Drawn 6 · predicted 6</figcaption>
-          </figure>
+      <article class="dossier dossier--blue" id="last-week-on-x">
+        <div class="still">
+          <img src="assets/lastweekonx-03-dashboard.png" width="3024" height="1708" alt="Last Week on X dashboard with a podcast player.">
         </div>
-      </div>
-    </section>
-
-    <section id="solana-gym" class="panel panel--solanagym" data-section="solana-gym" aria-labelledby="solana-gym-title">
-      <div class="panel__inner">
-        <p class="accession">05 · Solana Foundation · 2025</p>
-        <h2 id="solana-gym-title">Solana Gym</h2>
-        <p class="lede">An RL gym for LLMs on Solana. Agents write TypeScript, it runs on a Surfpool mainnet fork, and they score unique instructions that actually land. Two tracks: Basic and Swap. Curiosity reward, not PnL.</p>
-        <p class="lede">Basic median scores: claude-sonnet-4 115, gpt-5 60, gemini-2.5-flash 40.</p>
-        <ul class="links">
-          <li><a href="https://github.com/solana-foundation/solana-gym-env">github.com/solana-foundation/solana-gym-env</a></li>
-          <li><a href="https://solana-foundation.github.io/solana-gym-env/">solana-foundation.github.io/solana-gym-env</a></li>
-          <li><a href="https://solana-foundation.github.io/solana-gym-env/trajectories">Trajectories</a></li>
-        </ul>
-
-        <div class="gallery" data-gallery="solanagym">
-          <figure class="frame frame--hero">
-            <img id="solanagym-hero" src="assets/solana-gym-01-bench.png" width="1440" height="900" alt="Solana Bench writeup: How Well Can LLMs Build Complex Transactions, with an Explore Trajectories button.">
-            <figcaption id="solanagym-caption">Live writeup at solana-foundation.github.io/solana-gym-env. Published as Solana Bench.</figcaption>
-          </figure>
-          <div class="thumbs" role="list">
-            <button type="button" class="thumb is-active" role="listitem" aria-pressed="true" data-src="assets/solana-gym-01-bench.png" data-alt="Solana Bench writeup: How Well Can LLMs Build Complex Transactions, with an Explore Trajectories button." data-caption="Live writeup at solana-foundation.github.io/solana-gym-env. Published as Solana Bench.">
-              <img src="assets/solana-gym-01-bench.png" width="1440" height="900" alt="" aria-hidden="true">
-              <span>Writeup</span>
-            </button>
-            <button type="button" class="thumb" role="listitem" aria-pressed="false" data-src="assets/solana-gym-03-trajectories.png" data-alt="Solana Bench trajectories grid. Top card is Claude-Sonnet-4 Basic with total reward 181." data-caption="Trajectories grid: Claude-Sonnet-4 Basic 181, GPT-5 Basic 66, and other runs.">
-              <img src="assets/solana-gym-03-trajectories.png" width="1440" height="900" alt="" aria-hidden="true">
-              <span>Trajectories</span>
-            </button>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section id="lastweek" class="panel panel--lastweek" data-section="lastweek" aria-labelledby="lastweek-title">
-      <div class="panel__inner">
-        <p class="accession">06 · Devpost</p>
-        <h2 id="lastweek-title">Last Week on X</h2>
-        <p class="lede">Grok turns the last 7 days of X into a spoken podcast. Devpost only.</p>
-        <p class="notice">The timeline in these shots is a Devpost product demo (Anitej Thamma), not Noah’s feed.</p>
+        <h2>Last Week on X</h2>
+        <p>Turns the last seven days of an X account into a spoken podcast.</p>
         <ul class="links">
           <li><a href="https://devpost.com/software/last-week-on-x">devpost.com/software/last-week-on-x</a></li>
         </ul>
-
-        <div class="gallery" data-gallery="lastweek">
-          <figure class="frame frame--hero">
-            <img id="lastweek-hero" src="assets/lastweekonx-03-dashboard.png" width="3024" height="1708" alt="Last Week on X dashboard with a podcast player and a Tweets This Week list. Demo account Anitej Thamma.">
-            <figcaption id="lastweek-caption">Dashboard — podcast player over the week’s posts. Demo feed: Anitej Thamma, not Noah.</figcaption>
-          </figure>
-          <div class="thumbs" role="list">
-            <button type="button" class="thumb is-active" role="listitem" aria-pressed="true" data-src="assets/lastweekonx-03-dashboard.png" data-alt="Last Week on X dashboard with a podcast player and a Tweets This Week list. Demo account Anitej Thamma." data-caption="Dashboard — podcast player over the week’s posts. Demo feed: Anitej Thamma, not Noah.">
-              <img src="assets/lastweekonx-03-dashboard.png" width="3024" height="1708" alt="" aria-hidden="true">
-              <span>Dashboard</span>
-            </button>
-            <button type="button" class="thumb" role="listitem" aria-pressed="false" data-src="assets/lastweekonx-02-wrapped.png" data-alt="Your Last Week Wrapped modal for @anitej_thamma, a Devpost product demo." data-caption="Wrapped for @anitej_thamma — Devpost product demo, not Noah’s feed.">
-              <img src="assets/lastweekonx-02-wrapped.png" width="1714" height="1662" alt="" aria-hidden="true">
-              <span>Wrapped</span>
-            </button>
-            <button type="button" class="thumb" role="listitem" aria-pressed="false" data-src="assets/lastweekonx-01-landing.png" data-alt="Last Week on X landing page with a Connect Your X Account button." data-caption="Landing. The connected-account shots use Anitej Thamma’s demo feed.">
-              <img src="assets/lastweekonx-01-landing.png" width="3012" height="1724" alt="" aria-hidden="true">
-              <span>Landing</span>
-            </button>
-          </div>
-        </div>
-      </div>
-    </section>
-  </main>
-
-  <footer class="colophon">
-    <p>Security Engineer, Starship Security, SpaceX. Previously Solana Labs, Goldman Sachs. Berkeley Math &amp; CS.</p>
-    <p>
-      ICML 2019 with Shah, Abbeel, Dragan —
-      <a href="https://proceedings.mlr.press/v97/shah19a.html">On the Feasibility of Learning, Rather than Assuming, Human Biases for Reward Inference</a>
-    </p>
-  </footer>
-
-  <script src="script.js"></script>
+        <p class="note">The feed in this shot is a Devpost product demo, not Noah’s.</p>
+      </article>
+    </main>
+  </div>
 </body>
 </html>

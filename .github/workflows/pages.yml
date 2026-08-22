@@ -25,11 +25,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Confirm static museum at repo root
+      - name: Confirm static root
         run: |
           test -f index.html
           test -f styles.css
-          test -f script.js
           test -f favicon.svg
           test -d assets
           file assets/* | grep -E "PNG image|JPEG image|SVG"
@@ -50,7 +49,7 @@ jobs:
       - name: Stage static root
         run: |
           mkdir -p _site
-          cp index.html styles.css script.js favicon.svg .nojekyll _site/
+          cp index.html styles.css favicon.svg .nojekyll _site/
           cp -R assets _site/assets
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
