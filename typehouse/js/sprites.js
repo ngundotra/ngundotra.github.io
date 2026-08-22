@@ -329,6 +329,7 @@
       ["kiln", "well", "greenhouse"].forEach(function (n) {
         if (IMG[n] && srcW(IMG[n])) IMG[n] = punchRail(IMG[n]);
       });
+      if (IMG.cottage && srcW(IMG.cottage)) IMG.cottage = punchCottagePlate(IMG.cottage);
     }
     waiters.splice(0).forEach(function (fn) {
       fn();
@@ -365,7 +366,7 @@
   }
 
   function isPlateLime(r, g, b, a) {
-    return a > 8 && b < 18 && g > 150 && g > r + 12;
+    return a > 8 && g > 100 && g >= r + 8 && g > b + 20 && b < 90;
   }
 
   /* Kill leftover lime grass plate. Keep the circular rail + south wood bridge. */
@@ -418,6 +419,26 @@
         if (bridge) continue;
         px[i + 3] = 0;
       }
+    }
+    ctx.putImageData(data, 0, 0);
+    return c;
+  }
+
+  /* Gatehouse: keep stone, wood, tickets, dirt stub. Lose the lime rectangle. */
+  function punchCottagePlate(im) {
+    var w = srcW(im);
+    var h = srcH(im);
+    if (!w || !h) return im;
+    var c = document.createElement("canvas");
+    c.width = w;
+    c.height = h;
+    var ctx = c.getContext("2d");
+    ctx.drawImage(im, 0, 0);
+    var data = ctx.getImageData(0, 0, w, h);
+    var px = data.data;
+    var i;
+    for (i = 0; i < px.length; i += 4) {
+      if (isPlateLime(px[i], px[i + 1], px[i + 2], px[i + 3])) px[i + 3] = 0;
     }
     ctx.putImageData(data, 0, 0);
     return c;
@@ -583,17 +604,83 @@
       var c = owned[k];
       if (!c || !c.room || c.room === "lobby" || c.room === "transom" || c.room === "larder") return;
       var o = lotOrigin(c, bounds, lot);
+      /* Inner yard only. r=0.40 ate the south bridge (fy≈0.82). */
       ctx.beginPath();
-      ctx.arc(o.x + lot * 0.5, o.y + lot * 0.49, lot * 0.4, 0, Math.PI * 2);
+      ctx.arc(o.x + lot * 0.5, o.y + lot * 0.49, lot * 0.28, 0, Math.PI * 2);
       ctx.fill();
     });
     ctx.restore();
-    var fork = lotPt(1, 1, bounds, lot, 0.5, 0.8);
-    var west = lotPt(0, 1, bounds, lot, 0.5, 0.8);
-    var east = lotPt(2, 1, bounds, lot, 0.5, 0.8);
-    blitCrisp(ctx, "lantern", fork.x + 10, fork.y - 46, 16, 44);
-    blitCrisp(ctx, "lantern", west.x - 8, west.y - 46, 16, 44);
-    blitCrisp(ctx, "lantern", east.x + 8, east.y - 46, 16, 44);
+    paintForcedApproaches(ctx, lot, bounds, owned);
+    paintParkLamps(ctx, lot, bounds, owned);
+  }
+
+  function paintLampPost(ctx, x, y) {
+    ctx.save();
+    ctx.fillStyle = "#2a1c10";
+    ctx.fillRect(Math.round(x) - 2, Math.round(y) - 16, 4, 16);
+    ctx.fillStyle = "#6a5030";
+    ctx.fillRect(Math.round(x) - 1, Math.round(y) - 14, 2, 12);
+    ctx.fillStyle = "rgba(255, 214, 70, 0.28)";
+    ctx.beginPath();
+    ctx.arc(x, y - 18, 8, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = "#ffe060";
+    ctx.beginPath();
+    ctx.arc(x, y - 18, 4, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  }
+
+  function paintParkLamps(ctx, lot, bounds, owned) {
+    var spots = [
+      lotPt(1, 0, bounds, lot, 0.62, 0.78),
+      lotPt(1, 0, bounds, lot, 0.38, 0.34),
+    ];
+    if (hasLot(owned, 1, 1)) spots.push(lotPt(1, 1, bounds, lot, 0.64, 0.86));
+    if (hasLot(owned, 0, 1)) spots.push(lotPt(0, 1, bounds, lot, 0.5, 0.86));
+    if (hasLot(owned, 2, 1)) spots.push(lotPt(2, 1, bounds, lot, 0.5, 0.86));
+    if (hasLot(owned, 1, 2)) spots.push(lotPt(1, 2, bounds, lot, 0.64, 0.86));
+    spots.forEach(function (p) {
+      paintLampPost(ctx, p.x, p.y);
+    });
+  }
+
+  /* After dest-out: one dirt figure from the gate mouth to each pen south bridge.
+     South lips + a side bypass — never recross a punched yard. */
+  function paintForcedApproaches(ctx, lot, bounds, owned) {
+    var mouth = lotPt(1, 0, bounds, lot, 0.5, 0.96);
+    var gateN = lotPt(1, 0, bounds, lot, 0.5, 0.16);
+    var emberLip = lotPt(1, 1, bounds, lot, 0.5, 0.86);
+    paintVisitorPath(ctx, mouth.x, mouth.y, gateN.x, gateN.y);
+    paintVisitorPath(ctx, gateN.x, gateN.y, emberLip.x, emberLip.y);
+
+    var rows = {};
+    Object.keys(owned).forEach(function (k) {
+      var c = owned[k];
+      if (!c || !c.room || c.room === "lobby") return;
+      if (!rows[c.y]) rows[c.y] = [];
+      rows[c.y].push(c);
+      var bridge = lotPt(c.x, c.y, bounds, lot, 0.5, 0.84);
+      var lip = lotPt(c.x, c.y, bounds, lot, 0.5, 0.88);
+      paintVisitorPath(ctx, bridge.x, bridge.y, lip.x, lip.y);
+      if (c.x !== 1) {
+        paintVisitorPath(ctx, lip.x, lip.y, lotPt(1, c.y, bounds, lot, 0.5, 0.88).x, lotPt(1, c.y, bounds, lot, 0.5, 0.88).y);
+      }
+    });
+
+    Object.keys(rows)
+      .map(Number)
+      .sort(function (a, b) {
+        return a - b;
+      })
+      .forEach(function (y) {
+        if (y <= 1) return;
+        var hi = lotPt(1, y, bounds, lot, 0.88, 0.88);
+        var lo = lotPt(1, y - 1, bounds, lot, 0.88, 0.88);
+        paintVisitorPath(ctx, hi.x, hi.y, lo.x, lo.y);
+        paintVisitorPath(ctx, hi.x, hi.y, lotPt(1, y, bounds, lot, 0.5, 0.88).x, lotPt(1, y, bounds, lot, 0.5, 0.88).y);
+        paintVisitorPath(ctx, lo.x, lo.y, lotPt(1, y - 1, bounds, lot, 0.5, 0.88).x, lotPt(1, y - 1, bounds, lot, 0.5, 0.88).y);
+      });
   }
 
   function lotPt(x, y, bounds, lot, fx, fy) {
@@ -739,8 +826,8 @@
     } else if (yard && srcW(IMG[yard])) {
       ctx.save();
       ctx.beginPath();
-      ctx.arc(w * 0.5, h * 0.49, Math.min(w, h) * 0.44, 0, Math.PI * 2);
-      ctx.rect(w * 0.5 - 16, h * 0.72, 32, 28);
+      ctx.arc(w * 0.5, h * 0.49, Math.min(w, h) * 0.415, 0, Math.PI * 2);
+      ctx.rect(w * 0.5 - 14, h * 0.74, 28, 26);
       ctx.clip();
       drew = blitCrisp(ctx, yard, 0, 0, w, h);
       ctx.restore();
@@ -756,11 +843,20 @@
       ctx.arc(w / 2, h / 2, Math.min(w, h) * 0.4, 0, Math.PI * 2);
       ctx.fill();
     }
-    if (opt.selected) {
-      ctx.strokeStyle = "#e8c428";
-      ctx.lineWidth = 3;
+    if (opt.selected && kind !== "lobby") {
+      /* Glow on the rail — not a yellow spreadsheet cell. */
+      var hx = w * 0.5;
+      var hy = h * 0.49;
+      var hr = Math.min(w, h) * 0.405;
+      ctx.strokeStyle = "rgba(255, 214, 90, 0.5)";
+      ctx.lineWidth = 5;
       ctx.beginPath();
-      ctx.arc(w / 2, h / 2 - 2, Math.min(w, h) * 0.46, 0, Math.PI * 2);
+      ctx.arc(hx, hy, hr, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.strokeStyle = "rgba(255, 236, 160, 0.85)";
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.arc(hx, hy, hr, 0, Math.PI * 2);
       ctx.stroke();
     }
   }
@@ -770,14 +866,8 @@
   }
 
   function paintEmpty(canvas, opt) {
-    opt = opt || {};
     var ctx = canvas.getContext("2d");
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    if (opt.selected) {
-      ctx.strokeStyle = "#e8c428";
-      ctx.lineWidth = 3;
-      ctx.strokeRect(2, 2, canvas.width - 4, canvas.height - 4);
-    }
   }
 
   function paintFog(canvas, opt) {
@@ -788,11 +878,6 @@
     ctx.imageSmoothingEnabled = false;
     ctx.clearRect(0, 0, w, h);
     if (!opt.inert) blitCrisp(ctx, "buyland", Math.floor(w * 0.3), Math.floor(h * 0.28), Math.floor(w * 0.4), Math.floor(h * 0.58));
-    if (opt.selected) {
-      ctx.strokeStyle = "#e8c428";
-      ctx.lineWidth = 3;
-      ctx.strokeRect(2, 2, w - 4, h - 4);
-    }
   }
 
   function paintIcon(size) {

@@ -11,7 +11,7 @@
   var LOT = 192;
   var GW = 36;
   var GH = 36;
-  var RING = 0.28;
+  var RING = 0.32;
 
   function rng() {
     seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0;
@@ -77,8 +77,10 @@
   }
 
   function makeActor(d, room) {
-    var gate = gatePoint();
-    var stand = standPoint(room);
+    var gate = T.isFenced(room)
+      ? { x: LOT * 0.5 - GW * 0.5, y: LOT * 0.78 - GH * 0.5 }
+      : gatePoint();
+    var walk = walkTarget(room);
     return {
       id: d.id,
       kind: d.kind,
@@ -86,14 +88,30 @@
       y: d.y,
       px: gate.x,
       py: gate.y,
-      tx: stand.x,
-      ty: stand.y,
-      state: "enter",
+      tx: walk.x,
+      ty: walk.y,
+      state: "walk",
       face: 1,
       hold: 0,
-      enterLeft: 0.4,
+      enterLeft: 0,
       meetWith: null,
       meetDir: null,
+    };
+  }
+
+  function walkTarget(room) {
+    if (T.isFenced(room)) {
+      var ang = rng() * Math.PI * 2;
+      var rad = LOT * RING * (0.4 + rng() * 0.55);
+      return {
+        x: LOT * 0.5 - GW * 0.5 + Math.cos(ang) * rad,
+        y: LOT * 0.48 - GH * 0.5 + Math.sin(ang) * rad,
+      };
+    }
+    var pad = walkPad(room);
+    return {
+      x: pad + rng() * (LOT - pad * 2 - GW),
+      y: pad + rng() * (LOT - pad * 2 - GH),
     };
   }
 
@@ -161,17 +179,10 @@
   }
 
   function startWalk(a, room) {
+    var p = walkTarget(room);
     a.state = "walk";
-    if (T.isFenced(room)) {
-      var ang = rng() * Math.PI * 2;
-      var rad = rng() * LOT * (RING - 0.08);
-      a.tx = LOT * 0.5 - GW * 0.5 + Math.cos(ang) * rad;
-      a.ty = LOT * 0.48 - GH * 0.5 + Math.sin(ang) * rad;
-    } else {
-      var pad = walkPad(room);
-      a.tx = pad + rng() * (LOT - pad * 2 - GW);
-      a.ty = pad + rng() * (LOT - pad * 2 - GH);
-    }
+    a.tx = p.x;
+    a.ty = p.y;
     a.hold = 0;
   }
 
@@ -251,11 +262,11 @@
     }
     var c = T.cell(s, d.x, d.y);
     var home = c && T.yieldMult(s, d, c).home;
-    if (d.stage >= 1 && home && rng() < 0.28) {
+    if (d.stage >= 1 && home && rng() < 0.1) {
       startSit(a);
       return;
     }
-    if (rng() < 0.35) {
+    if (rng() < 0.12) {
       startInteract(a);
       return;
     }
@@ -266,7 +277,7 @@
     var dx = a.tx - a.px;
     var dy = a.ty - a.py;
     var dist = Math.hypot(dx, dy);
-    var spd = 56 * dt;
+    var spd = 78 * dt;
     if (dist <= spd || dist < 0.8) {
       a.px = a.tx;
       a.py = a.ty;
@@ -295,19 +306,7 @@
       var c = T.cell(s, d.x, d.y);
       var room = c && c.room;
       if (a.state === "enter") {
-        var t = a.enterLeft / 0.4;
-        var gate = gatePoint();
-        var stand = standPoint(room);
-        var u = 1 - Math.max(0, t);
-        a.px = gate.x + (stand.x - gate.x) * u;
-        a.py = gate.y + (stand.y - gate.y) * u;
-        a.enterLeft -= dt;
-        if (a.enterLeft <= 0) {
-          a.px = stand.x;
-          a.py = stand.y;
-          a.state = "idle";
-          a.hold = 0.6 + rng() * 1.4;
-        }
+        startWalk(a, room);
         clampWalk(a, room);
         return;
       }
@@ -315,16 +314,16 @@
         if (stepToward(a, dt)) {
           if (a.after === "interact") {
             a.state = "interact";
-            a.hold = 1.2 + rng() * 1.2;
+            a.hold = 0.6 + rng() * 0.6;
           } else if (a.after === "sit") {
             a.state = "sit";
-            a.hold = 2 + rng() * 2;
+            a.hold = 0.8 + rng() * 0.8;
           } else if (a.after === "meet") {
             a.state = "meet";
-            a.hold = 1.6 + rng() * 0.8;
+            a.hold = 1.2 + rng() * 0.6;
           } else {
             a.state = "idle";
-            a.hold = 0.8 + rng() * 1.8;
+            a.hold = 0.12 + rng() * 0.25;
           }
           a.after = null;
         }

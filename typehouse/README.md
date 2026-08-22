@@ -6,7 +6,7 @@ We do not ask what they are. We ask which grounds.
 
 This is original IP. Not a farm, not a battler, not Nintendo, not Pokémon, not 3D.
 
-Yards are authored PNGs in `typehouse/img/` (kiln, well, greenhouse, cottage, grass, trees, Wicknoll). Exhibit PNGs are punched to the circular rail so they sit on the shared lawn, not a square grass plate. A packed-earth spine runs from the WELCOME gate mouth to each pen’s south bridge.
+Yards are authored PNGs in `typehouse/img/` (kiln, well, greenhouse, cottage, grass, trees, Wicknoll). Exhibit and gate PNGs lose their lime grass plates so they sit on the shared lawn. A packed-earth figure is forced from the WELCOME gate mouth to each pen’s south bridge. Selected pens glow on the rail, not a yellow rectangle. Denizens walk inside the ring.
 
 ## Run locally
 
