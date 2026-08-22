@@ -641,10 +641,10 @@
       lotPt(1, 0, bounds, lot, 0.62, 0.78),
       lotPt(1, 0, bounds, lot, 0.38, 0.34),
     ];
-    if (roomAt(owned, 1, 1)) spots.push(lotPt(1, 1, bounds, lot, 0.64, 0.86));
-    if (roomAt(owned, 0, 1)) spots.push(lotPt(0, 1, bounds, lot, 0.5, 0.86));
-    if (roomAt(owned, 2, 1)) spots.push(lotPt(2, 1, bounds, lot, 0.5, 0.86));
-    if (roomAt(owned, 1, 2)) spots.push(lotPt(1, 2, bounds, lot, 0.64, 0.86));
+    if (roomAt(owned, 1, 1)) spots.push(lotPt(1, 1, bounds, lot, 0.68, 0.97));
+    if (roomAt(owned, 0, 1)) spots.push(lotPt(0, 1, bounds, lot, 0.68, 0.97));
+    if (roomAt(owned, 2, 1)) spots.push(lotPt(2, 1, bounds, lot, 0.32, 0.97));
+    if (roomAt(owned, 1, 2)) spots.push(lotPt(1, 2, bounds, lot, 0.68, 0.97));
     spots.forEach(function (p) {
       paintLampPost(ctx, p.x, p.y);
     });
@@ -654,10 +654,11 @@
      South lips + a side bypass — never recross a punched yard.
      Boot (no pens yet) keeps only the gate mouth so we do not paint a T on empty lawn. */
   function paintForcedApproaches(ctx, lot, bounds, owned) {
-    var mouth = lotPt(1, 0, bounds, lot, 0.5, 0.96);
-    var gateN = lotPt(1, 0, bounds, lot, 0.5, 0.16);
+    var mouthS = lotPt(1, 0, bounds, lot, 0.5, 0.98);
+    var mouthJoin = lotPt(1, 0, bounds, lot, 0.5, 0.78);
+    var gateN = lotPt(1, 0, bounds, lot, 0.5, 0.10);
+    paintVisitorPath(ctx, mouthS.x, mouthS.y, mouthJoin.x, mouthJoin.y);
     var ember = owned["1,1"];
-    paintVisitorPath(ctx, mouth.x, mouth.y, gateN.x, gateN.y);
     if (ember && ember.room && ember.room !== "lobby") {
       var emberLip = lotPt(1, 1, bounds, lot, 0.5, 0.92);
       paintVisitorPath(ctx, gateN.x, gateN.y, emberLip.x, emberLip.y);
@@ -705,11 +706,10 @@
 
   /* One packed-earth figure: gate mouth → north bridges. Lamps sit on the dirt. */
   function paintDirtSpine(ctx, lot, bounds, owned) {
-    var mouth = lotPt(1, 0, bounds, lot, 0.5, 0.92);
-    var gateMid = lotPt(1, 0, bounds, lot, 0.5, 0.42);
-    var gateN = lotPt(1, 0, bounds, lot, 0.5, 0.16);
-    paintVisitorPath(ctx, mouth.x, mouth.y, gateMid.x, gateMid.y);
-    paintVisitorPath(ctx, gateMid.x, gateMid.y, gateN.x, gateN.y);
+    var mouthS = lotPt(1, 0, bounds, lot, 0.5, 0.98);
+    var mouthJoin = lotPt(1, 0, bounds, lot, 0.5, 0.78);
+    var gateN = lotPt(1, 0, bounds, lot, 0.5, 0.10);
+    paintVisitorPath(ctx, mouthS.x, mouthS.y, mouthJoin.x, mouthJoin.y);
     var ember = owned["1,1"];
     if (ember && ember.room && ember.room !== "lobby") {
       var fork = lotPt(1, 1, bounds, lot, 0.5, 0.92);
