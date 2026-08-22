@@ -604,9 +604,9 @@
       var c = owned[k];
       if (!c || !c.room || c.room === "lobby" || c.room === "transom" || c.room === "larder") return;
       var o = lotOrigin(c, bounds, lot);
-      /* Inner yard only. r=0.40 ate the south bridge (fy≈0.82). */
+      /* Punch the yard so dirt cannot sit on the exhibit. South stubs are redrawn after. */
       ctx.beginPath();
-      ctx.arc(o.x + lot * 0.5, o.y + lot * 0.49, lot * 0.28, 0, Math.PI * 2);
+      ctx.arc(o.x + lot * 0.5, o.y + lot * 0.49, lot * 0.40, 0, Math.PI * 2);
       ctx.fill();
     });
     ctx.restore();
@@ -659,7 +659,7 @@
     var ember = owned["1,1"];
     paintVisitorPath(ctx, mouth.x, mouth.y, gateN.x, gateN.y);
     if (ember && ember.room && ember.room !== "lobby") {
-      var emberLip = lotPt(1, 1, bounds, lot, 0.5, 0.86);
+      var emberLip = lotPt(1, 1, bounds, lot, 0.5, 0.92);
       paintVisitorPath(ctx, gateN.x, gateN.y, emberLip.x, emberLip.y);
     }
 
@@ -669,11 +669,11 @@
       if (!c || !c.room || c.room === "lobby") return;
       if (!rows[c.y]) rows[c.y] = [];
       rows[c.y].push(c);
-      var bridge = lotPt(c.x, c.y, bounds, lot, 0.5, 0.84);
-      var lip = lotPt(c.x, c.y, bounds, lot, 0.5, 0.88);
+      var bridge = lotPt(c.x, c.y, bounds, lot, 0.5, 0.80);
+      var lip = lotPt(c.x, c.y, bounds, lot, 0.5, 0.94);
       paintVisitorPath(ctx, bridge.x, bridge.y, lip.x, lip.y);
       if (c.x !== 1) {
-        paintVisitorPath(ctx, lip.x, lip.y, lotPt(1, c.y, bounds, lot, 0.5, 0.88).x, lotPt(1, c.y, bounds, lot, 0.5, 0.88).y);
+        paintVisitorPath(ctx, lip.x, lip.y, lotPt(1, c.y, bounds, lot, 0.5, 0.94).x, lotPt(1, c.y, bounds, lot, 0.5, 0.94).y);
       }
     });
 
@@ -684,11 +684,11 @@
       })
       .forEach(function (y) {
         if (y <= 1) return;
-        var hi = lotPt(1, y, bounds, lot, 0.88, 0.88);
-        var lo = lotPt(1, y - 1, bounds, lot, 0.88, 0.88);
+        var hi = lotPt(1, y, bounds, lot, 0.94, 0.94);
+        var lo = lotPt(1, y - 1, bounds, lot, 0.94, 0.94);
         paintVisitorPath(ctx, hi.x, hi.y, lo.x, lo.y);
-        paintVisitorPath(ctx, hi.x, hi.y, lotPt(1, y, bounds, lot, 0.5, 0.88).x, lotPt(1, y, bounds, lot, 0.5, 0.88).y);
-        paintVisitorPath(ctx, lo.x, lo.y, lotPt(1, y - 1, bounds, lot, 0.5, 0.88).x, lotPt(1, y - 1, bounds, lot, 0.5, 0.88).y);
+        paintVisitorPath(ctx, hi.x, hi.y, lotPt(1, y, bounds, lot, 0.5, 0.94).x, lotPt(1, y, bounds, lot, 0.5, 0.94).y);
+        paintVisitorPath(ctx, lo.x, lo.y, lotPt(1, y - 1, bounds, lot, 0.5, 0.94).x, lotPt(1, y - 1, bounds, lot, 0.5, 0.94).y);
       });
   }
 
@@ -712,31 +712,16 @@
     paintVisitorPath(ctx, gateMid.x, gateMid.y, gateN.x, gateN.y);
     var ember = owned["1,1"];
     if (ember && ember.room && ember.room !== "lobby") {
-      var fork = lotPt(1, 1, bounds, lot, 0.5, 0.86);
+      var fork = lotPt(1, 1, bounds, lot, 0.5, 0.92);
       paintVisitorPath(ctx, gateN.x, gateN.y, fork.x, fork.y);
     }
     var westR = owned["0,1"];
     var eastR = owned["2,1"];
     if ((westR && westR.room) || (eastR && eastR.room)) {
-      var west = lotPt(0, 1, bounds, lot, 0.5, 0.86);
-      var east = lotPt(2, 1, bounds, lot, 0.5, 0.86);
+      var west = lotPt(0, 1, bounds, lot, 0.5, 0.94);
+      var east = lotPt(2, 1, bounds, lot, 0.5, 0.94);
       paintVisitorPath(ctx, west.x, west.y, east.x, east.y);
     }
-    Object.keys(owned).forEach(function (k) {
-      var c = owned[k];
-      if (!c || !c.room || c.room === "lobby") return;
-      var bridge = lotPt(c.x, c.y, bounds, lot, 0.5, 0.84);
-      var south = owned[c.x + "," + (c.y - 1)];
-      var eastC = owned[c.x + 1 + "," + c.y];
-      if (south && south.room) {
-        var so = lotPt(south.x, south.y, bounds, lot, 0.5, south.room === "lobby" ? 0.16 : 0.86);
-        paintVisitorPath(ctx, bridge.x, bridge.y, so.x, so.y);
-      }
-      if (eastC && eastC.room) {
-        var eo = lotPt(eastC.x, eastC.y, bounds, lot, 0.5, 0.86);
-        paintVisitorPath(ctx, bridge.x, bridge.y, eo.x, eo.y);
-      }
-    });
   }
 
   function fillDisk(ctx, cx, cy, r, col) {
