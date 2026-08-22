@@ -19,6 +19,7 @@ const ASSETS = [
   "./img/grass.png",
   "./img/path.png",
   "./img/trees.png",
+  "./img/canopy.png",
   "./img/wicknoll.png",
   "./img/lantern.png",
   "./img/buyland.png",

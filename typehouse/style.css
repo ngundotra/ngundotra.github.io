@@ -339,7 +339,7 @@ body {
   flex-direction: column;
 }
 .sheet.open { transform: translateX(-50%) translateY(0); }
-.sheet.short { height: 24dvh; }
+.sheet.short { height: 18dvh; }
 .sheet.event { height: 46dvh; background: #fff1d0; }
 #dim.soft { background: rgba(80, 110, 60, 0.12); }
 #sheet-body {

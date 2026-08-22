@@ -292,7 +292,7 @@
     lobby: "cottage",
   };
 
-  var NAMES = ["kiln", "well", "greenhouse", "cottage", "grass", "path", "trees", "wicknoll", "lantern", "buyland"];
+  var NAMES = ["kiln", "well", "greenhouse", "cottage", "grass", "path", "trees", "canopy", "wicknoll", "lantern", "buyland"];
   var IMG = {};
   var readyCount = 0;
   var waiters = [];
@@ -427,8 +427,11 @@
       ctx.fillRect(0, skyH, w, h - skyH);
     }
     if (IMG.trees && IMG.trees.naturalWidth) {
-      for (x = -20; x < w; x += 110) {
-        ctx.drawImage(IMG.trees, x, -8, 140, 140);
+      ctx.drawImage(IMG.trees, 0, 0, w, Math.floor(lot * 0.55));
+    }
+    if (IMG.canopy && IMG.canopy.naturalWidth) {
+      for (x = 8; x < w; x += 150) {
+        ctx.drawImage(IMG.canopy, x, Math.floor(lot * 0.28), 96, 96);
       }
     }
     Object.keys(owned).forEach(function (k) {
@@ -514,9 +517,9 @@
     var h = canvas.height;
     ctx.imageSmoothingEnabled = true;
     ctx.clearRect(0, 0, w, h);
-    blit(ctx, "trees", -10, -20, w + 20, Math.floor(h * 0.7));
-    blit(ctx, "trees", Math.floor(w * 0.25), Math.floor(h * 0.15), Math.floor(w * 0.7), Math.floor(h * 0.7));
-    if (!opt.inert) blit(ctx, "buyland", Math.floor(w * 0.22), Math.floor(h * 0.28), Math.floor(w * 0.56), Math.floor(h * 0.56));
+    blit(ctx, "canopy", 4, 8, Math.floor(w * 0.46), Math.floor(h * 0.46));
+    blit(ctx, "canopy", Math.floor(w * 0.42), 18, Math.floor(w * 0.5), Math.floor(h * 0.5));
+    if (!opt.inert) blit(ctx, "buyland", Math.floor(w * 0.28), Math.floor(h * 0.36), Math.floor(w * 0.44), Math.floor(h * 0.44));
     if (opt.selected) {
       ctx.strokeStyle = "#e8c428";
       ctx.lineWidth = 3;
