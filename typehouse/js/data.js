@@ -45,7 +45,7 @@
       name: "Gatehouse",
       type: "none",
       cost: { tally: 0, scrap: 0, dust: 0 },
-      blurb: "The gate. Holds four waiting. Pays nothing. The night desk lives here.",
+      blurb: "The zoo gate. Holds four waiting. Pays nothing. The night desk lives here.",
       unique: true,
       noSeat: false,
       waitCap: 4,
@@ -56,7 +56,7 @@
       name: "Ember Grounds",
       type: "ember",
       cost: { tally: 8, scrap: 0, dust: 0 },
-      blurb: "A kiln that remembers hands. Ember underfoot.",
+      blurb: "A sandy ember pen. The lamp-bug likes the heat.",
       start: true,
     },
     cistern: {
@@ -64,7 +64,7 @@
       name: "Tide Basin",
       type: "tide",
       cost: { tally: 14, scrap: 2, dust: 0 },
-      blurb: "A throat of standing water behind a rail.",
+      blurb: "A pool exhibit behind a circular rail.",
       afterHearth: true,
     },
     conservatory: {
@@ -72,7 +72,7 @@
       name: "Moss Plot",
       type: "moss",
       cost: { tally: 14, scrap: 2, dust: 0 },
-      blurb: "Glass and leaf. The leaf is winning.",
+      blurb: "A leafy jungle pen. Moss on the logs.",
       afterHearth: true,
     },
     dynamo: {

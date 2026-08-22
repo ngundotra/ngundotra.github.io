@@ -142,12 +142,31 @@
     var z = cam.z || 1;
     var pw = view.w * LOT * z;
     var ph = view.h * LOT * z;
-    if (pw <= ww) cam.x = Math.round((ww - pw) / 2);
+    if (pw <= ww) cam.x = Math.min(ww - pw, Math.max(0, cam.x));
     else cam.x = Math.min(0, Math.max(ww - pw, cam.x));
-    if (ph <= wh) cam.y = Math.round((wh - ph) / 2);
+    if (ph <= wh) cam.y = Math.min(wh - ph, Math.max(0, cam.y));
     else cam.y = Math.min(0, Math.max(wh - ph, cam.y));
     applyCam();
     syncZoomBtns();
+  }
+
+  function frameZoo() {
+    var wrap = $("house-wrap");
+    if (!wrap) return;
+    var ww = wrap.clientWidth || 390;
+    var wh = wrap.clientHeight || 560;
+    var zFit = ww / (3 * LOT + 12);
+    var usable = wh * 0.76;
+    zFit = Math.min(zFit, usable / (2 * LOT + 8));
+    cam.z = Math.max(Z_MIN, Math.min(Z_MAX, zFit));
+    var z = cam.z;
+    var ownedLeft = (0 - view.minX) * LOT * z;
+    var ownedTop = (view.maxY - 1) * LOT * z;
+    var ownedW = 3 * LOT * z;
+    var ownedH = 2 * LOT * z;
+    cam.x = (ww - ownedW) / 2 - ownedLeft;
+    cam.y = Math.max(6, (usable - ownedH) * 0.28) - ownedTop;
+    clampCam();
   }
 
   function setZoom(nz, fx, fy) {
@@ -205,8 +224,7 @@
   function ensureCam(s) {
     view = T.parkBounds(s);
     if (!camReady) {
-      cam.z = Z_DEFAULT;
-      centerOn(1, 0.55);
+      frameZoo();
       camReady = true;
     } else {
       clampCam();
@@ -664,8 +682,8 @@
     if (msg === "ok" && lot) {
       selected = { x: lot.x, y: lot.y };
       view = T.parkBounds(s);
+      frameZoo();
       includeLot(lot.x, lot.y);
-      centerOn(1, 0.55);
       markDirty();
       renderHouse(s);
       renderChrome(s);
@@ -931,7 +949,6 @@
           T.reset();
           W.reset();
           selected = null;
-          cam.z = Z_DEFAULT;
           camReady = false;
           lastBlotter = "";
           lastWaitKey = "";

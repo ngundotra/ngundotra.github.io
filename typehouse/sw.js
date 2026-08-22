@@ -1,4 +1,4 @@
-const CACHE = "typehouse-v6";
+const CACHE = "typehouse-v7";
 const ASSETS = [
   "./",
   "./index.html",

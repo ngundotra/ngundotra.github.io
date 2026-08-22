@@ -1,4 +1,4 @@
-/* The Grounds — PNG yards. House-spirits, not Nintendo. */
+/* The Grounds — zoo exhibit pens. House-spirits inside the rails. */
 (function (G) {
   const P = G.THData.PAL;
 
@@ -333,9 +333,47 @@
   function blit(ctx, name, x, y, w, h) {
     var im = IMG[name];
     if (!im || !im.naturalWidth) return false;
-    ctx.imageSmoothingEnabled = true;
-    ctx.drawImage(im, x, y, w, h);
+    var sx = w / im.naturalWidth;
+    var sy = h / im.naturalHeight;
+    var integer =
+      Math.abs(sx - Math.round(sx)) < 0.02 && Math.abs(sy - Math.round(sy)) < 0.02;
+    ctx.imageSmoothingEnabled = !integer;
+    ctx.drawImage(im, Math.round(x), Math.round(y), Math.round(w), Math.round(h));
     return true;
+  }
+
+  function blitCrisp(ctx, name, x, y, w, h) {
+    var im = IMG[name];
+    if (!im || !im.naturalWidth) return false;
+    ctx.imageSmoothingEnabled = false;
+    ctx.drawImage(im, Math.round(x), Math.round(y), Math.round(w), Math.round(h));
+    return true;
+  }
+
+  function paintVisitorPath(ctx, x1, y1, x2, y2) {
+    ctx.save();
+    ctx.lineCap = "round";
+    ctx.lineJoin = "round";
+    ctx.strokeStyle = "#6a4824";
+    ctx.lineWidth = 20;
+    ctx.beginPath();
+    ctx.moveTo(x1, y1);
+    ctx.lineTo(x2, y2);
+    ctx.stroke();
+    ctx.strokeStyle = "#c4a05a";
+    ctx.lineWidth = 14;
+    ctx.stroke();
+    ctx.strokeStyle = "#d8b46a";
+    ctx.lineWidth = 8;
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  function lotOrigin(c, bounds, lot) {
+    return {
+      x: (c.x - bounds.minX) * lot,
+      y: (bounds.maxY - c.y) * lot,
+    };
   }
 
   function drawMap(ctx, a, scale, ox, oy) {
@@ -362,7 +400,7 @@
       ctx.scale(-1, 1);
     }
     if (id === "Wicknoll" && IMG.wicknoll && IMG.wicknoll.naturalWidth) {
-      ctx.imageSmoothingEnabled = true;
+      ctx.imageSmoothingEnabled = false;
       var pad = 2;
       ctx.drawImage(IMG.wicknoll, pad, pad + bob, canvas.width - pad * 2, canvas.height - pad * 2 - bob);
       ctx.restore();
@@ -408,62 +446,47 @@
     var lot = opt.lot || 192;
     var bounds = opt.bounds || { minX: 0, minY: 0, maxX: 2, maxY: 1 };
     var owned = opt.owned || {};
-    ctx.imageSmoothingEnabled = true;
-    ctx.fillStyle = "#4aa8e8";
-    ctx.fillRect(0, 0, w, h);
-    var skyH = Math.floor(lot * 0.42);
-    ctx.fillStyle = "#7ec8f0";
-    ctx.fillRect(0, Math.floor(skyH * 0.55), w, skyH);
     var x;
     var y;
+    ctx.imageSmoothingEnabled = false;
     if (IMG.grass && IMG.grass.naturalWidth) {
-      for (y = Math.floor(skyH * 0.72); y < h; y += 128) {
-        for (x = 0; x < w; x += 128) {
-          ctx.drawImage(IMG.grass, x, y, 128, 128);
+      for (y = 0; y < h; y += IMG.grass.naturalHeight) {
+        for (x = 0; x < w; x += IMG.grass.naturalWidth) {
+          ctx.drawImage(IMG.grass, x, y);
         }
       }
     } else {
-      ctx.fillStyle = "#4cb83c";
-      ctx.fillRect(0, skyH, w, h - skyH);
+      ctx.fillStyle = "#58b03c";
+      ctx.fillRect(0, 0, w, h);
     }
+    /* Sky + trees only on the north zoo edge, never under the pens. */
+    ctx.fillStyle = "#7ec8f0";
+    ctx.fillRect(0, 0, w, Math.floor(lot * 0.22));
+    ctx.fillStyle = "#4aa8e8";
+    ctx.fillRect(0, 0, w, Math.floor(lot * 0.1));
     if (IMG.trees && IMG.trees.naturalWidth) {
-      ctx.drawImage(IMG.trees, 0, 0, w, Math.floor(lot * 0.55));
-    }
-    if (IMG.canopy && IMG.canopy.naturalWidth) {
-      for (x = 8; x < w; x += 150) {
-        ctx.drawImage(IMG.canopy, x, Math.floor(lot * 0.28), 96, 96);
-      }
+      ctx.drawImage(IMG.trees, 0, 0, w, Math.floor(lot * 0.38));
     }
     Object.keys(owned).forEach(function (k) {
       var c = owned[k];
       if (!c) return;
-      var ox = (c.x - bounds.minX) * lot;
-      var oy = (bounds.maxY - c.y) * lot;
+      var o = lotOrigin(c, bounds, lot);
       var east = owned[c.x + 1 + "," + c.y];
-      var north = owned[c.x + "," + (c.y + 1)];
-      if (east && IMG.path && IMG.path.naturalWidth) {
-        ctx.save();
-        ctx.translate(ox + lot * 0.5, oy + lot * 0.72);
-        ctx.rotate(0);
-        ctx.drawImage(IMG.path, 0, -14, lot, 28);
-        ctx.restore();
+      var south = owned[c.x + "," + (c.y - 1)];
+      var southY = o.y + lot * 0.82;
+      if (east) {
+        var eo = lotOrigin(east, bounds, lot);
+        paintVisitorPath(ctx, o.x + lot * 0.5, southY, eo.x + lot * 0.5, eo.y + lot * 0.82);
+        blitCrisp(ctx, "lantern", o.x + lot - 18, southY - 36, 18, 36);
       }
-      if (north && IMG.path && IMG.path.naturalWidth) {
-        ctx.save();
-        ctx.translate(ox + lot * 0.5, oy + lot * 0.2);
-        ctx.rotate(-Math.PI / 2);
-        ctx.drawImage(IMG.path, 0, -14, lot, 28);
-        ctx.restore();
+      if (south) {
+        var so = lotOrigin(south, bounds, lot);
+        paintVisitorPath(ctx, o.x + lot * 0.5, o.y + lot * 0.78, so.x + lot * 0.5, so.y + lot * 0.22);
+        blitCrisp(ctx, "lantern", o.x + lot * 0.5 + 10, o.y + lot - 20, 18, 36);
       }
-      if (c.room === "lobby" && IMG.path && IMG.path.naturalWidth) {
-        ctx.save();
-        ctx.translate(ox + lot * 0.5, oy + lot * 0.78);
-        ctx.rotate(-Math.PI / 2);
-        ctx.drawImage(IMG.path, 0, -14, lot * 0.4, 28);
-        ctx.restore();
+      if (c.room === "lobby") {
+        paintVisitorPath(ctx, o.x + lot * 0.5, o.y + lot * 0.96, o.x + lot * 0.5, o.y + lot * 0.28);
       }
-      if (east) blit(ctx, "lantern", ox + lot - 22, oy + lot * 0.52, 28, 46);
-      if (north) blit(ctx, "lantern", ox + lot * 0.36, oy - 8, 28, 46);
     });
   }
 
@@ -472,13 +495,11 @@
     var ctx = canvas.getContext("2d");
     var w = canvas.width;
     var h = canvas.height;
-    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingEnabled = false;
     ctx.clearRect(0, 0, w, h);
     var yard = YARD[kind];
-    if (yard && blit(ctx, yard, 0, 0, w, h)) {
-      /* authored PNG */
-    } else if (IMG.grass && IMG.grass.naturalWidth) {
-      ctx.drawImage(IMG.grass, 0, 0, w, h);
+    if (yard && blitCrisp(ctx, yard, 0, 0, w, h)) {
+      /* transparent exhibit on shared park grass */
     }
     if (opt.leaking) {
       ctx.fillStyle = "rgba(232,80,20,0.35)";
@@ -515,11 +536,9 @@
     var ctx = canvas.getContext("2d");
     var w = canvas.width;
     var h = canvas.height;
-    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingEnabled = false;
     ctx.clearRect(0, 0, w, h);
-    blit(ctx, "canopy", 4, 8, Math.floor(w * 0.46), Math.floor(h * 0.46));
-    blit(ctx, "canopy", Math.floor(w * 0.42), 18, Math.floor(w * 0.5), Math.floor(h * 0.5));
-    if (!opt.inert) blit(ctx, "buyland", Math.floor(w * 0.28), Math.floor(h * 0.36), Math.floor(w * 0.44), Math.floor(h * 0.44));
+    if (!opt.inert) blitCrisp(ctx, "buyland", Math.floor(w * 0.3), Math.floor(h * 0.28), Math.floor(w * 0.4), Math.floor(h * 0.58));
     if (opt.selected) {
       ctx.strokeStyle = "#e8c428";
       ctx.lineWidth = 3;
@@ -532,7 +551,7 @@
     c.width = size;
     c.height = size;
     var ctx = c.getContext("2d");
-    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingEnabled = false;
     if (IMG.cottage && IMG.cottage.naturalWidth) ctx.drawImage(IMG.cottage, 0, 0, size, size);
     else {
       ctx.fillStyle = P.ember;
