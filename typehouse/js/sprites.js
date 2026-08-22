@@ -292,7 +292,26 @@
     lobby: "cottage",
   };
 
-  var NAMES = ["kiln", "well", "greenhouse", "cottage", "grass", "path", "trees", "canopy", "wicknoll", "lantern", "buyland"];
+  var NAMES = [
+    "kiln",
+    "well",
+    "greenhouse",
+    "cottage",
+    "grass",
+    "path",
+    "trees",
+    "canopy",
+    "wicknoll",
+    "puddlewick",
+    "ledgerfrond",
+    "lantern",
+    "buyland",
+  ];
+  var GUEST_PNG = {
+    Wicknoll: "wicknoll",
+    Puddlewick: "puddlewick",
+    Ledgerfrond: "ledgerfrond",
+  };
   var IMG = {};
   var readyCount = 0;
   var waiters = [];
@@ -399,10 +418,11 @@
       ctx.translate(canvas.width, 0);
       ctx.scale(-1, 1);
     }
-    if (id === "Wicknoll" && IMG.wicknoll && IMG.wicknoll.naturalWidth) {
+    var png = GUEST_PNG[id];
+    if (png && IMG[png] && IMG[png].naturalWidth) {
       ctx.imageSmoothingEnabled = false;
-      var pad = 2;
-      ctx.drawImage(IMG.wicknoll, pad, pad + bob, canvas.width - pad * 2, canvas.height - pad * 2 - bob);
+      var pad = 1;
+      ctx.drawImage(IMG[png], pad, pad + bob, canvas.width - pad * 2, canvas.height - pad * 2 - bob);
       ctx.restore();
       return;
     }
@@ -477,12 +497,12 @@
       if (east) {
         var eo = lotOrigin(east, bounds, lot);
         paintVisitorPath(ctx, o.x + lot * 0.5, southY, eo.x + lot * 0.5, eo.y + lot * 0.82);
-        blitCrisp(ctx, "lantern", o.x + lot - 18, southY - 36, 18, 36);
+        blitCrisp(ctx, "lantern", o.x + lot - 16, southY - 44, 14, 40);
       }
       if (south) {
         var so = lotOrigin(south, bounds, lot);
         paintVisitorPath(ctx, o.x + lot * 0.5, o.y + lot * 0.78, so.x + lot * 0.5, so.y + lot * 0.22);
-        blitCrisp(ctx, "lantern", o.x + lot * 0.5 + 10, o.y + lot - 20, 18, 36);
+        blitCrisp(ctx, "lantern", o.x + lot * 0.5 + 10, o.y + lot - 22, 14, 40);
       }
       if (c.room === "lobby") {
         paintVisitorPath(ctx, o.x + lot * 0.5, o.y + lot * 0.96, o.x + lot * 0.5, o.y + lot * 0.28);

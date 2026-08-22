@@ -1,4 +1,4 @@
-const CACHE = "typehouse-v7";
+const CACHE = "typehouse-v8";
 const ASSETS = [
   "./",
   "./index.html",
@@ -21,6 +21,8 @@ const ASSETS = [
   "./img/trees.png",
   "./img/canopy.png",
   "./img/wicknoll.png",
+  "./img/puddlewick.png",
+  "./img/ledgerfrond.png",
   "./img/lantern.png",
   "./img/buyland.png",
 ];

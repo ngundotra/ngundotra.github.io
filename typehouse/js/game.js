@@ -1070,6 +1070,14 @@
       s.scrap = Math.max(s.scrap, 8);
       if (!cell(s, 2, 1).room) build(s, 2, 1, "cistern");
       if (!cell(s, 0, 1).room) build(s, 0, 1, "conservatory");
+      if (!denizen(s, "Puddlewick")) {
+        s.denizens.push({ id: "Puddlewick", kind: "Puddlewick", stage: 0, progress: 0, x: null, y: null, exhaustedUntil: 0 });
+      }
+      if (!denizen(s, "Ledgerfrond")) {
+        s.denizens.push({ id: "Ledgerfrond", kind: "Ledgerfrond", stage: 0, progress: 0, x: null, y: null, exhaustedUntil: 0 });
+      }
+      if (denizen(s, "Puddlewick").x == null) place(s, "Puddlewick", 2, 1, true);
+      if (denizen(s, "Ledgerfrond").x == null) place(s, "Ledgerfrond", 0, 1, true);
     }
     if (q.lots) {
       var lotsN = parseInt(q.lots, 10);
