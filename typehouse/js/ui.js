@@ -304,6 +304,12 @@
       grounds.height = ph;
       S.paintPark(grounds, { lot: LOT, bounds: bounds, owned: s.cells });
     }
+    var roads = $("roads");
+    if (roads) {
+      roads.width = pw;
+      roads.height = ph;
+      S.paintRoads(roads, { lot: LOT, bounds: bounds, owned: s.cells });
+    }
     ensureCam(s);
 
     var keep = {};
@@ -519,8 +525,7 @@
     var help = $("btn-help");
     if (build) {
       build.classList.toggle("on", mode === "build");
-      if (s && s.onboard === 0) build.textContent = "BUILD EMBER GROUNDS";
-      else build.textContent = "BUILD";
+      build.textContent = s && s.onboard === 0 ? "BUILD EMBER" : "BUILD";
     }
     if (assign) {
       var wait = s ? T.waiting(s) : [];

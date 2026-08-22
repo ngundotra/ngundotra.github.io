@@ -382,8 +382,8 @@
     var px = data.data;
     var cx = w * 0.5;
     var cy = h * 0.49;
-    var inner = Math.min(w, h) * 0.395;
-    var outer = Math.min(w, h) * 0.432;
+    var inner = Math.min(w, h) * 0.375;
+    var outer = Math.min(w, h) * 0.42;
     var i;
     var x;
     var y;
@@ -447,20 +447,17 @@
     ctx.save();
     ctx.lineCap = "round";
     ctx.lineJoin = "round";
-    ctx.strokeStyle = "#4a2e12";
-    ctx.lineWidth = 30;
+    ctx.strokeStyle = "#5a3a18";
+    ctx.lineWidth = 26;
     ctx.beginPath();
     ctx.moveTo(x1, y1);
     ctx.lineTo(x2, y2);
     ctx.stroke();
-    ctx.strokeStyle = "#8a5a28";
-    ctx.lineWidth = 24;
+    ctx.strokeStyle = "#b07a38";
+    ctx.lineWidth = 20;
     ctx.stroke();
-    ctx.strokeStyle = "#c49048";
-    ctx.lineWidth = 18;
-    ctx.stroke();
-    ctx.strokeStyle = "#d8b06a";
-    ctx.lineWidth = 10;
+    ctx.strokeStyle = "#d4a05a";
+    ctx.lineWidth = 12;
     ctx.stroke();
     ctx.restore();
   }
@@ -568,7 +565,35 @@
     if (IMG.trees && srcW(IMG.trees)) {
       ctx.drawImage(IMG.trees, 0, 0, w, Math.floor(lot * 0.28));
     }
+    /* Grass only. Dirt spine is painted on #roads above the lots. */
+  }
+
+  function paintRoads(canvas, opt) {
+    opt = opt || {};
+    var ctx = canvas.getContext("2d");
+    var lot = opt.lot || 192;
+    var bounds = opt.bounds || { minX: 0, minY: 0, maxX: 2, maxY: 1 };
+    var owned = opt.owned || {};
+    ctx.imageSmoothingEnabled = false;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
     paintDirtSpine(ctx, lot, bounds, owned);
+    ctx.save();
+    ctx.globalCompositeOperation = "destination-out";
+    Object.keys(owned).forEach(function (k) {
+      var c = owned[k];
+      if (!c || !c.room || c.room === "lobby" || c.room === "transom" || c.room === "larder") return;
+      var o = lotOrigin(c, bounds, lot);
+      ctx.beginPath();
+      ctx.arc(o.x + lot * 0.5, o.y + lot * 0.49, lot * 0.4, 0, Math.PI * 2);
+      ctx.fill();
+    });
+    ctx.restore();
+    var fork = lotPt(1, 1, bounds, lot, 0.5, 0.8);
+    var west = lotPt(0, 1, bounds, lot, 0.5, 0.8);
+    var east = lotPt(2, 1, bounds, lot, 0.5, 0.8);
+    blitCrisp(ctx, "lantern", fork.x + 10, fork.y - 46, 16, 44);
+    blitCrisp(ctx, "lantern", west.x - 8, west.y - 46, 16, 44);
+    blitCrisp(ctx, "lantern", east.x + 8, east.y - 46, 16, 44);
   }
 
   function lotPt(x, y, bounds, lot, fx, fy) {
@@ -609,9 +634,6 @@
         paintVisitorPath(ctx, bridge.x, bridge.y, eo.x, eo.y);
       }
     });
-    blitCrisp(ctx, "lantern", fork.x + 10, fork.y - 46, 16, 44);
-    blitCrisp(ctx, "lantern", west.x - 8, west.y - 46, 16, 44);
-    blitCrisp(ctx, "lantern", east.x + 8, east.y - 46, 16, 44);
   }
 
   function fillDisk(ctx, cx, cy, r, col) {
@@ -693,11 +715,13 @@
       ctx.fillRect(cx - 24, cy - 16, 48, 12);
       return;
     }
-    fillDisk(ctx, cx, cy, r - 2, col);
-    fillDisk(ctx, cx, cy, r - 8, kind === "dynamo" ? "#f0d020" : kind === "dormer" ? "#c4a0e0" : kind === "scullery" ? "#d86a2c" : kind === "vitrine" ? "#e8c428" : col);
+    fillDisk(ctx, cx, cy, r - 1, "#4a8c30");
+    fillDisk(ctx, cx, cy, r - 6, kind === "dynamo" ? "#e8c428" : kind === "dormer" ? "#b48ad4" : kind === "scullery" ? "#c45c26" : kind === "vitrine" ? "#e8d060" : col);
+    ctx.fillStyle = "rgba(42,28,16,0.2)";
+    ctx.fillRect(cx - 8, cy - 6, 16, 10);
     paintFenceRing(ctx, cx, cy, r, "#8a6030");
     ctx.fillStyle = "#6a4220";
-    ctx.fillRect(cx - 10, cy + r - 6, 20, 10);
+    ctx.fillRect(cx - 11, cy + r - 5, 22, 9);
     paintTypeBadge(ctx, cx, cy + r - 40, type);
   }
 
@@ -796,6 +820,7 @@
     paintEmpty: paintEmpty,
     paintFog: paintFog,
     paintPark: paintPark,
+    paintRoads: paintRoads,
     paintIcon: paintIcon,
     guestUrl: guestUrl,
     GUESTS: GUESTS,

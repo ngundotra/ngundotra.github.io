@@ -131,8 +131,10 @@ body {
   touch-action: none;
   padding: 0;
   min-height: 0;
-  background:
-    linear-gradient(180deg, #4aa8e8 0 14%, #7ec8f0 14% 20%, #6ad04c 20% 28%, #4cb83c 28%);
+  background-color: #558214;
+  background-image: url("img/grass.png");
+  background-repeat: repeat;
+  image-rendering: pixelated;
   user-select: none;
   -webkit-user-select: none;
 }
@@ -231,11 +233,20 @@ body {
   background: transparent;
 }
 
-#critters {
+#roads {
   position: absolute;
   left: 0;
   top: 0;
   z-index: 2;
+  pointer-events: none;
+  image-rendering: pixelated;
+}
+
+#critters {
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 3;
   pointer-events: none;
   image-rendering: pixelated;
 }

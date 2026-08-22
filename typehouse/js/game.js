@@ -1111,7 +1111,11 @@
     seedGuest(s, "Puddlewick", 2, 1, 1);
     seedGuest(s, "Ledgerfrond", 0, 1, 2);
     seedGuest(s, "Zitterplug", 1, 2, 1);
-    blot(s, "A mid-morning zoo. Four pens on the dirt.");
+    s.nextArrival = s.openSec + 100000;
+    s.nextEvent = s.openSec + 100000;
+    s.pendingEvent = null;
+    s.recap = null;
+    blot(s, "A mid-morning zoo. Pens on the dirt.");
   }
 
   function seedLate(s) {
@@ -1166,6 +1170,10 @@
     seedGuest(s, "Flakesmith", 2, 2, 1);
     seedGuest(s, "Specktin", 3, 2, 1);
     seedGuest(s, "Fluekin", 0, 2, 1);
+    s.nextArrival = s.openSec + 100000;
+    s.nextEvent = s.openSec + 100000;
+    s.pendingEvent = null;
+    s.recap = null;
     blot(s, "The grounds filled in. Lamps on the dirt.");
   }
 
