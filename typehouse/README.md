@@ -34,6 +34,9 @@ Away time keeps the inn alive (capped at 8 hours, taxed 0.85). Come back after t
 - `?debug=1` — rich wallet and faster arrivals
 - `?catchup=120` — apply 120 seconds of away catch-up
 - `?evt=evt_soot_handshake` — fire a named event
+- `?demo=seated` / `?demo=friction` — seed Hearth+Wicknoll, or Cistern beside it
+
+Console: `Typehouse.selfCheck()` runs the 60s script (soot, friction drop, away tax, save).
 
 ## Save
 

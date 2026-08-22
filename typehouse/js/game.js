@@ -913,6 +913,20 @@
       var ev = eventById(q.evt || q.event);
       if (ev) queueEvent(s, ev);
     }
+    if (q.demo === "seated" || q.demo === "friction") {
+      if (!cell(s, 1, 1).room) {
+        s.tally = Math.max(s.tally, 8);
+        build(s, 1, 1, "hearth");
+      }
+      if (denizen(s, "Wicknoll") && denizen(s, "Wicknoll").x == null) place(s, "Wicknoll", 1, 1, true);
+    }
+    if (q.demo === "friction") {
+      s.flags.sootDone = true;
+      s.sootDue = false;
+      s.tally = Math.max(s.tally, 20);
+      s.scrap = Math.max(s.scrap, 4);
+      if (!cell(s, 2, 1).room) build(s, 2, 1, "cistern");
+    }
   }
 
   function boot() {
