@@ -14,7 +14,7 @@
   var dirty = true;
   var pressTimer = 0;
   var lastWallet = { tally: 12, scrap: 6, dust: 0 };
-  var LOT = 96;
+  var LOT = 128;
   var Z_MIN = 0.7;
   var Z_MAX = 2.2;
   var Z_DEFAULT = 2;
@@ -346,7 +346,7 @@
     tile.width = LOT;
     tile.height = LOT;
     if (!c.room) {
-      S.paintEmpty(tile, { selected: selKey() === T.key(c.x, c.y) });
+      S.paintEmpty(tile, { selected: selKey() === T.key(c.x, c.y), x: c.x, y: c.y });
       return;
     }
     var d = c.denizen ? T.denizen(s, c.denizen) : null;
@@ -494,18 +494,23 @@
     var py = (ev.clientY - wrap.top - cam.y) / z;
     if (px < 0 || py < 0 || px >= view.w * LOT || py >= view.h * LOT) return;
     var s = T.getState();
-    var hit = W.hitTest(px, py, view);
-    if (hit) {
-      selected = { x: hit.x, y: hit.y };
-      var hc = T.cell(s, hit.x, hit.y);
-      if (hc && hc.room) openInspect(s, hc);
+    var lot = parkToLot(px, py);
+    var c = T.cell(s, lot.x, lot.y);
+    selected = { x: lot.x, y: lot.y };
+
+    if (c && !c.room) {
+      if (mode === "assign" && assignId) {
+        s.blotter = "No seat there.";
+        markDirty();
+        renderChrome(s);
+        return;
+      }
+      openBuild(s, c);
       markDirty();
       renderChrome(s);
       return;
     }
-    var lot = parkToLot(px, py);
-    var c = T.cell(s, lot.x, lot.y);
-    selected = { x: lot.x, y: lot.y };
+
     if (!c) {
       var isFog = T.fogOf(s).some(function (f) {
         return f.x === lot.x && f.y === lot.y;
@@ -515,6 +520,7 @@
       renderChrome(s);
       return;
     }
+
     if (mode === "assign" && assignId) {
       var msg = T.place(s, assignId, lot.x, lot.y);
       if (msg === "ok") {
@@ -530,8 +536,20 @@
       renderHouse(s);
       return;
     }
-    if (!c.room) openBuild(s, c);
-    else openInspect(s, c);
+
+    var hit = W.hitTest(px, py, view);
+    if (hit) {
+      var hc = T.cell(s, hit.x, hit.y);
+      if (hc && hc.room && hc.room !== "lobby") {
+        selected = { x: hit.x, y: hit.y };
+        openInspect(s, hc);
+        markDirty();
+        renderChrome(s);
+        return;
+      }
+    }
+
+    openInspect(s, c);
     markDirty();
     renderChrome(s);
   }
@@ -638,18 +656,35 @@
     });
   }
 
+  function buildEmberNow(s) {
+    var lot = T.preferredHearthLot(s);
+    var msg = T.buildPreferredHearth(s);
+    if (msg === "ok" && lot) {
+      selected = { x: lot.x, y: lot.y };
+      view = T.parkBounds(s);
+      includeLot(lot.x, lot.y);
+      centerOn(lot.x, lot.y);
+      markDirty();
+      renderHouse(s);
+      renderChrome(s);
+      openInspect(s, T.cell(s, lot.x, lot.y));
+      return true;
+    }
+    s.blotter = msg;
+    markDirty();
+    renderChrome(s);
+    renderHouse(s);
+    return false;
+  }
+
   function openInspect(s, c) {
     var def = D.ROOMS[c.room];
     if (c.room === "lobby" && s.onboard === 0) {
       showSheet(
-        '<div class="sheet-h">GATEHOUSE</div><p class="sheet-p">The night desk is open. First job: Ember Grounds beside this lot. Prefer 1,1.</p><button class="fat" id="do-hearth">BUILD EMBER GROUNDS</button><button class="fat ghost" disabled>SEAT</button>'
+        '<div class="sheet-h">GATEHOUSE</div><p class="sheet-p">The desk is open. First job: Ember Grounds on the lawn above this cottage.</p><button class="fat" id="do-hearth">BUILD EMBER GROUNDS</button><button class="fat ghost" disabled>SEAT</button>'
       );
       $("do-hearth").onclick = function () {
-        mode = "build";
-        selected = null;
-        hideSheet();
-        $("context").innerHTML = "<b>BUILD EMBER GROUNDS</b> · tap a lot beside the Gatehouse";
-        renderDock();
+        buildEmberNow(s);
       };
       return;
     }
@@ -690,7 +725,8 @@
     }
     html += '<div class="row">';
     if (c.room !== "lobby" && c.room !== "larder" && T.waiting(s).length) {
-      html += '<button class="fat" id="do-seat">ASSIGN</button>';
+      var seatLabel = s.onboard === 1 && T.waiting(s)[0] && T.waiting(s)[0].kind === "Wicknoll" ? "ASSIGN WICKNOLL" : "ASSIGN";
+      html += '<button class="fat" id="do-seat">' + seatLabel + "</button>";
     } else {
       html += '<button class="fat ghost" disabled>SEAT</button>';
     }
@@ -851,8 +887,13 @@
 
   function bind() {
     $("btn-build").onclick = function () {
-      mode = mode === "build" ? "none" : "build";
+      var s = T.getState();
       assignId = null;
+      if (s && s.onboard === 0) {
+        buildEmberNow(s);
+        return;
+      }
+      mode = mode === "build" ? "none" : "build";
       $("context").innerHTML = mode === "build" ? "<b>BUILD</b> · tap empty grounds" : "";
       renderDock();
     };
@@ -1057,6 +1098,11 @@
     renderHouse(s);
     W.sync(s, LOT);
     paintGuests(s);
+    if (s.onboard === 0) {
+      selected = { x: 1, y: 0 };
+      var lobby = T.cell(s, 1, 0);
+      if (lobby) openInspect(s, lobby);
+    }
     lastSave = performance.now();
     requestAnimationFrame(loop(performance.now()));
     if ("serviceWorker" in navigator) {

@@ -1,6 +1,58 @@
-/* 16×16 canvas silhouettes. Palette-locked. No Nintendo shapes. */
+/* The Grounds — authored park paint. House-spirits, not Nintendo. */
 (function (G) {
   const P = G.THData.PAL;
+
+  var C = {
+    sky: "#4aa8e8",
+    sky2: "#7ec8f0",
+    cloud: "#ffffff",
+    cloud2: "#d8eef8",
+    grass: "#4cb83c",
+    grassA: "#6ad04c",
+    grassB: "#3a9c2c",
+    grassC: "#58c844",
+    grassD: "#2e8a22",
+    path: "#e6d09a",
+    path2: "#d2b878",
+    path3: "#c4a060",
+    brick: "#c44832",
+    brick2: "#a83828",
+    brick3: "#e05a40",
+    brick4: "#8a2c1c",
+    mortar: "#d8b898",
+    stone: "#9aa4a8",
+    stone2: "#7a848c",
+    stone3: "#c4ccc8",
+    stone4: "#5a6468",
+    wood: "#8b5a32",
+    wood2: "#6a4020",
+    wood3: "#c48a50",
+    wood4: "#4a2c14",
+    roof: "#3a7ec8",
+    roof2: "#2a5ea0",
+    roof3: "#5a9ae0",
+    glass: "#c4eef8",
+    glass2: "#8cd0e4",
+    shine: "#eef8fc",
+    tomato: "#e83020",
+    leaf: "#2e9c38",
+    leaf2: "#1e7a28",
+    leaf3: "#5ad04a",
+    fire1: "#ff3a00",
+    fire2: "#ff8a10",
+    fire3: "#ffe060",
+    sand: "#e8d4a0",
+    sand2: "#d4c080",
+    sand3: "#c4a868",
+    water: "#2ec4c4",
+    water2: "#1a98b0",
+    water3: "#7eefe8",
+    gold: "#e8c428",
+    gold2: "#c4a010",
+    banner: "#3a6ec8",
+    white: "#f6f0e4",
+    ink: "#2a1c12",
+  };
 
   function art(map, pal) {
     return { map: map, pal: pal };
@@ -9,66 +61,90 @@
   const GUESTS = {
     Wicknoll: art(
       [
-        "................",
-        "......33........",
-        ".....3223.......",
-        "....322223......",
-        "....321123......",
-        "...32111123.....",
-        "...21144112.....",
-        "...21111112.....",
-        "...22111122.....",
-        "....222222......",
-        "....2.33.2......",
-        "....2.22.2......",
-        "...22....22.....",
-        "...2......2.....",
-        "..33......33....",
-        "................",
+        "........................",
+        ".........333333.........",
+        "........32222223........",
+        ".......3222222223.......",
+        "......322111111223......",
+        "......321144441123......",
+        "......321144441123......",
+        "......321111111123......",
+        ".......3211111123.......",
+        "........32222223........",
+        ".......3322222233.......",
+        "......3.3.2222.3.3......",
+        ".....33.3..22..3.33.....",
+        ".....3..3......3..3.....",
+        "....33..3......3..33....",
+        "....3...3......3...3....",
+        "...33..............33...",
+        "........................",
+        "........................",
+        "........................",
+        "........................",
+        "........................",
+        "........................",
+        "........................",
       ],
-      [P.ember, P.copper, P.timber, P.lamp]
+      ["#c47828", "#8a4a18", "#3a2010", "#ffe060"]
     ),
     Puddlewick: art(
       [
-        "................",
-        ".3..............",
-        ".23........3....",
-        ".223......32....",
-        "..223....322....",
-        "...22111122.....",
-        "...21144112.....",
-        "...21111112.....",
-        "....211112......",
-        "....221122......",
-        "...22.22.22.....",
-        "...2..2...2.....",
-        "..33......33....",
-        "................",
-        "................",
-        "................",
+        "........................",
+        "....3...................",
+        "...323.....222222.......",
+        "...32.2...22111122......",
+        "....3.2..2211441122.....",
+        ".....32..2114444112.....",
+        "......3221144444112.....",
+        "......22111444441122....",
+        "......22111111111122....",
+        ".......22222222222......",
+        "........2.2....2.2......",
+        "........3.3....3.3......",
+        "........3.3....3.3......",
+        ".......33.33..33.33.....",
+        "........................",
+        "........................",
+        "........................",
+        "........................",
+        "........................",
+        "........................",
+        "........................",
+        "........................",
+        "........................",
+        "........................",
       ],
-      [P.dusk, P.copper, P.lamp, P.ink]
+      ["#f4f0e8", "#3a88c8", "#8b5a32", "#4ec8e8"]
     ),
     Ledgerfrond: art(
       [
-        "................",
-        "....333333......",
-        "...32222223.....",
-        "...22111122.....",
-        "...21133112.....",
-        "...21111112.....",
-        "...22111122.....",
-        "....222222......",
-        "...22111122.....",
-        "...21144112.....",
-        "...21111112.....",
-        "...22111122.....",
-        "....22..22......",
-        "....3....3......",
-        "................",
-        "................",
+        "........................",
+        "......111.11.111........",
+        ".....11211121121........",
+        ".....11122112211........",
+        "......112111211.........",
+        ".......1111111..........",
+        "......2211141112........",
+        ".....221111111122.......",
+        ".....2.111333111.2......",
+        ".....2.113333311.2......",
+        ".....2.113444311.2......",
+        ".....2.113333311.2......",
+        "......2.1133311.2.......",
+        ".......2.11111.2........",
+        "........22...22.........",
+        "........2.....2.........",
+        ".......11.....11........",
+        "........................",
+        "........................",
+        "........................",
+        "........................",
+        "........................",
+        "........................",
+        "........................",
       ],
-      [P.moss, P.timber, P.parchment, P.ink]
+      ["#3db84a", "#1e6a28", "#c4a574", "#2a1c12"]
     ),
     Zitterplug: art(
       [
@@ -282,14 +358,18 @@
     var ctx = canvas.getContext("2d");
     ctx.imageSmoothingEnabled = false;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    var scale = Math.max(1, Math.floor(canvas.width / 16));
-    var bob = opt.sit ? 0 : frame % 2 ? Math.max(1, Math.floor(scale * 0.4)) : 0;
+    var mw = a.map[0].length;
+    var mh = a.map.length;
+    var scale = Math.max(1, Math.floor(Math.min(canvas.width / mw, canvas.height / mh)));
+    var ox = Math.floor((canvas.width - mw * scale) / 2);
+    var oy = Math.floor((canvas.height - mh * scale) / 2);
+    var bob = opt.sit ? 0 : frame % 2 ? Math.max(1, Math.floor(scale * 0.35)) : 0;
     ctx.save();
     if (opt.flip) {
       ctx.translate(canvas.width, 0);
       ctx.scale(-1, 1);
     }
-    drawMap(ctx, a, scale, 0, bob);
+    drawMap(ctx, a, scale, ox, oy + bob);
     ctx.restore();
   }
 
@@ -299,9 +379,11 @@
     if (cache[key]) return cache[key];
     var a = GUESTS[id];
     if (!a) return "";
+    var mw = a.map[0].length;
+    var mh = a.map.length;
     var c = document.createElement("canvas");
-    c.width = 16 * scale;
-    c.height = 16 * scale;
+    c.width = mw * scale;
+    c.height = mh * scale;
     var ctx = c.getContext("2d");
     ctx.imageSmoothingEnabled = false;
     drawMap(ctx, a, scale, 0, 0);
@@ -322,14 +404,9 @@
     return ((n ^ (n >>> 16)) >>> 0) / 4294967296;
   }
 
-  function grassColor(wx, wy) {
-    var n = hash2(wx, wy);
-    if (n < 0.07) return "#3d8c28";
-    if (n < 0.14) return "#6bb844";
-    if (n < 0.19) return "#c8b83a";
-    if (n < 0.26) return "#4aa030";
-    if (n < 0.33) return "#7ed056";
-    return "#58b03c";
+  function R(ctx, x, y, w, h, col) {
+    ctx.fillStyle = col;
+    ctx.fillRect(x | 0, y | 0, w, h);
   }
 
   function fillDisk(ctx, cx, cy, r, col) {
@@ -343,39 +420,86 @@
     }
   }
 
-  function strokeRing(ctx, cx, cy, r, col, thick, skipSouth) {
-    ctx.fillStyle = col;
-    var t = thick || 1;
-    var outer = r + t * 0.55;
-    var inner = r - t * 0.55;
-    var o2 = outer * outer;
-    var i2 = Math.max(0, inner) * Math.max(0, inner);
-    var lim = Math.ceil(outer);
+  function grassColor(wx, wy) {
+    var n = hash2(wx, wy);
+    if (n < 0.08) return C.grassB;
+    if (n < 0.16) return C.grassA;
+    if (n < 0.22) return "#c8c43a";
+    if (n < 0.3) return C.grassD;
+    if (n < 0.4) return C.grassC;
+    return C.grass;
+  }
+
+  function paintGrass(ctx, x0, y0, w, h, seedX, seedY) {
     var x;
     var y;
-    var d2;
-    for (y = -lim; y <= lim; y++) {
-      for (x = -lim; x <= lim; x++) {
-        if (skipSouth && y > 2 && Math.abs(x) < 8) continue;
-        d2 = x * x + y * y;
-        if (d2 <= o2 && d2 >= i2) ctx.fillRect(cx + x, cy + y, 1, 1);
+    for (y = 0; y < h; y += 2) {
+      for (x = 0; x < w; x += 2) {
+        ctx.fillStyle = grassColor(x + seedX, y + seedY);
+        ctx.fillRect(x0 + x, y0 + y, 2, 2);
       }
     }
   }
 
+  function paintFlower(ctx, x, y, col) {
+    R(ctx, x, y + 2, 1, 3, C.leaf2);
+    R(ctx, x - 1, y, 3, 2, col);
+    R(ctx, x, y - 1, 1, 1, C.white);
+  }
+
+  function paintFlowerBed(ctx, x, y, w) {
+    var cols = ["#e83040", "#f4f0e8", "#e878b0", "#a858d0", "#f0d020"];
+    var i;
+    for (i = 0; i < w; i += 4) {
+      paintFlower(ctx, x + i, y + ((i * 3) % 5), cols[(i + x + y) % cols.length]);
+    }
+  }
+
+  function paintTree(ctx, x, y, hgt, seed) {
+    var i;
+    var j;
+    var trunk = 3 + ((seed || 0) % 2);
+    R(ctx, x - 1, y + hgt - 4, trunk, 10, C.wood2);
+    R(ctx, x, y + hgt - 4, 1, 10, C.wood3);
+    var layers = [
+      [hgt * 0.15, hgt * 0.42, C.leaf2],
+      [hgt * 0.28, hgt * 0.38, C.leaf],
+      [hgt * 0.4, hgt * 0.3, C.leaf3],
+    ];
+    layers.forEach(function (L, li) {
+      var cy = y + L[0];
+      var rr = L[1];
+      var col = L[2];
+      for (j = -Math.floor(rr); j <= Math.floor(rr); j++) {
+        for (i = -Math.floor(rr * 1.15); i <= Math.floor(rr * 1.15); i++) {
+          var d = (i * i) / (rr * rr * 1.4) + (j * j) / (rr * rr);
+          if (d > 1) continue;
+          if (hash2(x + i + li * 9, y + j + seed) < 0.22) continue;
+          ctx.fillStyle = hash2(i + seed, j + li) < 0.18 ? C.leaf3 : hash2(i, j + seed) < 0.12 ? C.leaf2 : col;
+          ctx.fillRect(x + i, cy + j, 1, 1);
+        }
+      }
+    });
+    R(ctx, x - 2, y + 6, 2, 2, C.leaf3);
+    R(ctx, x + 3, y + 10, 2, 2, C.white);
+  }
+
+  function paintCloud(ctx, x, y, w) {
+    R(ctx, x + 4, y + 3, w - 6, 5, C.cloud);
+    R(ctx, x + 8, y, w - 14, 5, C.cloud);
+    R(ctx, x + 2, y + 5, w - 4, 4, C.cloud);
+    R(ctx, x + w - 8, y + 4, 6, 3, C.cloud2);
+  }
+
   function paintLantern(ctx, x, y) {
-    ctx.fillStyle = shade(P.lamp, 0.28);
-    ctx.fillRect(x - 5, y - 6, 12, 10);
-    ctx.fillStyle = P.ink;
-    ctx.fillRect(x, y - 1, 3, 11);
-    ctx.fillStyle = P.timber;
-    ctx.fillRect(x, y, 2, 9);
-    ctx.fillStyle = P.lamp;
-    ctx.fillRect(x - 3, y - 5, 8, 6);
-    ctx.fillStyle = P.ember;
-    ctx.fillRect(x, y - 3, 3, 3);
-    ctx.fillStyle = P.parchment;
-    ctx.fillRect(x - 1, y - 4, 2, 2);
+    R(ctx, x, y, 3, 16, C.wood2);
+    R(ctx, x + 1, y, 1, 16, C.wood3);
+    R(ctx, x - 3, y - 2, 9, 3, C.wood4);
+    R(ctx, x - 2, y - 8, 7, 7, C.ink);
+    R(ctx, x - 1, y - 7, 5, 5, C.fire3);
+    R(ctx, x, y - 6, 3, 3, C.fire2);
+    R(ctx, x - 2, y - 9, 7, 2, C.wood);
+    R(ctx, x - 1, y - 10, 5, 1, C.wood2);
   }
 
   function paintPathStrip(ctx, x0, y0, x1, y1, wide) {
@@ -386,16 +510,18 @@
     var uy = dy / len;
     var px = -uy;
     var py = ux;
-    var hw = Math.floor((wide || 12) / 2);
+    var hw = Math.floor((wide || 14) / 2);
     var i;
     var k;
     var x;
     var y;
+    var n;
     for (i = 0; i <= len; i++) {
       x = Math.round(x0 + ux * i);
       y = Math.round(y0 + uy * i);
       for (k = -hw; k <= hw; k++) {
-        ctx.fillStyle = Math.abs(k) >= hw - 1 ? "#8a6238" : k === 0 ? "#e0c488" : "#c9a86a";
+        n = Math.abs(k);
+        ctx.fillStyle = n >= hw - 1 ? C.path3 : n === 0 ? "#f0e0b0" : hash2(x + k, y) < 0.12 ? C.path2 : C.path;
         ctx.fillRect(x + Math.round(px * k), y + Math.round(py * k), 1, 1);
       }
     }
@@ -406,24 +532,26 @@
     var ctx = canvas.getContext("2d");
     var w = canvas.width;
     var h = canvas.height;
-    var lot = opt.lot || 96;
+    var lot = opt.lot || 128;
     var bounds = opt.bounds || { minX: 0, minY: 0, maxX: 2, maxY: 1 };
     var owned = opt.owned || {};
     ctx.imageSmoothingEnabled = false;
-    ctx.fillStyle = "#58b03c";
-    ctx.fillRect(0, 0, w, h);
-    var x;
+    var northH = lot;
     var y;
-    for (y = 0; y < h; y += 2) {
-      for (x = 0; x < w; x += 2) {
-        ctx.fillStyle = grassColor(x + bounds.minX * 17, y + bounds.minY * 13);
-        ctx.fillRect(x, y, 2, 2);
-      }
+    var x;
+    for (y = 0; y < h; y++) {
+      if (y < northH * 0.42) ctx.fillStyle = y < 10 ? C.sky : C.sky2;
+      else ctx.fillStyle = C.grass;
+      ctx.fillRect(0, y, w, 1);
     }
-    for (y = 3; y < h; y += 7) {
-      for (x = 2; x < w; x += 9) {
-        if (hash2(x + 3, y + 5) < 0.22) {
-          ctx.fillStyle = hash2(x, y) < 0.55 ? "#3d9c28" : "#f0d060";
+    paintCloud(ctx, 18, 6, 36);
+    paintCloud(ctx, Math.floor(w * 0.42), 10, 44);
+    paintCloud(ctx, w - 70, 4, 40);
+    paintGrass(ctx, 0, Math.floor(northH * 0.38), w, h - Math.floor(northH * 0.38), bounds.minX * 17, bounds.minY * 13);
+    for (y = Math.floor(northH * 0.4); y < h; y += 9) {
+      for (x = 3; x < w; x += 11) {
+        if (hash2(x + 4, y + 2) < 0.16) {
+          ctx.fillStyle = hash2(x, y) < 0.5 ? C.leaf2 : "#e8d050";
           ctx.fillRect(x, y, 2, 1);
           ctx.fillRect(x + 1, y - 1, 1, 1);
         }
@@ -432,446 +560,310 @@
     Object.keys(owned).forEach(function (k) {
       var c = owned[k];
       if (!c) return;
-      var east = owned[c.x + 1 + "," + c.y];
-      var north = owned[c.x + "," + (c.y + 1)];
       var ox = (c.x - bounds.minX) * lot;
       var oy = (bounds.maxY - c.y) * lot;
+      var east = owned[c.x + 1 + "," + c.y];
+      var north = owned[c.x + "," + (c.y + 1)];
       if (east) {
-        paintPathStrip(ctx, ox + lot * 0.5, oy + lot * 0.56, ox + lot * 1.5, oy + lot * 0.56, 13);
-        paintLantern(ctx, ox + lot - 1, oy + lot * 0.5);
+        paintPathStrip(ctx, ox + lot * 0.5, oy + lot * 0.72, ox + lot * 1.5, oy + lot * 0.72, 16);
+        paintLantern(ctx, ox + lot - 2, oy + lot * 0.62);
       }
       if (north) {
-        paintPathStrip(ctx, ox + lot * 0.5, oy + lot * 0.5, ox + lot * 0.5, oy - lot * 0.5, 13);
-        paintLantern(ctx, ox + lot * 0.42, oy - 2);
+        paintPathStrip(ctx, ox + lot * 0.5, oy + lot * 0.7, ox + lot * 0.5, oy - lot * 0.28, 16);
+        paintLantern(ctx, ox + lot * 0.38, oy - 4);
+      }
+      if (c.room === "lobby") {
+        paintPathStrip(ctx, ox + lot * 0.5, oy + lot * 0.78, ox + lot * 0.5, oy + lot + 2, 16);
       }
     });
-  }
-
-  function paintLampRing(ctx, cx, cy, r) {
-    strokeRing(ctx, cx, cy, r, shade(P.lamp, 0.85), 2, false);
-    var i;
-    var a;
-    for (i = 0; i < 8; i++) {
-      a = (i * Math.PI) / 4 + 0.2;
-      ctx.fillStyle = i % 2 ? P.ember : P.lamp;
-      ctx.fillRect(cx + Math.round(Math.cos(a) * r) - 1, cy + Math.round(Math.sin(a) * r) - 1, 2, 2);
+    for (y = Math.floor(northH * 0.55); y < h - 20; y += 28) {
+      for (x = 8; x < w - 12; x += 36) {
+        if (hash2(x + 11, y + 7) < 0.28) paintFlowerBed(ctx, x, y, 14);
+      }
     }
   }
 
-  function paintStuds(ctx, cx, cy, r) {
-    var i;
-    var a;
-    var x;
-    var y;
-    for (i = 0; i < 8; i++) {
-      a = (i * Math.PI) / 4 + 0.4;
-      x = cx + Math.round(Math.cos(a) * (r - 4));
-      y = cy + Math.round(Math.sin(a) * (r - 4));
-      ctx.fillStyle = P.timber;
-      ctx.fillRect(x, y, 2, 2);
-      ctx.fillStyle = "#2a1c16";
-      ctx.fillRect(x + 1, y + 1, 1, 1);
-    }
-  }
-
-  function paintBanner(ctx, cx, y, col, kind) {
-    ctx.fillStyle = P.ink;
-    ctx.fillRect(cx - 5, y, 11, 9);
-    ctx.fillStyle = col;
-    ctx.fillRect(cx - 4, y + 1, 9, 7);
-    ctx.fillStyle = P.lamp;
+  function paintPlaque(ctx, cx, y, kind, col) {
+    R(ctx, cx - 7, y, 14, 11, C.ink);
+    R(ctx, cx - 6, y + 1, 12, 9, C.wood);
+    R(ctx, cx - 5, y + 2, 10, 7, col || C.gold);
     if (kind === "hearth") {
-      ctx.fillRect(cx - 1, y + 2, 3, 5);
-      ctx.fillStyle = P.ember;
-      ctx.fillRect(cx, y + 3, 1, 3);
+      R(ctx, cx - 1, y + 3, 3, 5, C.fire2);
+      R(ctx, cx, y + 4, 1, 3, C.fire3);
     } else if (kind === "cistern") {
-      ctx.fillRect(cx - 3, y + 4, 7, 2);
-      ctx.fillRect(cx - 2, y + 3, 5, 1);
+      R(ctx, cx - 3, y + 5, 7, 2, C.white);
+      R(ctx, cx - 2, y + 4, 5, 1, C.white);
     } else if (kind === "conservatory") {
-      ctx.fillStyle = P.moss;
-      ctx.fillRect(cx, y + 2, 1, 5);
-      ctx.fillRect(cx - 2, y + 4, 5, 2);
-    } else if (kind === "dynamo") {
-      ctx.fillRect(cx - 2, y + 3, 5, 3);
-    } else if (kind === "vitrine") {
-      ctx.fillRect(cx - 2, y + 3, 5, 4);
+      R(ctx, cx, y + 3, 1, 5, C.leaf2);
+      R(ctx, cx - 2, y + 4, 5, 2, C.leaf);
     } else {
-      ctx.fillRect(cx - 1, y + 3, 3, 3);
+      R(ctx, cx - 1, y + 4, 3, 3, C.white);
     }
-    ctx.fillStyle = P.ink;
-    ctx.fillRect(cx, y + 9, 1, 3);
   }
 
-  function paintCircleFence(ctx, cx, cy, r, col, opt) {
+  function paintRoundFence(ctx, cx, cy, r, col, opt) {
     opt = opt || {};
-    var level = opt.level || 1;
-    var edges = opt.edges || {};
-    strokeRing(ctx, cx, cy, r, P.ink, 3, true);
-    strokeRing(ctx, cx, cy, r, P.timber, 2, true);
-    if (level >= 2) strokeRing(ctx, cx, cy, r - 3, P.copper, 1, true);
-    var n = 12;
+    var n = 16;
+    var posts = [];
     var i;
     var a;
     var px;
     var py;
     var key;
     var edge;
-    var post;
+    var postCol;
     for (i = 0; i < n; i++) {
-      a = (i / n) * Math.PI * 2 - Math.PI / 2;
-      if (Math.sin(a) > 0.72 && Math.abs(Math.cos(a)) < 0.35) continue;
-      px = cx + Math.round(Math.cos(a) * r) - 1;
-      py = cy + Math.round(Math.sin(a) * r) - 2;
-      key = Math.abs(Math.cos(a)) > Math.abs(Math.sin(a)) ? (Math.cos(a) > 0 ? "e" : "w") : Math.sin(a) > 0 ? "s" : "n";
-      edge = edges[key] || {};
-      post = edge.friction ? P.ember : edge.nourish ? P.moss : col || P.timber;
-      ctx.fillStyle = P.ink;
-      ctx.fillRect(px - 1, py - 1, 5, 6);
-      ctx.fillStyle = post;
-      ctx.fillRect(px, py, 3, 5);
-      ctx.fillStyle = P.ink;
-      ctx.fillRect(px + 1, py + 1, 1, 2);
-      if (level >= 3) {
-        ctx.fillStyle = P.copper;
-        ctx.fillRect(px - 1, py - 1, 5, 2);
-      }
+      a = (i / n) * Math.PI * 2 + Math.PI / 2;
+      if (Math.abs(Math.atan2(Math.sin(a), Math.cos(a)) - Math.PI / 2) < 0.38 && Math.sin(a) > 0.55) continue;
+      px = cx + Math.round(Math.cos(a) * r);
+      py = cy + Math.round(Math.sin(a) * r);
+      posts.push({ x: px, y: py, a: a });
     }
-    paintBanner(ctx, cx, cy + r - 3, col, opt.kind);
+    for (i = 0; i < posts.length; i++) {
+      var a0 = posts[i];
+      var a1 = posts[(i + 1) % posts.length];
+      var da = Math.hypot(a1.x - a0.x, a1.y - a0.y);
+      if (da > r * 0.7) continue;
+      paintPathStrip(ctx, a0.x, a0.y - 2, a1.x, a1.y - 2, 3);
+      R(ctx, a0.x, a0.y - 5, 1, 3, C.wood3);
+    }
+    for (i = 0; i < posts.length; i++) {
+      a = posts[i].a;
+      px = posts[i].x;
+      py = posts[i].y;
+      key = Math.abs(Math.cos(a)) > Math.abs(Math.sin(a)) ? (Math.cos(a) > 0 ? "e" : "w") : Math.sin(a) > 0 ? "s" : "n";
+      edge = (opt.edges || {})[key] || {};
+      postCol = edge.friction ? "#e86a1c" : edge.nourish ? "#3db84a" : C.wood;
+      R(ctx, px - 2, py - 8, 5, 12, C.ink);
+      R(ctx, px - 1, py - 7, 3, 10, postCol);
+      R(ctx, px, py - 6, 1, 8, C.wood3);
+      if ((opt.level || 1) >= 3) R(ctx, px - 2, py - 8, 5, 2, C.gold2);
+    }
+    paintPlaque(ctx, cx, cy + r - 4, opt.kind, col);
   }
 
-  function paintTypeFloor(ctx, cx, cy, r, type) {
-    var col = G.THData.TYPE_COLOR[type] || P.copper;
-    fillDisk(ctx, cx, cy, r, "#6aaa44");
-    fillDisk(ctx, cx, cy, r - 1, shade(col, 0.62));
+  function paintSandPatch(ctx, cx, cy, r) {
     var x;
     var y;
-    var d2;
-    var r2 = (r - 2) * (r - 2);
-    if (type === "ember") {
-      fillDisk(ctx, cx, cy, r - 2, "#d45a18");
-      for (y = -r + 3; y <= r - 3; y += 3) {
-        for (x = -r + 3; x <= r - 3; x += 4) {
-          if (x * x + y * y > r2) continue;
-          ctx.fillStyle = hash2(x, y) < 0.45 ? "#ff8a28" : "#a83810";
-          ctx.fillRect(cx + x, cy + y, 2, 1);
-        }
-      }
-      fillDisk(ctx, cx, cy + 2, 8, "#ff7a18");
-      fillDisk(ctx, cx, cy + 1, 4, "#ffe080");
-    } else if (type === "tide") {
-      fillDisk(ctx, cx, cy + 1, r - 3, "#1e88d0");
-      fillDisk(ctx, cx - 1, cy, r - 8, "#4ec8f0");
-      ctx.fillStyle = "#d8f4ff";
-      ctx.fillRect(cx - 6, cy - 4, 8, 1);
-      ctx.fillRect(cx + 2, cy + 5, 5, 1);
-    } else if (type === "moss") {
-      fillDisk(ctx, cx, cy, r - 2, "#2e8a38");
-      for (y = -r + 2; y <= r - 2; y += 3) {
-        for (x = -r + 2; x <= r - 2; x += 3) {
-          if (x * x + y * y > r2) continue;
-          if (hash2(x + 2, y) < 0.55) {
-            ctx.fillStyle = hash2(x, y + 1) < 0.4 ? "#5ad050" : "#1e6a28";
-            ctx.fillRect(cx + x, cy + y, 2, 2);
-          }
-        }
-      }
-    } else if (type === "spark") {
-      fillDisk(ctx, cx, cy, r - 2, "#f0d020");
-      for (y = -r + 4; y <= r - 4; y += 5) {
-        for (x = -r + 4; x <= r - 4; x += 5) {
-          if (x * x + y * y > r2) continue;
-          if (hash2(x, y) < 0.45) {
-            ctx.fillStyle = hash2(x + 1, y) < 0.5 ? "#fff06a" : "#d4a010";
-            ctx.fillRect(cx + x, cy + y, 2, 2);
-          }
-        }
-      }
-    } else if (type === "hush") {
-      fillDisk(ctx, cx, cy, r - 2, "#c4a0e0");
-      for (y = -r + 4; y <= r - 4; y += 5) {
-        for (x = -r + 4; x <= r - 4; x += 5) {
-          if (x * x + y * y > r2) continue;
-          if (hash2(x, y) < 0.4) {
-            ctx.fillStyle = "#e8d4f8";
-            ctx.fillRect(cx + x, cy + y, 1, 2);
-          }
-        }
-      }
-    } else if (type === "rust") {
-      fillDisk(ctx, cx, cy, r - 2, "#d86a2c");
-      for (y = -r + 4; y <= r - 4; y += 5) {
-        for (x = -r + 4; x <= r - 4; x += 5) {
-          if (x * x + y * y > r2) continue;
-          if (hash2(x, y) < 0.4) {
-            ctx.fillStyle = "#f08840";
-            ctx.fillRect(cx + x, cy + y, 2, 1);
-          }
-        }
-      }
-    } else if (type === "gleam") {
-      fillDisk(ctx, cx, cy, r - 2, "#e8c428");
-      for (y = -r + 4; y <= r - 4; y += 5) {
-        for (x = -r + 4; x <= r - 4; x += 5) {
-          if (x * x + y * y > r2) continue;
-          if (hash2(x, y) < 0.45) {
-            ctx.fillStyle = "#fff3a0";
-            ctx.fillRect(cx + x, cy + y, 2, 2);
-          }
-        }
-      }
-    } else if (type === "draft") {
-      fillDisk(ctx, cx, cy, r - 2, "#b8dcf0");
-      for (y = -r + 4; y <= r - 4; y += 5) {
-        for (x = -r + 4; x <= r - 4; x += 5) {
-          d2 = x * x + y * y;
-          if (d2 > r2) continue;
-          if (hash2(x, y) < 0.4) {
-            ctx.fillStyle = "#e8f6ff";
-            ctx.fillRect(cx + x, cy + y, 1, 2);
-          }
-        }
-      }
-    } else {
-      for (y = -r + 4; y <= r - 4; y += 5) {
-        for (x = -r + 4; x <= r - 4; x += 5) {
-          d2 = x * x + y * y;
-          if (d2 > r2) continue;
-          if (hash2(x, y) < 0.4) {
-            ctx.fillStyle = shade(col, 0.5);
-            ctx.fillRect(cx + x, cy + y, 1, 2);
-          }
-        }
+    var r2 = r * r;
+    for (y = -r; y <= r; y++) {
+      for (x = -r; x <= r; x++) {
+        if (x * x + y * y > r2) continue;
+        ctx.fillStyle = hash2(x + 3, y + 5) < 0.18 ? C.sand3 : hash2(x, y) < 0.22 ? C.sand2 : C.sand;
+        ctx.fillRect(cx + x, cy + y, 1, 1);
       }
     }
   }
 
-  var PROPS = {
-    hearth: art(
-      [
-        "................",
-        ".....333333.....",
-        "....32222223....",
-        "...3222222223...",
-        "...3211111123...",
-        "...3211441123...",
-        "...3211441123...",
-        "...3211111123...",
-        "...3222222223...",
-        "....32222223....",
-        "....22222222....",
-        "...22.3333.22...",
-        "................",
-        "................",
-        "................",
-        "................",
-      ],
-      [P.ember, P.copper, P.timber, P.lamp]
-    ),
-    cistern: art(
-      [
-        "................",
-        "......333.......",
-        "......323.......",
-        "....2222222.....",
-        "...221111122....",
-        "...214444412....",
-        "...214444412....",
-        "...221111122....",
-        "....2222222.....",
-        "......22........",
-        "....333..33.....",
-        "................",
-        "................",
-        "................",
-        "................",
-        "................",
-      ],
-      [P.dusk, P.copper, P.lamp, P.ink]
-    ),
-    conservatory: art(
-      [
-        "................",
-        "......33........",
-        ".....3223.......",
-        "....321123......",
-        "...32111123.....",
-        "...21144112.....",
-        "...21111112.....",
-        "...22111122.....",
-        "..3222222223....",
-        ".322222222223...",
-        ".333333333333...",
-        "....2....2......",
-        "................",
-        "................",
-        "................",
-        "................",
-      ],
-      [P.moss, P.timber, P.parchment, P.ink]
-    ),
-    dynamo: art(
-      [
-        "................",
-        "....333333......",
-        "...32....23.....",
-        "...2.3333.2.....",
-        "...2.2112.2.....",
-        "...2.2142.2.....",
-        "...2.2112.2.....",
-        "...2.3333.2.....",
-        "...32....23.....",
-        "....333333......",
-        "......22........",
-        "......22........",
-        "................",
-        "................",
-        "................",
-        "................",
-      ],
-      [P.lamp, P.copper, P.parchment, P.ink]
-    ),
-    dormer: art(
-      [
-        "................",
-        "....333333......",
-        "....3....3......",
-        "....3.22.3......",
-        "....3....3......",
-        ".....2222.......",
-        ".......2........",
-        ".......2........",
-        "......222.......",
-        ".....2.2.2......",
-        "....22.2.22.....",
-        ".......2........",
-        "................",
-        "................",
-        "................",
-        "................",
-      ],
-      [P.timber, P.ink, P.parchment, P.dusk]
-    ),
-    scullery: art(
-      [
-        "................",
-        "......33........",
-        ".....3..3.......",
-        "....222222......",
-        "...22111122.....",
-        ".332114411233...",
-        "...22111122.....",
-        "....222222......",
-        ".....2..2.......",
-        "....22..22......",
-        "................",
-        "................",
-        "................",
-        "................",
-        "................",
-        "................",
-      ],
-      [P.copper, P.ember, P.timber, P.lamp]
-    ),
-    vitrine: art(
-      [
-        "................",
-        "...33333333.....",
-        "...32222223.....",
-        "...22111122.....",
-        "...2114.4112....",
-        "...22111122.....",
-        "...21111112.....",
-        "...2214.4122....",
-        "...32222223.....",
-        "...33333333.....",
-        "....2....2......",
-        "................",
-        "................",
-        "................",
-        "................",
-        "................",
-      ],
-      [P.parchment, P.lamp, P.copper, P.ink]
-    ),
-    lobby: art(
-      [
-        "................",
-        ".....333333.....",
-        "....32222223....",
-        "...3222222223...",
-        "...2211111122...",
-        "...2111411112...",
-        "...2111111112...",
-        "...2211111122...",
-        "...2222222222...",
-        "...22.3333.22...",
-        "...22.3333.22...",
-        "....2......2....",
-        "................",
-        "................",
-        "................",
-        "................",
-      ],
-      [P.timber, P.copper, P.parchment, P.ink]
-    ),
-    larder: art(
-      [
-        "................",
-        "......3333......",
-        ".....322223.....",
-        ".....221122.....",
-        "..3333222233....",
-        "..3222222223....",
-        "..2211111122....",
-        "..2222222222....",
-        "..3333333333....",
-        "................",
-        "................",
-        "................",
-        "................",
-        "................",
-        "................",
-        "................",
-      ],
-      [P.copper, P.timber, P.parchment, P.ink]
-    ),
-  };
-
-  function paintProp(ctx, kind, cx, cy) {
-    var a = PROPS[kind];
-    if (!a) return;
-    drawMap(ctx, a, 2, cx - 16, cy - 16);
+  function paintBrickWall(ctx, x, y, w, h) {
+    R(ctx, x, y, w, h, C.brick);
+    var row;
+    var col;
+    for (row = 0; row < h; row += 4) {
+      R(ctx, x, y + row, w, 1, C.mortar);
+      var off = (row / 4) % 2 ? 3 : 0;
+      for (col = off; col < w; col += 6) {
+        R(ctx, x + col, y + row, 1, Math.min(4, h - row), C.mortar);
+        if (hash2(x + col, y + row) < 0.28) R(ctx, x + col + 1, y + row + 1, 4, 2, C.brick2);
+        else if (hash2(x + col + 2, y + row) < 0.2) R(ctx, x + col + 1, y + row + 1, 3, 2, C.brick3);
+      }
+    }
+    R(ctx, x, y, w, 1, C.brick4);
+    R(ctx, x, y + h - 1, w, 1, C.brick4);
+    R(ctx, x, y, 1, h, C.brick4);
+    R(ctx, x + w - 1, y, 1, h, C.brick4);
   }
 
-  function paintCottageExtras(ctx, w, h) {
-    var cx = Math.floor(w / 2);
-    var cy = Math.floor(h * 0.42);
-    fillDisk(ctx, cx, cy + 10, 6, P.ink);
-    fillDisk(ctx, cx, cy + 10, 5, P.copper);
-    fillDisk(ctx, cx, cy + 10, 4, P.parchment);
-    ctx.fillStyle = P.ink;
-    ctx.fillRect(cx - 1, cy + 8, 2, 5);
-    ctx.fillRect(cx - 2, cy + 10, 4, 1);
-    paintLantern(ctx, 14, Math.floor(h * 0.38));
-    paintLantern(ctx, w - 16, Math.floor(h * 0.38));
-    ctx.fillStyle = P.timber;
-    ctx.fillRect(10, cy + 8, 5, 7);
-    ctx.fillRect(w - 15, cy + 8, 5, 7);
-    ctx.fillStyle = P.parchment;
-    ctx.fillRect(11, cy + 9, 3, 3);
-    ctx.fillRect(w - 14, cy + 9, 3, 3);
-    ctx.fillStyle = P.ink;
-    ctx.fillRect(12, cy + 10, 1, 2);
-    ctx.fillRect(w - 13, cy + 10, 1, 2);
+  function paintStoneWall(ctx, x, y, w, h) {
+    R(ctx, x, y, w, h, C.stone);
+    var i;
+    var j;
+    for (j = 0; j < h; j += 5) {
+      R(ctx, x, y + j, w, 1, C.stone4);
+      for (i = (j / 5) % 2 ? 4 : 0; i < w; i += 7) {
+        R(ctx, x + i, y + j, 1, Math.min(5, h - j), C.stone4);
+        if (hash2(x + i, y + j) < 0.35) R(ctx, x + i + 1, y + j + 1, 4, 3, C.stone2);
+        else R(ctx, x + i + 1, y + j + 1, 3, 2, C.stone3);
+      }
+    }
+    R(ctx, x, y, w, 1, C.stone4);
+    R(ctx, x, y + h - 1, w, 1, C.stone4);
+    R(ctx, x, y, 1, h, C.stone4);
+    R(ctx, x + w - 1, y, 1, h, C.stone4);
   }
 
-  function paintLane(ctx, w, h) {
-    paintPathStrip(ctx, Math.floor(w / 2), 6, Math.floor(w / 2), h - 6, 14);
-    paintPathStrip(ctx, 8, Math.floor(h * 0.56), w - 8, Math.floor(h * 0.56), 12);
-    ctx.fillStyle = G.THData.TYPE_COLOR.draft;
-    ctx.fillRect(Math.floor(w / 2) - 1, 10, 2, h - 20);
-    paintLantern(ctx, Math.floor(w * 0.32), 16);
-    paintLantern(ctx, Math.floor(w * 0.66), h - 22);
+  function paintBlueRoof(ctx, x, y, w, h) {
+    var i;
+    var j;
+    for (j = 0; j < h; j++) {
+      var inset = Math.floor((j / h) * 2);
+      R(ctx, x + inset, y + j, w - inset * 2, 1, j % 3 === 0 ? C.roof2 : C.roof);
+      if (j % 3 === 1) {
+        for (i = 2; i < w - 2; i += 4) R(ctx, x + i, y + j, 2, 1, C.roof3);
+      }
+    }
+    R(ctx, x, y, w, 1, C.ink);
+  }
+
+  function paintKiln(ctx, cx, cy) {
+    var x = cx - 20;
+    var y = cy - 28;
+    paintBrickWall(ctx, x + 12, y, 14, 14);
+    R(ctx, x + 14, y - 4, 10, 5, C.brick2);
+    R(ctx, x + 16, y - 6, 6, 3, C.brick4);
+    R(ctx, x + 17, y - 8, 4, 3, C.ink);
+    paintBrickWall(ctx, x, y + 12, 40, 30);
+    var k;
+    for (k = 0; k < 10; k++) {
+      R(ctx, x + 10 + k, y + 22 + Math.floor((k * k) / 16), 20 - k * 2, 1, C.ink);
+    }
+    R(ctx, x + 12, y + 26, 16, 14, C.ink);
+    R(ctx, x + 14, y + 28, 12, 12, C.fire1);
+    R(ctx, x + 16, y + 30, 8, 9, C.fire2);
+    R(ctx, x + 18, y + 32, 4, 6, C.fire3);
+    R(ctx, x + 19, y + 34, 2, 3, C.white);
+    R(ctx, x + 8, y + 40, 4, 3, C.wood2);
+    R(ctx, x + 28, y + 40, 4, 3, C.wood2);
+  }
+
+  function paintWellAndPool(ctx, cx, cy) {
+    var wx = cx - 18;
+    var wy = cy - 22;
+    paintBlueRoof(ctx, wx + 2, wy, 22, 8);
+    R(ctx, wx + 4, wy + 7, 3, 8, C.wood2);
+    R(ctx, wx + 19, wy + 7, 3, 8, C.wood2);
+    R(ctx, wx + 3, wy + 6, 20, 2, C.wood);
+    paintStoneWall(ctx, wx + 4, wy + 14, 18, 16);
+    R(ctx, wx + 7, wy + 18, 12, 8, C.water2);
+    R(ctx, wx + 8, wy + 19, 10, 3, C.water3);
+    var px = cx + 4;
+    var py = cy + 6;
+    fillDisk(ctx, px + 10, py + 8, 14, C.water2);
+    fillDisk(ctx, px + 9, py + 7, 11, C.water);
+    R(ctx, px + 4, py + 4, 8, 1, C.water3);
+    R(ctx, px + 12, py + 10, 6, 1, C.shine);
+    R(ctx, wx + 20, wy + 28, 3, 8, C.water3);
+    R(ctx, wx + 21, wy + 30, 2, 6, C.white);
+    R(ctx, px + 4, py + 8, 4, 2, C.leaf);
+    R(ctx, px + 14, py + 12, 3, 2, C.leaf2);
+    R(ctx, px + 5, py + 8, 2, 1, C.white);
+  }
+
+  function paintTomatoPlant(ctx, x, y) {
+    R(ctx, x + 2, y + 4, 2, 14, C.leaf2);
+    R(ctx, x, y + 6, 6, 3, C.leaf);
+    R(ctx, x - 1, y + 10, 8, 3, C.leaf3);
+    R(ctx, x + 1, y + 8, 2, 2, C.tomato);
+    R(ctx, x + 4, y + 12, 2, 2, C.tomato);
+    R(ctx, x, y + 13, 2, 2, C.tomato);
+  }
+
+  function paintGreenhouse(ctx, cx, cy) {
+    var x = cx - 24;
+    var y = cy - 26;
+    R(ctx, x + 20, y - 6, 6, 8, C.stone2);
+    R(ctx, x + 21, y - 8, 4, 3, C.stone4);
+    R(ctx, x + 6, y + 2, 36, 8, C.white);
+    var i;
+    for (i = 0; i < 8; i++) {
+      R(ctx, x + 8 + i * 2, y + 2 - i, 36 - i * 4, 1, i % 2 ? C.white : C.glass);
+    }
+    R(ctx, x + 4, y + 10, 40, 28, C.white);
+    R(ctx, x + 6, y + 12, 16, 10, C.glass);
+    R(ctx, x + 24, y + 12, 16, 10, C.glass);
+    R(ctx, x + 6, y + 24, 16, 10, C.glass2);
+    R(ctx, x + 24, y + 24, 16, 10, C.glass);
+    R(ctx, x + 7, y + 13, 5, 2, C.shine);
+    R(ctx, x + 25, y + 13, 5, 2, C.shine);
+    paintTomatoPlant(ctx, x + 10, y + 16);
+    paintTomatoPlant(ctx, x + 28, y + 18);
+    paintTomatoPlant(ctx, x + 18, y + 20);
+    R(ctx, x + 22, y + 10, 2, 28, C.white);
+    R(ctx, x + 4, y + 23, 40, 2, C.white);
+    R(ctx, x - 6, y + 32, 10, 7, C.wood);
+    R(ctx, x - 5, y + 33, 3, 3, C.tomato);
+    R(ctx, x - 1, y + 33, 3, 3, C.tomato);
+    R(ctx, x + 2, y + 34, 2, 2, C.tomato);
+  }
+
+  function paintCottage(ctx, cx, cy) {
+    var x = cx - 26;
+    var y = cy - 28;
+    paintBlueRoof(ctx, x + 2, y, 48, 16);
+    R(ctx, x + 38, y + 2, 8, 16, C.brick2);
+    R(ctx, x + 40, y - 2, 4, 6, C.brick4);
+    paintStoneWall(ctx, x + 6, y + 16, 40, 28);
+    R(ctx, x + 20, y + 26, 12, 18, C.wood2);
+    R(ctx, x + 22, y + 24, 8, 4, C.wood4);
+    R(ctx, x + 24, y + 30, 4, 8, C.wood);
+    fillDisk(ctx, cx, y + 22, 6, C.ink);
+    fillDisk(ctx, cx, y + 22, 5, C.gold);
+    fillDisk(ctx, cx, y + 22, 3, C.gold2);
+    R(ctx, cx - 1, y + 20, 2, 5, C.ink);
+    R(ctx, cx - 2, y + 22, 4, 1, C.ink);
+    R(ctx, x + 10, y + 22, 6, 8, C.sky2);
+    R(ctx, x + 36, y + 22, 6, 8, C.sky2);
+    R(ctx, x + 10, y + 25, 6, 1, C.white);
+    R(ctx, x + 36, y + 25, 6, 1, C.white);
+    R(ctx, x + 8, y + 16, 5, 12, C.banner);
+    R(ctx, x + 39, y + 16, 5, 12, C.banner);
+    R(ctx, x + 9, y + 18, 3, 3, C.white);
+    R(ctx, x + 40, y + 18, 3, 3, C.white);
+    R(ctx, x + 40, y + 36, 12, 7, C.wood);
+    R(ctx, x + 41, y + 37, 10, 5, C.white);
+    R(ctx, x + 42, y + 38, 2, 3, C.ink);
+    R(ctx, x + 45, y + 38, 2, 3, C.ink);
+    R(ctx, x + 48, y + 38, 2, 3, C.ink);
+  }
+
+  function paintDynamo(ctx, cx, cy) {
+    var x = cx - 16;
+    var y = cy - 18;
+    paintStoneWall(ctx, x + 4, y + 10, 24, 20);
+    R(ctx, x + 8, y, 16, 12, C.gold);
+    R(ctx, x + 10, y + 2, 12, 8, C.gold2);
+    R(ctx, x + 14, y + 4, 4, 4, C.ink);
+    R(ctx, x + 6, y + 14, 4, 10, C.wood2);
+    R(ctx, x + 22, y + 14, 4, 10, C.wood2);
+  }
+
+  function paintLoft(ctx, cx, cy) {
+    var x = cx - 18;
+    var y = cy - 22;
+    paintBlueRoof(ctx, x, y, 36, 12);
+    paintStoneWall(ctx, x + 4, y + 12, 28, 22);
+    R(ctx, x + 10, y + 16, 8, 8, C.sky2);
+    R(ctx, x + 22, y + 20, 6, 10, C.wood2);
+  }
+
+  function paintYard(ctx, cx, cy) {
+    var x = cx - 18;
+    var y = cy - 12;
+    R(ctx, x, y + 10, 16, 10, "#d86a2c");
+    R(ctx, x + 2, y + 12, 12, 6, "#f08840");
+    R(ctx, x + 18, y, 14, 16, "#c45c26");
+    R(ctx, x + 20, y + 2, 10, 10, "#8b5a3c");
+    R(ctx, x + 8, y + 6, 6, 4, C.wood);
+  }
+
+  function paintCase(ctx, cx, cy) {
+    var x = cx - 16;
+    var y = cy - 20;
+    R(ctx, x, y, 32, 36, C.wood2);
+    R(ctx, x + 3, y + 4, 26, 28, C.glass);
+    R(ctx, x + 5, y + 6, 8, 8, C.gold);
+    R(ctx, x + 16, y + 16, 8, 8, C.gold2);
+    R(ctx, x + 6, y + 7, 3, 2, C.shine);
+  }
+
+  function paintShed(ctx, cx, cy) {
+    var x = cx - 18;
+    var y = cy - 16;
+    paintBrickWall(ctx, x, y + 8, 36, 22);
+    R(ctx, x - 2, y, 40, 10, C.wood);
+    R(ctx, x + 4, y + 12, 10, 3, C.wood3);
+    R(ctx, x + 4, y + 18, 10, 3, C.wood3);
+    R(ctx, x + 22, y + 14, 8, 12, C.wood2);
   }
 
   function paintHabitat(canvas, kind, opt) {
@@ -883,46 +875,54 @@
     ctx.clearRect(0, 0, w, h);
     var def = G.THData.ROOMS[kind];
     var type = def && def.type ? def.type : "none";
-    var col = type !== "none" ? G.THData.TYPE_COLOR[type] : P.copper;
+    var col = type !== "none" ? G.THData.TYPE_COLOR[type] : C.wood;
     var cx = Math.floor(w / 2);
-    var cy = Math.floor(h / 2) - 1;
-    var floorR = 33;
-    var fenceR = 39;
+    var cy = Math.floor(h / 2) - 2;
+    var fenceR = Math.floor(Math.min(w, h) * 0.42);
 
     if (kind === "lobby") {
-      fillDisk(ctx, cx, cy + 2, 26, "#c4a878");
-      paintPathStrip(ctx, cx, cy + 8, cx, h - 2, 12);
-      paintProp(ctx, "lobby", cx, cy - 2);
-      paintCottageExtras(ctx, w, h);
+      paintCottage(ctx, cx, cy);
+      paintLantern(ctx, 18, h - 36);
+      paintLantern(ctx, w - 22, h - 36);
     } else if (kind === "larder") {
-      fillDisk(ctx, cx, cy + 4, 18, "#c4a060");
-      paintProp(ctx, "larder", cx, cy + 2);
+      paintShed(ctx, cx, cy);
     } else if (kind === "transom") {
-      paintLane(ctx, w, h);
+      paintPathStrip(ctx, cx, 8, cx, h - 8, 16);
+      paintPathStrip(ctx, 10, Math.floor(h * 0.68), w - 10, Math.floor(h * 0.68), 14);
+      paintLantern(ctx, Math.floor(w * 0.3), 22);
+      paintLantern(ctx, Math.floor(w * 0.7), h - 28);
     } else {
-      paintTypeFloor(ctx, cx, cy, floorR, type);
-      paintProp(ctx, kind, cx, cy - 6);
-      paintCircleFence(ctx, cx, cy, fenceR, col, { level: opt.level || 1, edges: opt.edges, kind: kind });
+      if (kind === "hearth") paintSandPatch(ctx, cx, cy + 6, fenceR - 8);
+      else if (kind === "cistern") {
+        fillDisk(ctx, cx, cy + 8, fenceR - 10, C.grass);
+        fillDisk(ctx, cx + 8, cy + 14, 16, C.water2);
+      } else {
+        fillDisk(ctx, cx, cy + 6, fenceR - 10, C.grassA);
+      }
+      if (kind === "hearth") paintKiln(ctx, cx, cy - 4);
+      else if (kind === "cistern") paintWellAndPool(ctx, cx, cy - 2);
+      else if (kind === "conservatory") paintGreenhouse(ctx, cx, cy - 2);
+      else if (kind === "dynamo") paintDynamo(ctx, cx, cy);
+      else if (kind === "dormer") paintLoft(ctx, cx, cy);
+      else if (kind === "scullery") paintYard(ctx, cx, cy);
+      else if (kind === "vitrine") paintCase(ctx, cx, cy);
+      else paintShed(ctx, cx, cy);
+      paintRoundFence(ctx, cx, cy + 2, fenceR, col, { level: opt.level || 1, edges: opt.edges, kind: kind });
     }
 
-    if (opt.leaking) {
-      ctx.fillStyle = P.ember;
-      ctx.fillRect(cx - 18, cy - 4, 3, 22);
-    }
-    if (opt.haunted) {
-      fillDisk(ctx, cx, cy, floorR + 2, "rgba(90,50,120,0.22)");
-    }
-    if (opt.unpowered) {
-      ctx.fillStyle = P.ink;
-      ctx.fillRect(cx - 5, cy - 20, 10, 4);
-    }
+    if (opt.leaking) R(ctx, cx - 18, cy, 3, 22, C.fire1);
+    if (opt.haunted) fillDisk(ctx, cx, cy, fenceR, "rgba(90,50,120,0.2)");
+    if (opt.unpowered) R(ctx, cx - 6, cy - 24, 12, 4, C.ink);
     if (opt.home) {
-      ctx.fillStyle = col;
-      ctx.fillRect(cx - 10, cy + 14, 20, 5);
-      ctx.fillStyle = shade(P.parchment, 0.55);
-      ctx.fillRect(cx - 8, cy + 15, 16, 3);
+      R(ctx, cx - 12, cy + 18, 24, 6, col);
+      R(ctx, cx - 10, cy + 19, 20, 4, shade(P.parchment, 0.7));
     }
-    if (opt.selected) paintLampRing(ctx, cx, cy, kind === "lobby" || kind === "larder" || kind === "transom" ? 34 : fenceR + 4);
+    if (opt.selected) {
+      R(ctx, 2, 2, w - 4, 2, C.gold);
+      R(ctx, 2, h - 4, w - 4, 2, C.gold);
+      R(ctx, 2, 2, 2, h - 4, C.gold);
+      R(ctx, w - 4, 2, 2, h - 4, C.gold);
+    }
   }
 
   function paintRoom(canvas, kind, opt) {
@@ -933,29 +933,24 @@
     opt = opt || {};
     var ctx = canvas.getContext("2d");
     ctx.imageSmoothingEnabled = false;
-    var w = canvas.width;
-    var h = canvas.height;
-    ctx.clearRect(0, 0, w, h);
-    var cx = Math.floor(w / 2);
-    var cy = Math.floor(h / 2);
-    fillDisk(ctx, cx, cy, 32, "#6aaa44");
-    fillDisk(ctx, cx, cy, 29, "#5a9c38");
-    var i;
-    var j;
-    for (i = -20; i <= 20; i += 6) {
-      for (j = -18; j <= 18; j += 7) {
-        if (i * i + j * j > 700) continue;
-        if (hash2(i + 4, j + 2) < 0.35) {
-          ctx.fillStyle = "#4a8c30";
-          ctx.fillRect(cx + i, cy + j, 2, 2);
-        }
-      }
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    if (hash2((opt.x || 1) * 5, (opt.y || 0) * 7) < 0.7) {
+      paintFlowerBed(ctx, 16, canvas.height - 28, 18);
     }
-    paintStuds(ctx, cx, cy, 30);
-    if (opt.selected) paintLampRing(ctx, cx, cy, 34);
+    if (opt.selected) {
+      R(ctx, 3, 3, canvas.width - 6, 2, C.gold);
+      R(ctx, 3, canvas.height - 5, canvas.width - 6, 2, C.gold);
+    }
   }
 
-  var DIGIT = {
+  var GLYPH = {
+    B: ["11.", "1.1", "11.", "1.1", "11."],
+    U: ["1.1", "1.1", "1.1", "1.1", "111"],
+    Y: ["1.1", "1.1", ".1.", ".1.", ".1."],
+    L: ["1..", "1..", "1..", "1..", "111"],
+    A: [".1.", "1.1", "111", "1.1", "1.1"],
+    N: ["1.1", "11.", "1.1", "1.1", "1.1"],
+    D: ["11.", "1.1", "1.1", "1.1", "11."],
     "0": ["111", "1.1", "1.1", "1.1", "111"],
     "1": [".1.", "11.", ".1.", ".1.", "111"],
     "2": ["111", "..1", "111", "1..", "111"],
@@ -968,7 +963,7 @@
     "9": ["111", "1.1", "111", "..1", "111"],
   };
 
-  function paintDigits(ctx, text, x, y, col) {
+  function paintText(ctx, text, x, y, col) {
     ctx.fillStyle = col;
     var i;
     var r;
@@ -976,7 +971,7 @@
     var glyph;
     var ox = x;
     for (i = 0; i < text.length; i++) {
-      glyph = DIGIT[text.charAt(i)];
+      glyph = GLYPH[text.charAt(i)];
       if (!glyph) {
         ox += 3;
         continue;
@@ -990,39 +985,15 @@
     }
   }
 
-  function paintPine(ctx, x, y, hgt, col) {
-    var i;
-    var half;
-    ctx.fillStyle = col;
-    for (i = 0; i < hgt; i++) {
-      half = Math.max(1, Math.floor(((hgt - i) / hgt) * (hgt * 0.45)));
-      ctx.fillRect(x - half, y + i, half * 2 + 1, 1);
-    }
-    ctx.fillStyle = "#2a4a1c";
-    ctx.fillRect(x, y + hgt - 1, 2, 5);
-  }
-
   function paintStake(ctx, cx, cy, cost) {
-    var x = cx - 10;
-    var y = cy - 16;
-    ctx.fillStyle = P.ink;
-    ctx.fillRect(cx - 1, y + 18, 3, 16);
-    ctx.fillStyle = P.timber;
-    ctx.fillRect(cx, y + 18, 1, 15);
-    ctx.fillStyle = P.ink;
-    ctx.fillRect(x, y, 21, 20);
-    ctx.fillStyle = "#2a1c14";
-    ctx.fillRect(x + 1, y + 1, 19, 18);
-    ctx.fillStyle = P.copper;
-    ctx.fillRect(x + 2, y + 2, 17, 16);
-    ctx.fillStyle = P.ink;
-    ctx.fillRect(x + 3, y + 3, 15, 14);
-    ctx.fillStyle = P.parchment;
-    ctx.fillRect(cx - 2, y + 5, 5, 5);
-    ctx.fillStyle = P.ink;
-    ctx.fillRect(cx - 1, y + 6, 3, 3);
-    ctx.fillStyle = P.ember;
-    paintDigits(ctx, String((cost && cost.scrap) || 12), cx - 6, y + 12, P.lamp);
+    R(ctx, cx - 1, cy + 6, 3, 22, C.ink);
+    R(ctx, cx, cy + 7, 1, 20, C.wood3);
+    R(ctx, cx - 16, cy - 16, 33, 24, C.ink);
+    R(ctx, cx - 15, cy - 15, 31, 22, C.wood);
+    R(ctx, cx - 13, cy - 13, 27, 18, C.wood4);
+    paintText(ctx, "BUY", cx - 6, cy - 10, C.white);
+    paintText(ctx, "LAND", cx - 8, cy - 3, C.white);
+    paintText(ctx, String((cost && cost.scrap) || 12), cx - 4, cy + 4, C.gold);
   }
 
   function paintFog(canvas, opt) {
@@ -1034,30 +1005,34 @@
     ctx.clearRect(0, 0, w, h);
     var seedX = (opt.x || 0) * 19;
     var seedY = (opt.y || 0) * 23;
+    if ((opt.y || 0) >= 1) {
+      var y;
+      for (y = 0; y < 36; y++) {
+        ctx.fillStyle = y < 16 ? C.sky : C.sky2;
+        ctx.fillRect(0, y, w, 1);
+      }
+    }
+    paintTree(ctx, 18, 8, 34, seedX);
+    paintTree(ctx, w - 22, 4, 40, seedY + 3);
+    paintTree(ctx, Math.floor(w * 0.42), 10, 28, seedX + 7);
+    paintTree(ctx, 28, h - 52, 26, seedY + 11);
+    paintTree(ctx, w - 30, h - 56, 30, seedX + 13);
     var i;
     var j;
     var n;
     for (i = 0; i < w; i += 2) {
       for (j = 0; j < h; j += 2) {
         n = hash2(i + seedX, j + seedY);
-        if (n > 0.62) continue;
-        ctx.fillStyle = n < 0.2 ? "rgba(210,230,200,0.5)" : n < 0.4 ? "rgba(190,215,180,0.35)" : "rgba(240,250,230,0.22)";
+        if (n > 0.55) continue;
+        ctx.fillStyle = n < 0.18 ? "rgba(220,240,210,0.35)" : "rgba(240,250,230,0.16)";
         ctx.fillRect(i, j, 2, 2);
       }
     }
-    var pines = [
-      [16, 10, 22],
-      [w - 20, 8, 26],
-      [10, h - 36, 18],
-      [w - 18, h - 40, 20],
-      [Math.floor(w * 0.38), 6, 16],
-    ];
-    pines.forEach(function (p, idx) {
-      var col = idx % 2 ? "#245a28" : "#1a4a20";
-      if (hash2(seedX + idx, seedY) > 0.18) paintPine(ctx, p[0], p[1], p[2], col);
-    });
-    if (!opt.inert) paintStake(ctx, Math.floor(w / 2), Math.floor(h / 2) + 4, opt.cost);
-    if (opt.selected) paintLampRing(ctx, Math.floor(w / 2), Math.floor(h / 2), 30);
+    if (!opt.inert) paintStake(ctx, Math.floor(w / 2), Math.floor(h / 2) + 6, opt.cost);
+    if (opt.selected) {
+      R(ctx, 3, 3, w - 6, 2, C.gold);
+      R(ctx, 3, h - 5, w - 6, 2, C.gold);
+    }
   }
 
   function paintIcon(size) {
@@ -1067,18 +1042,16 @@
     var ctx = c.getContext("2d");
     ctx.imageSmoothingEnabled = false;
     var s = size / 16;
-    function R(x, y, w, h, col) {
+    function box(x, y, w, h, col) {
       ctx.fillStyle = col;
       ctx.fillRect(Math.floor(x * s), Math.floor(y * s), Math.ceil(w * s), Math.ceil(h * s));
     }
-    R(0, 0, 16, 16, P.ink);
-    R(2, 7, 12, 8, P.timber);
-    R(1, 6, 14, 2, P.copper);
-    R(3, 4, 10, 3, P.ember);
-    R(6, 2, 4, 3, P.copper);
-    R(4, 9, 3, 3, P.lamp);
-    R(9, 9, 3, 3, P.dusk);
-    R(7, 12, 2, 3, P.ink);
+    box(0, 0, 16, 16, C.sky);
+    box(1, 8, 14, 7, C.grass);
+    box(3, 6, 10, 8, C.brick);
+    box(6, 2, 4, 5, C.brick2);
+    box(5, 9, 6, 5, C.fire2);
+    box(7, 10, 2, 3, C.fire3);
     return c;
   }
 

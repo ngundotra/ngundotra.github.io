@@ -910,6 +910,34 @@
     return recap;
   }
 
+  function preferredHearthLot(s) {
+    var prefer = [
+      [1, 1],
+      [0, 0],
+      [2, 0],
+      [0, 1],
+      [2, 1],
+      [1, -1],
+    ];
+    var i;
+    var x;
+    var y;
+    var c;
+    for (i = 0; i < prefer.length; i++) {
+      x = prefer[i][0];
+      y = prefer[i][1];
+      c = cell(s, x, y);
+      if (c && !c.room && Math.abs(x - 1) + Math.abs(y - 0) === 1) return { x: x, y: y };
+    }
+    return null;
+  }
+
+  function buildPreferredHearth(s) {
+    var lot = preferredHearthLot(s);
+    if (!lot) return "No empty lot beside the Gatehouse.";
+    return build(s, lot.x, lot.y, "hearth");
+  }
+
   function build(s, x, y, kind) {
     var c = cell(s, x, y);
     var def = D.ROOMS[kind];
@@ -1140,9 +1168,14 @@
     else pass("buy locked until Wicknoll seated");
     if (waiting(s).length !== 1 || waiting(s)[0].kind !== "Wicknoll") fail("Wicknoll waiting");
     else pass("Wicknoll waiting");
-    var b = build(s, 1, 1, "hearth");
+    var pref = preferredHearthLot(s);
+    if (!pref || pref.x !== 1 || pref.y !== 1) fail("preferred hearth lot " + JSON.stringify(pref));
+    else pass("preferred hearth lot 1,1");
+    var b = buildPreferredHearth(s);
     if (b !== "ok") fail("build hearth: " + b);
     else pass("hearth at 1,1");
+    if (!cell(s, 1, 1) || cell(s, 1, 1).room !== "hearth") fail("preferred build did not seat Ember at 1,1");
+    else pass("BUILD EMBER GROUNDS places Ember at 1,1");
     if (s.tally !== 4) fail("tally after hearth " + s.tally);
     var a = place(s, "Wicknoll", 1, 1);
     if (a !== "ok") fail("assign: " + a);
@@ -1235,6 +1268,8 @@
     getState: getState,
     cell: cell,
     build: build,
+    preferredHearthLot: preferredHearthLot,
+    buildPreferredHearth: buildPreferredHearth,
     upgrade: upgrade,
     buyLot: buyLot,
     buyUnlocked: buyUnlocked,
