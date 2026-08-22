@@ -1,6 +1,6 @@
 # Noah Gundotra — Toy Museum
 
-A personal site: things I built that I still think are cool. Four projects, no build step.
+A personal site: things I built that I still think are cool. Five projects, no build step.
 
 Open `index.html` in a browser, or wait for GitHub Pages to serve the repository root.
 

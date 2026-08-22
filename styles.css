@@ -196,6 +196,7 @@ a:hover {
 .panel--code2pix { --pigment: #3d9a96; }
 .panel--notelet { --pigment: #a34b5c; }
 .panel--sculptml { --pigment: #7a5aa8; }
+.panel--solanagym { --pigment: #3d8a6e; }
 .panel--lastweek { --pigment: #3d6eae; }
 
 .panel--foyer {
@@ -222,6 +223,12 @@ a:hover {
 .panel--sculptml {
   background:
     radial-gradient(ellipse at 90% 70%, rgba(122, 90, 168, 0.16), transparent 42%),
+    var(--ink);
+}
+
+.panel--solanagym {
+  background:
+    radial-gradient(ellipse at 80% 20%, rgba(61, 138, 110, 0.16), transparent 42%),
     var(--ink);
 }
 
