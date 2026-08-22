@@ -240,8 +240,7 @@ a:hover {
 .accession,
 .kicker,
 .subhead,
-figcaption,
-.place {
+figcaption {
   font-size: 0.72rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -263,7 +262,7 @@ figcaption,
 }
 
 .name {
-  margin: 0;
+  margin: 0 0 1.15rem;
   line-height: 0.86;
 }
 
@@ -285,10 +284,6 @@ figcaption,
   font-weight: 300;
   font-size: clamp(3.6rem, 9.5vw, 6.4rem);
   color: var(--gold);
-}
-
-.place {
-  margin: 1.15rem 0 0.7rem;
 }
 
 .links {
