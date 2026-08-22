@@ -262,6 +262,31 @@
       if (em) em.textContent = cost.scrap + " SCRAP" + (cost.tally ? " · " + cost.tally + " TALLY" : "") + (cost.dust ? " · " + cost.dust + " DUST" : "");
     });
 
+    var fogSet = {};
+    fog.forEach(function (f) {
+      fogSet[T.key(f.x, f.y)] = true;
+    });
+    for (var fy = bounds.minY; fy <= bounds.maxY; fy++) {
+      for (var fx = bounds.minX; fx <= bounds.maxX; fx++) {
+        var fk = T.key(fx, fy);
+        if (s.cells[fk] || fogSet[fk]) continue;
+        var vk = "void:" + fk;
+        keep[vk] = true;
+        var vnode = lotNode(house, vk, fx, fy, true);
+        vnode.className = "lot fog void";
+        vnode.style.left = (fx - bounds.minX) * LOT + "px";
+        vnode.style.top = (bounds.maxY - fy) * LOT + "px";
+        vnode.style.width = LOT + "px";
+        vnode.style.height = LOT + "px";
+        var vtile = vnode.querySelector(".tile");
+        vtile.width = LOT;
+        vtile.height = LOT;
+        S.paintFog(vtile, { inert: true });
+        var tag = vnode.querySelector(".fog-tag");
+        if (tag) tag.hidden = true;
+      }
+    }
+
     Array.prototype.forEach.call(house.children, function (n) {
       if (!keep[n.dataset.k]) n.remove();
     });
@@ -376,7 +401,12 @@
     }
     var c = T.cell(s, selected.x, selected.y);
     if (!c) {
-      $("context").innerHTML = "<b>FOG</b> " + selected.x + "," + selected.y + " · BUY LAND";
+      var fogHit = T.fogOf(s).some(function (f) {
+        return f.x === selected.x && f.y === selected.y;
+      });
+      $("context").innerHTML = fogHit
+        ? "<b>FOG</b> " + selected.x + "," + selected.y + " · BUY LAND"
+        : "<b>MIST</b> · not a lot yet";
       return;
     }
     if (!c.room) {

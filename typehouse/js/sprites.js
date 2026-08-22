@@ -547,9 +547,12 @@
     var h = canvas.height;
     dirtFill(ctx, w, h, null);
     if (opt.path) paintPath(ctx, w, h, true);
+    ctx.strokeStyle = "#1a100c";
+    ctx.lineWidth = 1;
+    ctx.strokeRect(1, 1, w - 2, h - 2);
     ctx.fillStyle = P.timber;
     ctx.fillRect(Math.floor(w / 2) - 1, h - 16, 2, 10);
-    ctx.fillStyle = P.ink;
+    ctx.fillStyle = P.parchment;
     ctx.fillRect(Math.floor(w / 2) - 4, h - 20, 8, 5);
   }
 
