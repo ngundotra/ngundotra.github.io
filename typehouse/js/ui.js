@@ -206,9 +206,7 @@
     node.dataset.k = k;
     node.dataset.x = String(x);
     node.dataset.y = String(y);
-    node.innerHTML = fog
-      ? '<canvas class="tile"></canvas><span class="fog-tag"><b>+ BUY LAND</b><em></em></span>'
-      : '<canvas class="tile"></canvas>';
+    node.innerHTML = '<canvas class="tile"></canvas>';
     house.appendChild(node);
     return node;
   }
@@ -227,6 +225,12 @@
     house.style.height = ph + "px";
     critters.width = pw;
     critters.height = ph;
+    var grounds = $("grounds");
+    if (grounds) {
+      grounds.width = pw;
+      grounds.height = ph;
+      S.paintPark(grounds, { lot: LOT, bounds: bounds, owned: s.cells });
+    }
     ensureCam(s);
 
     var keep = {};
@@ -257,9 +261,7 @@
       var tile = node.querySelector(".tile");
       tile.width = LOT;
       tile.height = LOT;
-      S.paintFog(tile, { cost: cost });
-      var em = node.querySelector(".fog-tag em");
-      if (em) em.textContent = cost.scrap + " SCRAP" + (cost.tally ? " · " + cost.tally + " TALLY" : "") + (cost.dust ? " · " + cost.dust + " DUST" : "");
+      S.paintFog(tile, { cost: cost, x: f.x, y: f.y, selected: selKey() === T.key(f.x, f.y) });
     });
 
     var fogSet = {};
@@ -281,9 +283,7 @@
         var vtile = vnode.querySelector(".tile");
         vtile.width = LOT;
         vtile.height = LOT;
-        S.paintFog(vtile, { inert: true });
-        var tag = vnode.querySelector(".fog-tag");
-        if (tag) tag.hidden = true;
+        S.paintFog(vtile, { inert: true, x: fx, y: fy });
       }
     }
 
@@ -299,18 +299,19 @@
     tile.width = LOT;
     tile.height = LOT;
     if (!c.room) {
-      S.paintEmpty(tile, { path: c.x === 1 });
+      S.paintEmpty(tile, { selected: selKey() === T.key(c.x, c.y) });
       return;
     }
     var d = c.denizen ? T.denizen(s, c.denizen) : null;
     var info = d ? T.yieldMult(s, d, c) : { home: false, nourish: 0, friction: 0 };
-    S.paintRoom(tile, c.room, {
+    S.paintHabitat(tile, c.room, {
       level: c.level,
       haunted: c.haunted,
       leaking: c.leaking,
       unpowered: c.unpowered,
       home: !!(d && info.home),
       edges: edgeFlags(s, c),
+      selected: selKey() === T.key(c.x, c.y),
     });
   }
 
