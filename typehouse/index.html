@@ -24,10 +24,10 @@
     <div id="app">
       <header id="top">
         <h1 id="title"><span class="ivy">THE GROUNDS</span></h1>
-        <div id="wallet">
-          <div class="res tally"><i class="ico coin" aria-hidden="true"></i><div><span>TALLY</span><b id="tally">12</b></div></div>
-          <div class="res scrap"><i class="ico gear" aria-hidden="true"></i><div><span>SCRAP</span><b id="scrap">6</b></div></div>
-          <div class="res dust"><i class="ico gem" aria-hidden="true"></i><div><span>DUST</span><b id="dust">0</b></div></div>
+        <div id="wallet" class="plaque">
+          <span class="res tally"><i class="ico coin" aria-hidden="true"></i><b id="tally">12</b></span>
+          <span class="res scrap"><i class="ico gear" aria-hidden="true"></i><b id="scrap">6</b></span>
+          <span class="res dust"><i class="ico gem" aria-hidden="true"></i><b id="dust">0</b></span>
         </div>
       </header>
       <div id="weather" hidden></div>
@@ -35,22 +35,24 @@
         <div id="park">
           <canvas id="grounds" aria-hidden="true"></canvas>
           <div id="house" aria-label="The Grounds park"></div>
+          <canvas id="roads" aria-hidden="true"></canvas>
           <canvas id="critters" aria-hidden="true"></canvas>
           <div id="pips"></div>
+        </div>
+        <div id="float-dock">
+          <button type="button" id="btn-build">BUILD</button>
+          <button type="button" id="btn-assign">ASSIGN</button>
+          <button type="button" id="btn-help">?</button>
         </div>
         <div id="zoom-dock" aria-label="Zoom">
           <button type="button" id="btn-zoom-in" aria-label="Zoom in">+</button>
           <button type="button" id="btn-zoom-out" aria-label="Zoom out">−</button>
         </div>
+        <div id="blotter">The night desk is open.</div>
+        <div id="map-card" hidden></div>
       </div>
       <div id="lobby-strip" hidden></div>
-      <div id="blotter">The night desk is open.</div>
-      <div id="context"><b>THE GROUNDS</b> · tap a lot</div>
-      <nav id="dock">
-        <button type="button" id="btn-build"><i class="ico hammer" aria-hidden="true"></i>BUILD</button>
-        <button type="button" id="btn-assign"><i class="ico critter" aria-hidden="true"></i>ASSIGN</button>
-        <button type="button" id="btn-help">?</button>
-      </nav>
+      <div id="context" hidden><b>THE GROUNDS</b> · tap a lot</div>
     </div>
     <div id="dim"></div>
     <div id="sheet" class="sheet" role="dialog" aria-modal="true">

@@ -15,9 +15,9 @@
   var pressTimer = 0;
   var lastWallet = { tally: 12, scrap: 6, dust: 0 };
   var LOT = 192;
-  var Z_MIN = 0.45;
+  var Z_MIN = 0.38;
   var Z_MAX = 1.8;
-  var Z_DEFAULT = 0.68;
+  var Z_DEFAULT = 0.62;
   var view = { minX: 0, minY: 0, maxX: 2, maxY: 1, w: 3, h: 2 };
   var cam = { x: 0, y: 0, z: Z_DEFAULT };
   var camReady = false;
@@ -112,10 +112,12 @@
 
   function hideSheet() {
     var s = T.getState();
-    if (s && (s.pendingEvent || s.recap)) return;
+    var demo = T.parseQS().demo;
+    if (s && (s.pendingEvent || s.recap) && demo !== "mid" && demo !== "late") return;
     $("sheet").className = "sheet";
     $("dim").classList.remove("on");
     $("dim").classList.remove("soft");
+    hideMapCard();
     mode = "none";
     assignId = null;
     renderDock();
@@ -153,19 +155,28 @@
   function frameZoo() {
     var wrap = $("house-wrap");
     if (!wrap) return;
+    var s = T.getState();
+    var owned = s && T.ownedBounds ? T.ownedBounds(s) : { minX: 0, minY: 0, maxX: 2, maxY: 1, w: 3, h: 2 };
     var ww = wrap.clientWidth || 390;
     var wh = wrap.clientHeight || 560;
-    var zFit = ww / (3 * LOT + 12);
-    var usable = wh * 0.76;
-    zFit = Math.min(zFit, usable / (2 * LOT + 8));
+    var pad = 20;
+    var zFit = Math.min(ww / (owned.w * LOT + pad), wh / (owned.h * LOT + pad));
+    var demo = T.parseQS().demo;
+    if (demo === "mid") zFit *= 0.84;
+    if (demo === "late") {
+      var park = s && T.parkBounds ? T.parkBounds(s) : owned;
+      zFit = Math.min(ww / (park.w * LOT + 8), wh / (park.h * LOT + 16));
+      zFit *= 0.88;
+    }
+    if (!demo) zFit = Math.min(zFit, ww / (3 * LOT + 8));
     cam.z = Math.max(Z_MIN, Math.min(Z_MAX, zFit));
     var z = cam.z;
-    var ownedLeft = (0 - view.minX) * LOT * z;
-    var ownedTop = (view.maxY - 1) * LOT * z;
-    var ownedW = 3 * LOT * z;
-    var ownedH = 2 * LOT * z;
+    var ownedLeft = (owned.minX - view.minX) * LOT * z;
+    var ownedTop = (view.maxY - owned.maxY) * LOT * z;
+    var ownedW = owned.w * LOT * z;
+    var ownedH = owned.h * LOT * z;
     cam.x = (ww - ownedW) / 2 - ownedLeft;
-    cam.y = Math.max(6, (usable - ownedH) * 0.28) - ownedTop;
+    cam.y = Math.max(8, (wh - ownedH) * 0.42) - ownedTop;
     clampCam();
   }
 
@@ -297,6 +308,12 @@
       grounds.width = pw;
       grounds.height = ph;
       S.paintPark(grounds, { lot: LOT, bounds: bounds, owned: s.cells });
+    }
+    var roads = $("roads");
+    if (roads) {
+      roads.width = pw;
+      roads.height = ph;
+      S.paintRoads(roads, { lot: LOT, bounds: bounds, owned: s.cells });
     }
     ensureCam(s);
 
@@ -494,10 +511,35 @@
     $("context").innerHTML = line;
   }
 
+  function hideMapCard() {
+    var card = $("map-card");
+    if (card) card.hidden = true;
+  }
+
+  function showMapCard(html) {
+    var card = $("map-card");
+    if (!card) return;
+    card.hidden = false;
+    card.innerHTML = html;
+  }
+
   function renderDock() {
-    $("btn-build").classList.toggle("on", mode === "build");
-    $("btn-assign").classList.toggle("on", mode === "assign");
-    $("btn-help").classList.toggle("on", mode === "help");
+    var s = T.getState();
+    var build = $("btn-build");
+    var assign = $("btn-assign");
+    var help = $("btn-help");
+    if (build) {
+      build.classList.toggle("on", mode === "build");
+      build.textContent = s && s.onboard === 0 ? "BUILD EMBER" : "BUILD";
+    }
+    if (assign) {
+      var wait = s ? T.waiting(s) : [];
+      var needWick = s && s.onboard === 1 && wait[0] && wait[0].kind === "Wicknoll";
+      assign.hidden = !wait.length || (s && s.onboard === 0);
+      assign.classList.toggle("on", mode === "assign");
+      assign.textContent = needWick ? "ASSIGN WICKNOLL" : "ASSIGN";
+    }
+    if (help) help.classList.toggle("on", mode === "help");
   }
 
   function parkToLot(px, py) {
@@ -558,7 +600,15 @@
     }
 
     var hit = W.hitTest(px, py, view);
-    if (hit) {
+    if (hit && hit.waiting) {
+      assignId = hit.id;
+      mode = "assign";
+      openAssignHint(s, T.denizen(s, hit.id));
+      renderDock();
+      renderChrome(s);
+      return;
+    }
+    if (hit && !hit.waiting) {
       var hc = T.cell(s, hit.x, hit.y);
       if (hc && hc.room && hc.room !== "lobby") {
         selected = { x: hit.x, y: hit.y };
@@ -687,7 +737,7 @@
       markDirty();
       renderHouse(s);
       renderChrome(s);
-      openInspect(s, T.cell(s, lot.x, lot.y));
+      showMapCard("<b>EMBER GROUNDS</b><small>ASSIGN WICKNOLL from the ring</small>");
       return true;
     }
     s.blotter = msg;
@@ -700,13 +750,27 @@
   function openInspect(s, c) {
     var def = D.ROOMS[c.room];
     if (c.room === "lobby" && s.onboard === 0) {
-      showSheet(
-        '<div class="sheet-h">GATEHOUSE</div><p class="sheet-p">Ember Grounds on the lawn above.</p><button class="fat" id="do-hearth">BUILD EMBER GROUNDS</button>',
-        "short"
+      $("context").innerHTML = "<b>BUILD EMBER GROUNDS</b> · or tap BUILD";
+      hideMapCard();
+      return;
+    }
+    if (c.denizen) {
+      var d = T.denizen(s, c.denizen);
+      var r = T.ratesFor(s, d);
+      showMapCard(
+        "<b>" +
+          def.name.toUpperCase() +
+          "</b><small>" +
+          d.kind +
+          " · " +
+          fmtRate(r.tally) +
+          " tally/s</small>"
       );
-      $("do-hearth").onclick = function () {
-        buildEmberNow(s);
-      };
+      return;
+    }
+    if (c.room === "lobby") {
+      var waitN = T.waiting(s).length;
+      showMapCard("<b>GATEHOUSE</b><small>" + waitN + " waiting at the ring</small>");
       return;
     }
     var html = '<div class="sheet-h">' + def.name.toUpperCase() + " <small>lv " + c.level + "</small></div>";
@@ -876,8 +940,10 @@
       toast.hidden = false;
       toast.textContent = s.toast.text;
     } else toast.hidden = true;
-    if (s.recap && !sheetOpen()) openRecap(s);
-    else if (s.pendingEvent && !sheetOpen()) openEvent(s);
+    var demo = T.parseQS().demo;
+    var hushSheet = demo === "mid" || demo === "late";
+    if (s.recap && !sheetOpen() && !hushSheet) openRecap(s);
+    else if (s.pendingEvent && !sheetOpen() && !hushSheet) openEvent(s);
   }
 
   function loop(prev) {
@@ -927,6 +993,24 @@
         renderChrome(s);
         return;
       }
+      if (s.onboard === 1 && w[0].kind === "Wicknoll") {
+        var hearth = null;
+        Object.keys(s.cells).forEach(function (k) {
+          if (s.cells[k].room === "hearth" && !s.cells[k].denizen) hearth = s.cells[k];
+        });
+        if (hearth) {
+          var seated = T.place(s, w[0].id, hearth.x, hearth.y);
+          if (seated === "ok") {
+            W.enter(w[0].id);
+            selected = { x: hearth.x, y: hearth.y };
+            hideSheet();
+            markDirty();
+            renderChrome(s);
+            renderHouse(s);
+            return;
+          }
+        }
+      }
       mode = "assign";
       assignId = w[0].id;
       openAssignHint(s, w[0]);
@@ -966,7 +1050,7 @@
     });
     var wrap = $("house-wrap");
     function isZoomCtl(el) {
-      return !!(el && el.closest && el.closest("#zoom-dock"));
+      return !!(el && el.closest && (el.closest("#zoom-dock") || el.closest("#float-dock")));
     }
     function pointerList() {
       return Object.keys(pointers);
@@ -1120,15 +1204,21 @@
     W.sync(s, LOT);
     paintGuests(s);
     S.load(function () {
+      var demo = T.parseQS().demo;
+      if (demo === "mid" || demo === "late") {
+        camReady = false;
+        frameZoo();
+        camReady = true;
+      }
       markDirty();
       renderHouse(T.getState());
       paintGuests(T.getState());
     });
     if (s.onboard === 0) {
       selected = { x: 1, y: 0 };
-      var lobby = T.cell(s, 1, 0);
-      if (lobby) openInspect(s, lobby);
+      $("context").innerHTML = "<b>BUILD EMBER GROUNDS</b> · tap BUILD";
     }
+    if (T.parseQS().demo === "mid" || T.parseQS().demo === "late") hideSheet();
     lastSave = performance.now();
     requestAnimationFrame(loop(performance.now()));
     if ("serviceWorker" in navigator) {
