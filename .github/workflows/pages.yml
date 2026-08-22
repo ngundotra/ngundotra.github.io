@@ -1,0 +1,59 @@
+name: GitHub Pages
+
+# This user site is served from `master` / repository root.
+# After merge, index.html is the live homepage — no Next build.
+# Switch Settings → Pages → Source to "GitHub Actions" only if you
+# want this workflow to publish instead of the branch.
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Confirm static root
+        run: |
+          test -f index.html
+          test -f styles.css
+          test -f favicon.svg
+          test -d assets
+          file assets/* | grep -E "PNG image|JPEG image|SVG"
+          if grep -l "<html" assets/*; then
+            echo "an asset looks like an HTML error page"
+            exit 1
+          fi
+
+  deploy:
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/master'
+    needs: check
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Stage static root
+        run: |
+          mkdir -p _site
+          cp index.html styles.css favicon.svg .nojekyll _site/
+          cp -R assets _site/assets
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+      - id: deploy
+        uses: actions/deploy-pages@v4
