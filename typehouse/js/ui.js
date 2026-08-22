@@ -444,7 +444,7 @@
   function renderContext(s) {
     if (mode === "assign" && assignId) return;
     if (!selected) {
-      $("context").innerHTML = "<b>HABITAT GROUNDS</b> · drag to pan · pinch or +/− to zoom";
+      $("context").innerHTML = "<b>THE GROUNDS</b> · drag to pan · pinch or +/− to zoom";
       return;
     }
     var c = T.cell(s, selected.x, selected.y);
@@ -800,7 +800,7 @@
       ".</p>";
     if (s.flags.hint) html += '<p class="sheet-p">Hint: ' + s.flags.hint + "</p>";
     html +=
-      '<p class="sheet-p muted">Pinch, double-tap, or the +/− buttons to zoom. Long-press TYPEHOUSE to reset. Offline. No accounts. Fogged lots are BUY LAND, not BUILD.</p>';
+      '<p class="sheet-p muted">Pinch, double-tap, or the +/− buttons to zoom. Long-press THE GROUNDS to reset. Offline. No accounts. Fogged lots are BUY LAND, not BUILD.</p>';
     html += '<button class="fat" id="help-ok">BACK TO THE DESK</button>';
     showSheet(html);
     $("help-ok").onclick = hideSheet;

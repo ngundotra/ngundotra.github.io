@@ -1,7 +1,7 @@
 {
-  "name": "Typehouse",
-  "short_name": "Typehouse",
-  "description": "Clerk of Habitat Grounds.",
+  "name": "The Grounds",
+  "short_name": "The Grounds",
+  "description": "Clerk of The Grounds.",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",

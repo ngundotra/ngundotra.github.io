@@ -1,4 +1,4 @@
-# Typehouse — Habitat Grounds
+# The Grounds
 
 A phone-first idle park. You are the clerk of a bright little zoo. Guests are slightly-wrong house-spirits. They walk inside fenced habitats. Types are weather in the walls.
 
@@ -15,7 +15,7 @@ Zero build. Relative paths only.
 
 After merge, the phone URL is https://ngundotra.github.io/typehouse/
 
-Add to Home Screen: the folder ships a PWA manifest (`Typehouse`, theme `#6aaa48`) and apple-touch-icon.
+Add to Home Screen: the folder ships a PWA manifest (`The Grounds`, theme `#6aaa48`) and apple-touch-icon. The files still live under `typehouse/` so the phone URL stays the same.
 
 ## How to play
 
