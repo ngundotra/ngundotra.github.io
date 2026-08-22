@@ -1066,9 +1066,10 @@
     if (q.demo === "friction") {
       s.flags.sootDone = true;
       s.sootDue = false;
-      s.tally = Math.max(s.tally, 20);
-      s.scrap = Math.max(s.scrap, 4);
+      s.tally = Math.max(s.tally, 40);
+      s.scrap = Math.max(s.scrap, 8);
       if (!cell(s, 2, 1).room) build(s, 2, 1, "cistern");
+      if (!cell(s, 0, 1).room) build(s, 0, 1, "conservatory");
     }
     if (q.lots) {
       var lotsN = parseInt(q.lots, 10);

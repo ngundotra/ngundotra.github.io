@@ -8,9 +8,9 @@
   var last = 0;
   var frame = 0;
   var tmp = null;
-  var LOT = 128;
-  var GW = 40;
-  var GH = 40;
+  var LOT = 192;
+  var GW = 56;
+  var GH = 56;
 
   function rng() {
     seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0;
@@ -23,7 +23,7 @@
   }
 
   function walkPad(room) {
-    return T.isFenced(room) ? 24 : 12;
+    return T.isFenced(room) ? 36 : 16;
   }
 
   function clamp(v, a, b) {
@@ -320,8 +320,8 @@
   function scratch() {
     if (!tmp) {
       tmp = document.createElement("canvas");
-      tmp.width = 48;
-      tmp.height = 48;
+      tmp.width = 56;
+      tmp.height = 56;
     }
     return tmp;
   }

@@ -6,6 +6,8 @@ We do not ask what they are. We ask which grounds.
 
 This is original IP. Not a farm, not a battler, not Nintendo, not Pokémon, not 3D.
 
+Yards are authored PNGs in `typehouse/img/` (kiln, well, greenhouse, cottage, grass, trees, Wicknoll). The camera starts pulled back so kiln, cottage, and a neighbor habitat can share one phone frame.
+
 ## Run locally
 
 Zero build. Relative paths only.

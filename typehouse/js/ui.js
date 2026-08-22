@@ -14,10 +14,10 @@
   var dirty = true;
   var pressTimer = 0;
   var lastWallet = { tally: 12, scrap: 6, dust: 0 };
-  var LOT = 128;
-  var Z_MIN = 0.7;
-  var Z_MAX = 2.2;
-  var Z_DEFAULT = 1.7;
+  var LOT = 192;
+  var Z_MIN = 0.45;
+  var Z_MAX = 1.8;
+  var Z_DEFAULT = 0.68;
   var view = { minX: 0, minY: 0, maxX: 2, maxY: 1, w: 3, h: 2 };
   var cam = { x: 0, y: 0, z: Z_DEFAULT };
   var camReady = false;
@@ -107,6 +107,7 @@
     sh.className = "sheet open" + (cls ? " " + cls : "");
     $("sheet-body").innerHTML = html;
     $("dim").classList.add("on");
+    $("dim").classList.toggle("soft", cls === "short");
   }
 
   function hideSheet() {
@@ -114,6 +115,7 @@
     if (s && (s.pendingEvent || s.recap)) return;
     $("sheet").className = "sheet";
     $("dim").classList.remove("on");
+    $("dim").classList.remove("soft");
     mode = "none";
     assignId = null;
     renderDock();
@@ -168,7 +170,7 @@
     var wrap = $("house-wrap");
     if (!wrap) return;
     var box = wrap.getBoundingClientRect();
-    var next = cam.z >= 1.45 ? 1 : Z_DEFAULT;
+    var next = cam.z >= 1.0 ? Z_DEFAULT : 1.15;
     setZoom(next, ev.clientX - box.left, ev.clientY - box.top);
   }
 
@@ -204,7 +206,7 @@
     view = T.parkBounds(s);
     if (!camReady) {
       cam.z = Z_DEFAULT;
-      centerOn(1, 0.5);
+      centerOn(1, 0.55);
       camReady = true;
     } else {
       clampCam();
@@ -663,7 +665,7 @@
       selected = { x: lot.x, y: lot.y };
       view = T.parkBounds(s);
       includeLot(lot.x, lot.y);
-      centerOn(lot.x, lot.y);
+      centerOn(1, 0.55);
       markDirty();
       renderHouse(s);
       renderChrome(s);
@@ -681,7 +683,8 @@
     var def = D.ROOMS[c.room];
     if (c.room === "lobby" && s.onboard === 0) {
       showSheet(
-        '<div class="sheet-h">GATEHOUSE</div><p class="sheet-p">The desk is open. First job: Ember Grounds on the lawn above this cottage.</p><button class="fat" id="do-hearth">BUILD EMBER GROUNDS</button><button class="fat ghost" disabled>SEAT</button>'
+        '<div class="sheet-h">GATEHOUSE</div><p class="sheet-p">Ember Grounds on the lawn above.</p><button class="fat" id="do-hearth">BUILD EMBER GROUNDS</button>',
+        "short"
       );
       $("do-hearth").onclick = function () {
         buildEmberNow(s);
@@ -815,6 +818,7 @@
       T.dismissRecap();
       $("sheet").className = "sheet";
       $("dim").classList.remove("on");
+      $("dim").classList.remove("soft");
       markDirty();
       renderChrome(s);
     };
@@ -1098,6 +1102,11 @@
     renderHouse(s);
     W.sync(s, LOT);
     paintGuests(s);
+    S.load(function () {
+      markDirty();
+      renderHouse(T.getState());
+      paintGuests(T.getState());
+    });
     if (s.onboard === 0) {
       selected = { x: 1, y: 0 };
       var lobby = T.cell(s, 1, 0);
