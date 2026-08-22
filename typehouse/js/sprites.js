@@ -468,17 +468,17 @@
     ctx.save();
     ctx.lineCap = "round";
     ctx.lineJoin = "round";
-    ctx.strokeStyle = "#5a3a18";
-    ctx.lineWidth = 26;
+    ctx.strokeStyle = "#c47832";
+    ctx.lineWidth = 34;
     ctx.beginPath();
     ctx.moveTo(x1, y1);
     ctx.lineTo(x2, y2);
     ctx.stroke();
-    ctx.strokeStyle = "#b07a38";
-    ctx.lineWidth = 20;
+    ctx.strokeStyle = "#f0b44a";
+    ctx.lineWidth = 26;
     ctx.stroke();
-    ctx.strokeStyle = "#d4a05a";
-    ctx.lineWidth = 12;
+    ctx.strokeStyle = "#f6c878";
+    ctx.lineWidth = 14;
     ctx.stroke();
     ctx.restore();
   }
@@ -631,28 +631,37 @@
     ctx.restore();
   }
 
+  function roomAt(owned, x, y) {
+    var c = owned[x + "," + y];
+    return c && c.room && c.room !== "lobby" ? c : null;
+  }
+
   function paintParkLamps(ctx, lot, bounds, owned) {
     var spots = [
       lotPt(1, 0, bounds, lot, 0.62, 0.78),
       lotPt(1, 0, bounds, lot, 0.38, 0.34),
     ];
-    if (hasLot(owned, 1, 1)) spots.push(lotPt(1, 1, bounds, lot, 0.64, 0.86));
-    if (hasLot(owned, 0, 1)) spots.push(lotPt(0, 1, bounds, lot, 0.5, 0.86));
-    if (hasLot(owned, 2, 1)) spots.push(lotPt(2, 1, bounds, lot, 0.5, 0.86));
-    if (hasLot(owned, 1, 2)) spots.push(lotPt(1, 2, bounds, lot, 0.64, 0.86));
+    if (roomAt(owned, 1, 1)) spots.push(lotPt(1, 1, bounds, lot, 0.64, 0.86));
+    if (roomAt(owned, 0, 1)) spots.push(lotPt(0, 1, bounds, lot, 0.5, 0.86));
+    if (roomAt(owned, 2, 1)) spots.push(lotPt(2, 1, bounds, lot, 0.5, 0.86));
+    if (roomAt(owned, 1, 2)) spots.push(lotPt(1, 2, bounds, lot, 0.64, 0.86));
     spots.forEach(function (p) {
       paintLampPost(ctx, p.x, p.y);
     });
   }
 
   /* After dest-out: one dirt figure from the gate mouth to each pen south bridge.
-     South lips + a side bypass — never recross a punched yard. */
+     South lips + a side bypass — never recross a punched yard.
+     Boot (no pens yet) keeps only the gate mouth so we do not paint a T on empty lawn. */
   function paintForcedApproaches(ctx, lot, bounds, owned) {
     var mouth = lotPt(1, 0, bounds, lot, 0.5, 0.96);
     var gateN = lotPt(1, 0, bounds, lot, 0.5, 0.16);
-    var emberLip = lotPt(1, 1, bounds, lot, 0.5, 0.86);
+    var ember = owned["1,1"];
     paintVisitorPath(ctx, mouth.x, mouth.y, gateN.x, gateN.y);
-    paintVisitorPath(ctx, gateN.x, gateN.y, emberLip.x, emberLip.y);
+    if (ember && ember.room && ember.room !== "lobby") {
+      var emberLip = lotPt(1, 1, bounds, lot, 0.5, 0.86);
+      paintVisitorPath(ctx, gateN.x, gateN.y, emberLip.x, emberLip.y);
+    }
 
     var rows = {};
     Object.keys(owned).forEach(function (k) {
@@ -697,27 +706,34 @@
   /* One packed-earth figure: gate mouth → north bridges. Lamps sit on the dirt. */
   function paintDirtSpine(ctx, lot, bounds, owned) {
     var mouth = lotPt(1, 0, bounds, lot, 0.5, 0.92);
-    var fork = lotPt(1, 1, bounds, lot, 0.5, 0.8);
-    var west = lotPt(0, 1, bounds, lot, 0.5, 0.8);
-    var east = lotPt(2, 1, bounds, lot, 0.5, 0.8);
     var gateMid = lotPt(1, 0, bounds, lot, 0.5, 0.42);
+    var gateN = lotPt(1, 0, bounds, lot, 0.5, 0.16);
     paintVisitorPath(ctx, mouth.x, mouth.y, gateMid.x, gateMid.y);
-    paintVisitorPath(ctx, gateMid.x, gateMid.y, fork.x, fork.y);
-    if (hasLot(owned, 0, 1) || hasLot(owned, 2, 1)) {
+    paintVisitorPath(ctx, gateMid.x, gateMid.y, gateN.x, gateN.y);
+    var ember = owned["1,1"];
+    if (ember && ember.room && ember.room !== "lobby") {
+      var fork = lotPt(1, 1, bounds, lot, 0.5, 0.86);
+      paintVisitorPath(ctx, gateN.x, gateN.y, fork.x, fork.y);
+    }
+    var westR = owned["0,1"];
+    var eastR = owned["2,1"];
+    if ((westR && westR.room) || (eastR && eastR.room)) {
+      var west = lotPt(0, 1, bounds, lot, 0.5, 0.86);
+      var east = lotPt(2, 1, bounds, lot, 0.5, 0.86);
       paintVisitorPath(ctx, west.x, west.y, east.x, east.y);
     }
     Object.keys(owned).forEach(function (k) {
       var c = owned[k];
       if (!c || !c.room || c.room === "lobby") return;
-      var bridge = lotPt(c.x, c.y, bounds, lot, 0.5, 0.8);
+      var bridge = lotPt(c.x, c.y, bounds, lot, 0.5, 0.84);
       var south = owned[c.x + "," + (c.y - 1)];
       var eastC = owned[c.x + 1 + "," + c.y];
-      if (south) {
-        var so = lotPt(south.x, south.y, bounds, lot, 0.5, south.room === "lobby" ? 0.28 : 0.8);
+      if (south && south.room) {
+        var so = lotPt(south.x, south.y, bounds, lot, 0.5, south.room === "lobby" ? 0.16 : 0.86);
         paintVisitorPath(ctx, bridge.x, bridge.y, so.x, so.y);
       }
       if (eastC && eastC.room) {
-        var eo = lotPt(eastC.x, eastC.y, bounds, lot, 0.5, 0.8);
+        var eo = lotPt(eastC.x, eastC.y, bounds, lot, 0.5, 0.86);
         paintVisitorPath(ctx, bridge.x, bridge.y, eo.x, eo.y);
       }
     });

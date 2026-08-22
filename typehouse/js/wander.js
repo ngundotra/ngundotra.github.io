@@ -186,8 +186,8 @@
     a.hold = 0;
   }
 
-  function startInteract(a) {
-    var p = propPoint();
+  function startInteract(a, room) {
+    var p = T.isFenced(room) ? walkTarget(room) : propPoint();
     a.state = "walk";
     a.tx = p.x;
     a.ty = p.y;
@@ -195,8 +195,8 @@
     a.after = "interact";
   }
 
-  function startSit(a) {
-    var p = rugPoint();
+  function startSit(a, room) {
+    var p = T.isFenced(room) ? walkTarget(room) : rugPoint();
     a.state = "walk";
     a.tx = p.x;
     a.ty = p.y;
@@ -263,11 +263,11 @@
     var c = T.cell(s, d.x, d.y);
     var home = c && T.yieldMult(s, d, c).home;
     if (d.stage >= 1 && home && rng() < 0.1) {
-      startSit(a);
+      startSit(a, room);
       return;
     }
     if (rng() < 0.12) {
-      startInteract(a);
+      startInteract(a, room);
       return;
     }
     startWalk(a, room);
