@@ -112,7 +112,8 @@
 
   function hideSheet() {
     var s = T.getState();
-    if (s && (s.pendingEvent || s.recap)) return;
+    var demo = T.parseQS().demo;
+    if (s && (s.pendingEvent || s.recap) && demo !== "mid" && demo !== "late") return;
     $("sheet").className = "sheet";
     $("dim").classList.remove("on");
     $("dim").classList.remove("soft");
@@ -161,8 +162,12 @@
     var pad = 20;
     var zFit = Math.min(ww / (owned.w * LOT + pad), wh / (owned.h * LOT + pad));
     var demo = T.parseQS().demo;
-    if (demo === "mid") zFit *= 0.92;
-    if (demo === "late") zFit *= 0.96;
+    if (demo === "mid") zFit *= 0.84;
+    if (demo === "late") {
+      var park = s && T.parkBounds ? T.parkBounds(s) : owned;
+      zFit = Math.min(ww / (park.w * LOT + 8), wh / (park.h * LOT + 16));
+      zFit *= 0.88;
+    }
     if (!demo) zFit = Math.min(zFit, ww / (3 * LOT + 8));
     cam.z = Math.max(Z_MIN, Math.min(Z_MAX, zFit));
     var z = cam.z;
@@ -935,8 +940,10 @@
       toast.hidden = false;
       toast.textContent = s.toast.text;
     } else toast.hidden = true;
-    if (s.recap && !sheetOpen()) openRecap(s);
-    else if (s.pendingEvent && !sheetOpen()) openEvent(s);
+    var demo = T.parseQS().demo;
+    var hushSheet = demo === "mid" || demo === "late";
+    if (s.recap && !sheetOpen() && !hushSheet) openRecap(s);
+    else if (s.pendingEvent && !sheetOpen() && !hushSheet) openEvent(s);
   }
 
   function loop(prev) {
@@ -1197,6 +1204,12 @@
     W.sync(s, LOT);
     paintGuests(s);
     S.load(function () {
+      var demo = T.parseQS().demo;
+      if (demo === "mid" || demo === "late") {
+        camReady = false;
+        frameZoo();
+        camReady = true;
+      }
       markDirty();
       renderHouse(T.getState());
       paintGuests(T.getState());
@@ -1205,6 +1218,7 @@
       selected = { x: 1, y: 0 };
       $("context").innerHTML = "<b>BUILD EMBER GROUNDS</b> · tap BUILD";
     }
+    if (T.parseQS().demo === "mid" || T.parseQS().demo === "late") hideSheet();
     lastSave = performance.now();
     requestAnimationFrame(loop(performance.now()));
     if ("serviceWorker" in navigator) {

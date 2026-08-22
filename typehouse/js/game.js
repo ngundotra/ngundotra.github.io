@@ -1067,7 +1067,7 @@
     ensureLot(s, x, y);
     var c = cell(s, x, y);
     if (!c) return;
-    if (!c.room) c.room = kind;
+    c.room = kind;
   }
 
   function seedGuest(s, kind, x, y, stage) {
@@ -1084,7 +1084,16 @@
     }
     var d = denizen(s, kind);
     if (stage != null && d.stage < stage) d.stage = stage;
-    if (x != null && d.x == null) place(s, kind, x, y, true);
+    if (x != null) place(s, kind, x, y, true);
+  }
+
+  function quietDemo(s) {
+    var q = parseQS();
+    if (q.demo !== "mid" && q.demo !== "late" && q.demo !== "friction" && q.demo !== "seated") return;
+    s.recap = null;
+    s.pendingEvent = null;
+    s.nextArrival = s.openSec + 100000;
+    s.nextEvent = s.openSec + 100000;
   }
 
   function seedMid(s) {
@@ -1111,10 +1120,8 @@
     seedGuest(s, "Puddlewick", 2, 1, 1);
     seedGuest(s, "Ledgerfrond", 0, 1, 2);
     seedGuest(s, "Zitterplug", 1, 2, 1);
-    s.nextArrival = s.openSec + 100000;
-    s.nextEvent = s.openSec + 100000;
-    s.pendingEvent = null;
-    s.recap = null;
+    seedGuest(s, "Napwisp", 0, 2, 1);
+    quietDemo(s);
     blot(s, "A mid-morning zoo. Pens on the dirt.");
   }
 
@@ -1160,8 +1167,8 @@
     seedRoom(s, 2, 2, "scullery");
     seedRoom(s, 3, 2, "vitrine");
     seedRoom(s, 0, 2, "transom");
-    seedRoom(s, 2, 0, "larder");
-    seedRoom(s, 3, 0, "transom");
+    seedRoom(s, 2, 0, "cistern");
+    seedRoom(s, 3, 0, "conservatory");
     seedGuest(s, "Wicknoll", 1, 1, 2);
     seedGuest(s, "Puddlewick", 2, 1, 2);
     seedGuest(s, "Ledgerfrond", 0, 1, 2);
@@ -1170,30 +1177,15 @@
     seedGuest(s, "Flakesmith", 2, 2, 1);
     seedGuest(s, "Specktin", 3, 2, 1);
     seedGuest(s, "Fluekin", 0, 2, 1);
-    s.nextArrival = s.openSec + 100000;
-    s.nextEvent = s.openSec + 100000;
-    s.pendingEvent = null;
-    s.recap = null;
+    seedGuest(s, "Jarfox", 2, 0, 1);
+    seedGuest(s, "Roofself", 3, 0, 1);
+    quietDemo(s);
     blot(s, "The grounds filled in. Lamps on the dirt.");
   }
 
   function applyDebug(s) {
     var q = parseQS();
-    if (q.debug || q.rich) {
-      s.tally = Math.max(s.tally, 240);
-      s.scrap = Math.max(s.scrap, 60);
-      s.dust = Math.max(s.dust, 6);
-      s.debugFast = true;
-      s.nextArrival = s.openSec + 8;
-    }
-    if (q.catchup) {
-      var n = parseInt(q.catchup, 10);
-      if (n > 0) applyAway(s, n * 1000);
-    }
-    if (q.evt || q.event) {
-      var ev = eventById(q.evt || q.event);
-      if (ev) queueEvent(s, ev);
-    }
+    var zooDemo = q.demo === "mid" || q.demo === "late";
     if (q.demo === "seated" || q.demo === "friction") {
       if (!cell(s, 1, 1).room) {
         s.tally = Math.max(s.tally, 8);
@@ -1219,7 +1211,7 @@
     }
     if (q.demo === "mid") seedMid(s);
     if (q.demo === "late") seedLate(s);
-    if (q.lots) {
+    if (q.lots && !zooDemo) {
       var lotsN = parseInt(q.lots, 10);
       if (lotsN > 0) {
         for (var li = 0; li < lotsN; li++) {
@@ -1231,6 +1223,22 @@
         }
       }
     }
+    if ((q.debug || q.rich) && !zooDemo) {
+      s.tally = Math.max(s.tally, 240);
+      s.scrap = Math.max(s.scrap, 60);
+      s.dust = Math.max(s.dust, 6);
+      s.debugFast = true;
+      s.nextArrival = s.openSec + 8;
+    }
+    if (q.catchup && !zooDemo) {
+      var n = parseInt(q.catchup, 10);
+      if (n > 0) applyAway(s, n * 1000);
+    }
+    if ((q.evt || q.event) && !zooDemo) {
+      var ev = eventById(q.evt || q.event);
+      if (ev) queueEvent(s, ev);
+    }
+    quietDemo(s);
   }
 
   function boot() {
@@ -1248,6 +1256,7 @@
       state = fresh();
     }
     applyDebug(state);
+    quietDemo(state);
     save(state);
     return state;
   }
@@ -1412,7 +1421,7 @@
     if (roomCount(mid) < 4 || roomCount(mid) > 5) fail("mid habitats " + roomCount(mid));
     else pass("mid habitats " + roomCount(mid));
     var seatedMid = mid.denizens.filter(function (d) { return d.x != null; }).length;
-    if (seatedMid < 3) fail("mid seated " + seatedMid);
+    if (seatedMid < 4) fail("mid seated " + seatedMid);
     else pass("mid seated " + seatedMid);
     var late = fresh();
     seedLate(late);
@@ -1421,7 +1430,7 @@
     if (roomCount(late) < 8 || roomCount(late) > 10) fail("late habitats " + roomCount(late));
     else pass("late habitats " + roomCount(late));
     var seatedLate = late.denizens.filter(function (d) { return d.x != null; }).length;
-    if (seatedLate < 6) fail("late seated " + seatedLate);
+    if (seatedLate < 8) fail("late seated " + seatedLate);
     else pass("late seated " + seatedLate);
     state = s;
     return report;

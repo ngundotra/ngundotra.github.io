@@ -290,6 +290,10 @@
     cistern: "well",
     conservatory: "greenhouse",
     lobby: "cottage",
+    dynamo: "kiln",
+    dormer: "greenhouse",
+    scullery: "kiln",
+    vitrine: "well",
   };
 
   var NAMES = [

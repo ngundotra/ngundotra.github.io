@@ -38,8 +38,8 @@ Away time keeps the park alive (capped at 8 hours, taxed 0.85). Come back after 
 - `?catchup=120` — apply 120 seconds of away catch-up
 - `?evt=evt_soot_handshake` — fire a named event
 - `?demo=seated` / `?demo=friction` — seed Ember Grounds+Wicknoll, or Tide Basin + Moss Plot beside it
-- `?demo=mid` — ~8 lots, 5 habitats, several seated denizens, mid wallet, camera pulled back
-- `?demo=late` — 16 lots, 8–10 habitats, many walkers, high wallet
+- `?demo=mid` — 8 lots, 5 occupied habitats, mid wallet, camera pulled back. No Night Desk.
+- `?demo=late` — 16 lots, 10 built habitats (ember / tide / moss / spark / hush / rust / gleam / draft), 10 seated denizens, camera zoomed out. No Night Desk. `lots=` only grants empty tiles — use `demo=late` to actually build.
 - `?meet=1` — force the next fence-meet
 - `?lots=3` — grant 3 legal fog lots free
 
